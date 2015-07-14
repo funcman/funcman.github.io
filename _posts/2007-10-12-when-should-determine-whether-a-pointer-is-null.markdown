@@ -2,7 +2,7 @@
 layout: post
 title:  "应该在何时判断一个指针是否为NULL"
 date:   2007-10-12 11:20:00
-categories: c/c++
+categories: programming 
 ---
 今天看到一篇Blog：[《NULL指标两三事》][link]，文中谈的主题即是我这篇Blog的题目，我这里也只是对原文的做些简单的记录。
 
@@ -16,3 +16,4 @@ categories: c/c++
 以后再操作指针时，要记得有这么回事~
 
 [link]: http://fsfoundry.org/codefreak/2007/09/16/a-couple-of-things-about-pointer-to-null/
+
