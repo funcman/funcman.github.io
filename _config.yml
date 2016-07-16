@@ -2,8 +2,7 @@
 title: funcman's blog
 email: hyq1986@gmail.com
 description: > # this means to ignore newlines until "baseurl:"
-  一个游戏程序员，但是现在正在做iOS应用。<br/>
-  欢迎使用<a href='https://itunes.apple.com/app/id938688461'>小米运动</a>和<a href='https://itunes.apple.com/app/id1034182617'>米动</a>！
+  一个游戏程序员，现在正在找工作。曾经参与开发过<a href='http://www.sogou.com/web?query=%E4%BB%99%E4%BE%A3%E5%A5%87%E7%BC%983'>仙侣奇缘3</a>、<a href='http://sh.70yx.com'>水浒传</a>、<a href='https://itunes.apple.com/app/id938688461'>小米运动</a>和<a href='https://itunes.apple.com/app/id1034182617'>米动</a>。
 baseurl: "" # the subpath of your site, e.g. /blog/
 url: "http://funcman.github.io" # the base hostname & protocol for your site
 twitter_username: funcman
