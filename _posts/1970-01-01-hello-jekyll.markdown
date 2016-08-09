@@ -7,6 +7,8 @@ categories: jekyll
 你好，世界！
 
 {% highlight c %}
+#include <stdio.h>
+
 int main() {
     printf("Hello world!\n");
     return 0;
