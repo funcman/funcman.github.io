@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="zh_cn">
+<head>
+        <meta charset="utf-8" />
+        <meta name="generator" content="Pelican" />
+        <title>funcman's blog - 编程环境</title>
+        <link rel="stylesheet" href="/theme/css/main.css" />
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="/">funcman's blog</a></h1>
+                <nav><ul>
+                    <li><a href="/category/gamedev.html">gamedev</a></li>
+                    <li><a href="/category/mathematics.html">mathematics</a></li>
+                    <li><a href="/category/others.html">others</a></li>
+                    <li><a href="/category/programming.html">programming</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+
+            <aside id="featured" class="body">
+                <article>
+                    <h1 class="entry-title"><a href="/another_way_to_use_jekyll_on_windows_10.html">另一种在Windows10下使用Jekyll的方法</a></h1>
+<footer class="post-info">
+        <abbr class="published" title="2019-03-31T08:37:45+08:00">
+                Published: 周日 31 三月 2019
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/funcman.html">funcman</a>
+        </address>
+<p>In <a href="/category/others.html">others</a>.</p>
+<p>tags: <a href="/tag/jekyll.html">jekyll</a> <a href="/tag/ruby.html">Ruby</a> <a href="/tag/bian-cheng-huan-jing.html">编程环境</a> </p>
+</footer><!-- /.post-info --><p>最近准备继续记博客，需要安装Jekyll环境。</p>
+<p>手头既有Mac也有PC，考虑到上班期间带的是PC，所以还是要在Windows下配置一个Jekyll环境。</p>
+<p>按照Jekyll官网的方法，是去安装RubyInstaller。但是，RubyInstaller本身是基于MSYS2的，我的PC已经装了MSYS2，不想再多搞一套，于是决定基于MSYS2安装Ruby和Jekyll。</p>
+<p>MSYS2类似Cygwin（其实就是一个Cygwin分支），可以让用户在Windows下使用UNIX环境的套件。这里先介绍一下相关概念：</p>
+<ul>
+<li>
+<p>Pacman是一套流行于Arch Linux下的软件包管理软件。</p>
+</li>
+<li>
+<p>MinGW是一套在Windows使用的GNU工具链，MinGW-w64是新一代MinGW，同时支持32位和64位。</p>
+</li>
+<li>
+<p>MSYS是为帮助MinGW在Windows下使用，随MinGW提供的一套基本的POSIX操作环境。它是基于较旧的Cygwin项目创建的一个分支。MSYS2和MSYS并不是同一个项目的不同版本，它们各为独立项目。</p>
+</li>
+</ul>
+<p>MSYS2集成了Pacman和MinGW-w64。</p>
+<p>我们在中国使用MSYS2，最好设置一下国内的镜像，网上的文章基本都是让用<a href="https://lug.ustc.edu.cn/wiki/mirrors/help/msys2">中科大的镜像</a>，但目前他们的东西有点问题，只好改用<a href="https://mirrors.tuna.tsinghua.edu.cn/help/msys2">清华的镜像</a>。可惜了，实际上中科大离我很近。</p>
+<p>按照页面上的说明设置好镜像，并执行：</p>
+<div class="highlight"><pre><span></span><code>pacman -Syu
+</code></pre></div>
+
+<p>在最后提示关闭MSYS2时，点窗口的X进行关闭，再去MSYS2安装目录里运行一下autorebase.bat。然后打开MSYS2，执行一下更新：</p>
+<div class="highlight"><pre><span></span><code>pacman -Su
+</code></pre></div>
+
+<p>之后就安装一系列软件，我这里是：</p>
+<div class="highlight"><pre><span></span><code><span class="n">pacman</span> <span class="o">-</span><span class="n">S</span> <span class="n">vim</span> <span class="n">git</span> <span class="n">base</span><span class="o">-</span><span class="n">devel</span> <span class="n">mingw</span><span class="o">-</span><span class="n">w64</span><span class="o">-</span><span class="n">x86_64</span><span class="o">-</span><span class="n">toolchain</span> <span class="n">mingw</span><span class="o">-</span><span class="n">w64</span><span class="o">-</span><span class="n">x86_64</span><span class="o">-</span><span class="n">ruby</span> <span class="n">mingw</span><span class="o">-</span><span class="n">w64</span><span class="o">-</span><span class="n">x86_64</span><span class="o">-</span><span class="n">ruby</span><span class="o">-</span><span class="n">native</span><span class="o">-</span><span class="n">package</span><span class="o">-</span><span class="n">installer</span>
+</code></pre></div>
+
+<p>之所以是使用mingw64/mingw-w64-x86_64-ruby，而不是msys/ruby，是因为我先用它试了一番，在Gem安装Jekyll时总是有个库编不过去。我没有深究下去，先这么着吧，以后有空再找找解决方法。</p>
+<p>安装了这个版本的Ruby之后，需要将<a href="https://github.com/msys2/msys2/wiki/MSYS2-introduction#subsystems">shell type</a>设为mingw64进入MSYS2环境，也就是从“MSYS2 MinGW 64-bit”而不是“MSYS2 MSYS”进。前者会把/mingw64/bin加入到PATH里，而此版本Ruby安装在/mingw64/bin中。</p>
+<p>然后，我用Gem安装Bundler和Jekyll：</p>
+<div class="highlight"><pre><span></span><code>gem install bundler jekyll
+</code></pre></div>
+
+<p>我已经有个很久没写过的旧博客，需要升级一下，所以进入博客的目录，执行了一下：</p>
+<div class="highlight"><pre><span></span><code>bundle update
+</code></pre></div>
+
+<p>据说升级Gem是一件很折腾人的事情，Ruby程序员往往一次升级单个Gem，一次性bundle update，容易出问题。我也是反复在bundle install和bundle update之间折腾，才搞定了这件事。具体可以查一下<a href="https://bing.com/search?q=bundle%20install%20bundle%20update%20%E5%8C%BA%E5%88%AB">bundle install和bundle update之间的区别</a>。</p>
+<p>升级完成之后，就可以继续<a href="https://jekyllrb.com/docs/step-by-step/01-setup">用Jekyll写博客</a>了。</p>
+<p>PS：</p>
+<p>我为了复习怎么用Jekyll，粗略的看了一下<a href="https://jekyllrb.com/docs/step-by-step/01-setup">Jekyll Step by Step Tutorial</a>。它在第一步里讲使用jekyll serve来运行Jekyll，这和我们平常使用bundle exec jekyll serve的方式有点不一样。实际上在第十步里有解释<a href="https://jekyllrb.com/docs/step-by-step/10-deployment/#gemfile">怎么一回事</a>。我也不是很熟悉Ruby，使用Jekyll的很多人估计也是这样。反正Bundler大概是一个处理相同Gem的不同版本被同时引用的工具，我们记得用它就行了。</p>
+<p>另外，这一篇虽然标题是Windows10，并不是说不适用于之前的Windows版本，我只是没有试过。</p>                </article>
+            </aside><!-- /#featured -->
+        <section id="extras" class="body">
+                <div class="blogroll">
+                        <h2>links</h2>
+                        <ul>
+                            <li><a href="https://funcman.me/">我的博客</a></li>
+                        </ul>
+                </div><!-- /.blogroll -->
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+
+                            <li><a href="mailto:hyq1986@gmail.com">E-Mail</a></li>
+                            <li><a href="https://twitter.com/funcman">Twitter</a></li>
+                            <li><a href="https://github.com/funcman">Github</a></li>
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="https://getpelican.com/">Pelican</a>, which takes great advantage of <a href="https://www.python.org/">Python</a>.
+                </address><!-- /#about -->
+
+                <p>The theme is by <a href="https://www.smashingmagazine.com/2009/08/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+        </footer><!-- /#contentinfo -->
+
+</body>
+</html>

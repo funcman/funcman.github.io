@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="zh_cn">
+<head>
+        <meta charset="utf-8" />
+        <meta name="generator" content="Pelican" />
+        <title>funcman's blog - C语言</title>
+        <link rel="stylesheet" href="/theme/css/main.css" />
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="/">funcman's blog</a></h1>
+                <nav><ul>
+                    <li><a href="/category/gamedev.html">gamedev</a></li>
+                    <li><a href="/category/mathematics.html">mathematics</a></li>
+                    <li><a href="/category/others.html">others</a></li>
+                    <li><a href="/category/programming.html">programming</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+
+            <aside id="featured" class="body">
+                <article>
+                    <h1 class="entry-title"><a href="/data_hiding_in_c.html">C语言对数据的隐藏封装</a></h1>
+<footer class="post-info">
+        <abbr class="published" title="2010-05-16T19:48:00+08:00">
+                Published: 周日 16 五月 2010
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/funcman.html">funcman</a>
+        </address>
+<p>In <a href="/category/programming.html">programming</a>.</p>
+<p>tags: <a href="/tag/cyu-yan.html">C语言</a> <a href="/tag/jie-kou.html">接口</a> <a href="/tag/feng-zhuang.html">封装</a> </p>
+</footer><!-- /.post-info --><p>在C++中，如果我们想把数据结构隐藏起来，只为用户提供接口，可以通过实现继承接口类的方式到达目的。那C中，可以采用什么方式呢。下面有一例：</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// demo.h</span>
+
+<span class="cp">#ifndef DEMO_H</span>
+<span class="cp">#define DEMO_H</span>
+
+<span class="k">typedef</span> <span class="k">struct</span> <span class="nc">Demo</span><span class="o">*</span> <span class="n">Demo</span><span class="p">;</span>
+
+<span class="k">extern</span> <span class="n">Demo</span> <span class="nf">DemoCreate</span><span class="p">(</span><span class="kt">int</span> <span class="n">num</span><span class="p">);</span>
+<span class="k">extern</span> <span class="kt">void</span> <span class="nf">DemoDestory</span><span class="p">(</span><span class="n">Demo</span> <span class="n">demo</span><span class="p">);</span>
+<span class="k">extern</span> <span class="kt">void</span> <span class="nf">DemoShow</span><span class="p">(</span><span class="n">Demo</span> <span class="n">demo</span><span class="p">);</span>
+
+<span class="cp">#endif</span><span class="c1">//DEMO_H</span>
+</code></pre></div>
+
+<div class="highlight"><pre><span></span><code><span class="c1">// demo.c</span>
+
+<span class="cp">#include</span> <span class="cpf">&quot;demo.h&quot;</span><span class="cp"></span>
+<span class="cp">#include</span> <span class="cpf">&lt;stdio.h&gt;</span><span class="cp"></span>
+<span class="cp">#include</span> <span class="cpf">&lt;stdlib.h&gt;</span><span class="cp"></span>
+
+<span class="k">typedef</span> <span class="k">struct</span> <span class="nc">Demo_</span> <span class="p">{</span>
+    <span class="kt">int</span> <span class="n">num_</span><span class="p">;</span>
+<span class="p">}</span> <span class="n">Demo_</span><span class="p">;</span>
+
+<span class="n">Demo</span> <span class="nf">DemoCreate</span><span class="p">(</span><span class="kt">int</span> <span class="n">num</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">Demo_</span><span class="o">*</span> <span class="n">demo</span> <span class="o">=</span> <span class="p">(</span><span class="n">Demo_</span><span class="o">*</span><span class="p">)</span><span class="n">malloc</span><span class="p">(</span><span class="k">sizeof</span><span class="p">(</span><span class="n">Demo_</span><span class="p">));</span>
+    <span class="n">demo</span><span class="o">-&gt;</span><span class="n">num_</span> <span class="o">=</span> <span class="n">num</span><span class="p">;</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">Demo</span><span class="p">)</span><span class="n">demo</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="kt">void</span> <span class="nf">DemoDestory</span><span class="p">(</span><span class="n">Demo</span> <span class="n">demo</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">free</span><span class="p">(</span><span class="n">demo</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="kt">void</span> <span class="nf">DemoShow</span><span class="p">(</span><span class="n">Demo</span> <span class="n">demo</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;%d</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="p">((</span><span class="n">Demo_</span><span class="o">*</span><span class="p">)</span><span class="n">demo</span><span class="p">)</span><span class="o">-&gt;</span><span class="n">num_</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<div class="highlight"><pre><span></span><code><span class="c1">// main.c</span>
+
+<span class="cp">#include</span> <span class="cpf">&quot;demo.h&quot;</span><span class="cp"></span>
+
+<span class="kt">int</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+    <span class="n">Demo</span> <span class="n">demo</span> <span class="o">=</span> <span class="n">DemoCreate</span><span class="p">(</span><span class="mi">777</span><span class="p">);</span>
+    <span class="n">DemoShow</span><span class="p">(</span><span class="n">demo</span><span class="p">);</span>
+    <span class="n">DemoDestory</span><span class="p">(</span><span class="n">demo</span><span class="p">);</span>
+    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div>                </article>
+            </aside><!-- /#featured -->
+        <section id="extras" class="body">
+                <div class="blogroll">
+                        <h2>links</h2>
+                        <ul>
+                            <li><a href="https://funcman.me/">我的博客</a></li>
+                        </ul>
+                </div><!-- /.blogroll -->
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+
+                            <li><a href="mailto:hyq1986@gmail.com">E-Mail</a></li>
+                            <li><a href="https://twitter.com/funcman">Twitter</a></li>
+                            <li><a href="https://github.com/funcman">Github</a></li>
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="https://getpelican.com/">Pelican</a>, which takes great advantage of <a href="https://www.python.org/">Python</a>.
+                </address><!-- /#about -->
+
+                <p>The theme is by <a href="https://www.smashingmagazine.com/2009/08/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+        </footer><!-- /#contentinfo -->
+
+</body>
+</html>

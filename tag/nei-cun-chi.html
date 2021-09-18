@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="zh_cn">
+<head>
+        <meta charset="utf-8" />
+        <meta name="generator" content="Pelican" />
+        <title>funcman's blog - 内存池</title>
+        <link rel="stylesheet" href="/theme/css/main.css" />
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="/">funcman's blog</a></h1>
+                <nav><ul>
+                    <li><a href="/category/gamedev.html">gamedev</a></li>
+                    <li><a href="/category/mathematics.html">mathematics</a></li>
+                    <li><a href="/category/others.html">others</a></li>
+                    <li><a href="/category/programming.html">programming</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+
+            <aside id="featured" class="body">
+                <article>
+                    <h1 class="entry-title"><a href="/how_do_you_manage_memory.html">“你是如果管理内存的？”</a></h1>
+<footer class="post-info">
+        <abbr class="published" title="2016-07-22T04:46:07+08:00">
+                Published: 周五 22 七月 2016
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/funcman.html">funcman</a>
+        </address>
+<p>In <a href="/category/programming.html">programming</a>.</p>
+<p>tags: <a href="/tag/mian-shi.html">面试</a> <a href="/tag/nei-cun-guan-li.html">内存管理</a> <a href="/tag/nei-cun-chi.html">内存池</a> </p>
+</footer><!-- /.post-info --><p>还没找到工作，面了几家，都没下文。我脸皮厚，写点总结发博客。</p>
+<p>像标题这样的面试问题，这些天遇到不止一两次。第一次我略懵，毕竟好久没被面了，没什么准备，所以没做出全面的回答。不过，就算到现在，我也没能在面试时把这个问题回答得很到位。可能这个问题对我来说已经不是什么困扰，平时想得也不多，遇到了我也能解决。这里做一下笔记，这样再遇到这个问题，我可以表现得好一些。</p>
+<p>首先破题，为什么需要考虑管理内存的事，因为C/C++主要提供的是一种很原始的手工释放内存的方式。人难免出错，如果申请了内存，最后忘记释放，就会造成内存泄漏。此外，对于那些在好几个模块之间共享的内存，怎样才能做到正确且合理地释放，也是个问题。如果其中某个模块做了解引用（dereference）操作，还要专门去通知别的模块，再根据情况的不同决定是否需要真的释放内存，那模块之间必然是紧耦合的。所以，并不是小心谨慎就能解决好内存管理问题，好的内存管理一定要借助合适的方法和工具。</p>
+<p>我这里第一个要谈的工具，是内存池。内存池实际上是在一开始申请一大块内存，再将这大块的内存按照一定规则划分成几个尺寸的小块内存集合。同一尺寸的小块内存用一个叫FreeList的东西串起来，有几种尺寸就搞几条FreeList。当我们需要内存时，根据需要的尺寸，就近找到一条合适的FreeList（比如系统内有8 Bytes和16 Bytes等尺寸的FreeList，我们需要9 Bytes的内存，那么就挑16 Bytes的FreeList），从中拿一个小块即可。当这个内存不再使用时，被释放的过程，就是将它还回FreeList的过程。当然，内存池有其它的实现方式，但也是差不多的东西，大同小异。</p>
+<p>内存池技术并没有减免程序员的内存释放工作，那它带来了什么好处呢。由于它要考虑的系统的分配器少一点，所以一般效率会高那么一点。同时保证了一定的内存对齐，这里的对齐并不是为了CPU更高效的寻址，而是一定程度上可以避免内存碎片。如果分配内存时没有对齐，最终内存中的连续空闲块会越来越小，分配大块内存时会因为找不到尺寸足够的连续空闲内存，而失败。内存对齐分配的内存池技术，很大程度能够缓解这个问题。</p>
+<p>实际上，内存池技术在很多开源内存分配器就带了，甚至操作系统内核里就有。除非是在极端应用场景，否则没有必要自己自制内存池。我觉得如果真遇到这样的场景，恐怕就不是内存池技术能解决的了，更静态一些、固定一些的分配方案，会更好一点。</p>
+<p>如果自制内存池，可以同时集成一个内存跟踪器。内存跟踪器可以帮助程序员找到内存泄漏。前面已经说到了，内存泄漏是由于没有及时释放内存所致。跟踪器Hook在分配器上，登记每一次内存的分配操作。同时Hook在释放操作上，每次释放时注销之前的登记。当进程或模块退出时，可以查看跟踪器中还有没有登记项目，如果有，说明有内存存在泄漏的情况。根据登记信息，我们可以知道哪里申请的内存最后没有被释放，进而我们可以找到放置释放代码的地方。内存跟踪器是和内存池互为独立的工具，并不依赖内存池存在。</p>
+<p>对于很多应用场景来说，我们可以借助其数据的关联结构，来减轻手工内存释放的痛苦程度。这些系统中，数据往往成父子关联关系：比如GUI系统中，按钮是窗体的子对象（不是说子类）；再如游戏场景树中，物件实体作为子对象挂在场景根节点上，物件实体又可以挂子物件。对于这样的结构，可以将子对象的释放操作交给父对象来完成。这样，只要树状结构中一个节点不再使用（即需要被移除并释放），那么这个节点连同其后代，就可以以一种遍历子树的方式，全部被释放掉。</p>
+<p>很多时候，对象之间的关系，并没有呈现出一种像树状的规则的结构。这些对象被不同模块所持有，模块之间关系往往是平行的。那么如何在不制造耦合的情况下，减轻内存释放的难度？这就可以使用引用计数技术了：每次申请一块内存，将这块内存的计数器标为1；每次对这块内存做引用传递时，将这块内存的计数器加1；每次对这块内存做解引用时，将计数器减1；当计数器减到0时，就可以真正释放这块内存了。这样，是否需要释放，是在引用计数器内部实现的，和具体的引用对象的模块无关，是正交的，不存在增加模块间耦合的问题。</p>
+<p>对于最简单的引用计数器实现来说，加一、减一操作，往往要我们手工进行。即使将加一、减一隐藏在构造、析构、赋值运算符中，依然需要我们手工写释放操作来进一步触发减一机制。要解决这一问题，我们可以引入智能指针技术：栈对象在出作用域时会自动触发析构，智能指针对象其实就是一种栈对象，它能自动触发减一操作。实际上，新的C++1x的std::shared_ptr，就是一种结合了引用计数的高级智能指针。</p>
+<p>引用计数技术有个问题，就是一旦对象之间出现循环引用的关系时，就会出问题，无法正常的释放。因为对象的引用计数，由于循环引用的存在，无法降为0。这时需要手工将循环引用关系打断，才能正常的释放。而在真实的编码中，我们会极力避免循环引用的出现，所依赖的手段是好的程序结构。</p>
+<p>对于C/C++的内存管理，一般不谈论GC垃圾回收。我不把引用计数归为GC，这里说的GC是指使用标记法之类的那种GC。它们普遍比引用计数低效一些，C/C++这种比较偏向执行效率的语言，人们不太将它与GC一起谈。虽然C/C++也是有GC库可用的，但是一旦使用GC库，GC库分配的内存，就必须由GC库管理，且缺乏语言的语法支持。至于细节，不同的GC库使用不同的算法，和那么支持GC的语言并没有太多本质上的区别，其特点可以参考其它语言。GC对比引用计数机制，有一个好处，就是不担心循环引用。</p>
+<p>对于使用什么手段来解决内存管理问题，不能一概而论，没有方法是最优的。优化程序结构，可以在大的结构节点，使用手工申请、释放的方式控制内存；可以在系统逻辑主干部分，设计结构性强的对象关系，系统地进行对象的释放。不过度设计，减少不必要的机制，比如不滥用Lazy初始化，固化对象生命周期的次序，减少发生循环引用的可能。需要我们编写复杂代码的地方，应该是对性能有严格要求的地方。但即使是游戏编程，也不是所有地方都对性能有强烈的需求。对于那些真正有需求的地方，我们则采取一些特别的手段来管理内存，且要付出的代价不仅仅在编码实现上，还需要有足量的测试，一切根据实际出发。而多数地方，我们要采用现成的、性价比好的方法。</p>                </article>
+            </aside><!-- /#featured -->
+        <section id="extras" class="body">
+                <div class="blogroll">
+                        <h2>links</h2>
+                        <ul>
+                            <li><a href="https://funcman.me/">我的博客</a></li>
+                        </ul>
+                </div><!-- /.blogroll -->
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+
+                            <li><a href="mailto:hyq1986@gmail.com">E-Mail</a></li>
+                            <li><a href="https://twitter.com/funcman">Twitter</a></li>
+                            <li><a href="https://github.com/funcman">Github</a></li>
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="https://getpelican.com/">Pelican</a>, which takes great advantage of <a href="https://www.python.org/">Python</a>.
+                </address><!-- /#about -->
+
+                <p>The theme is by <a href="https://www.smashingmagazine.com/2009/08/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+        </footer><!-- /#contentinfo -->
+
+</body>
+</html>

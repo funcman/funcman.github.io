@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="zh_cn">
+<head>
+        <meta charset="utf-8" />
+        <meta name="generator" content="Pelican" />
+        <title>funcman's blog - 控制台</title>
+        <link rel="stylesheet" href="/theme/css/main.css" />
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="/">funcman's blog</a></h1>
+                <nav><ul>
+                    <li><a href="/category/gamedev.html">gamedev</a></li>
+                    <li><a href="/category/mathematics.html">mathematics</a></li>
+                    <li><a href="/category/others.html">others</a></li>
+                    <li><a href="/category/programming.html">programming</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+
+            <aside id="featured" class="body">
+                <article>
+                    <h1 class="entry-title"><a href="/win32_console_class.html">一个Win32控制台类</a></h1>
+<footer class="post-info">
+        <abbr class="published" title="2010-06-06T10:54:00+08:00">
+                Published: 周日 06 六月 2010
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/funcman.html">funcman</a>
+        </address>
+<p>In <a href="/category/programming.html">programming</a>.</p>
+<p>tags: <a href="/tag/c.html">C++</a> <a href="/tag/win32.html">Win32</a> <a href="/tag/kong-zhi-tai.html">控制台</a> </p>
+</footer><!-- /.post-info --><p>对于编写Win32程序，尤其是游戏这种实时性高的程序来说，断点调试未必是最合适的调试方法。很多时候，我们更渴望看到实时打印的调试信息。</p>
+<p>一种方法是使用VC的调试函数OutputDebugString()，将信息输出给VC调试控制台。还有一种方法是在Win32控制台工程的基础上创建窗口程序（入口为main而非WinMain）。可以用宏来控制编译，使Debug版本时有控制台，Release版本没有控制台，像这样：</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// 一个简单的方法</span>
+<span class="cp">#ifndef _DEBUG</span>
+<span class="kt">int</span> <span class="n">WINAPI</span> <span class="n">WinMain</span><span class="p">(</span><span class="n">HINSTANCE</span> <span class="n">hInstance</span><span class="p">,</span> <span class="n">HINSTANCE</span> <span class="n">hPrevInstance</span><span class="p">,</span> <span class="n">LPSTR</span> <span class="n">lpCmdLine</span><span class="p">,</span> <span class="kt">int</span> <span class="n">nCmdShow</span><span class="p">)</span> <span class="p">{</span>
+<span class="cp">#else</span>
+    <span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span><span class="o">**</span> <span class="n">argv</span><span class="p">)</span> <span class="p">{</span>
+<span class="cp">#endif</span><span class="c1">//_DEBUG</span>
+</code></pre></div>
+
+<p>但这种方法并不灵活，这里介绍一个直接用Win32 API获得控制台的方法。一切皆在代码中：</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// DbgCon.h</span>
+
+<span class="cp">#ifndef DBGCON_H</span>
+<span class="cp">#define DBGCON_H</span>
+
+<span class="cp">#include</span> <span class="cpf">&lt;windows.h&gt;</span><span class="c1">;</span><span class="cp"></span>
+<span class="cp">#include</span> <span class="cpf">&lt;stdio.h&gt;</span><span class="c1">;</span><span class="cp"></span>
+
+<span class="k">class</span> <span class="nc">DbgCon</span> <span class="p">{</span>
+<span class="k">public</span><span class="o">:</span>
+    <span class="n">DbgCon</span><span class="p">();</span>
+    <span class="o">~</span><span class="n">DbgCon</span><span class="p">();</span>
+
+    <span class="kt">void</span>    <span class="nf">Show</span><span class="p">();</span>
+    <span class="kt">void</span>    <span class="nf">Hide</span><span class="p">();</span>
+
+    <span class="kt">void</span>    <span class="nf">Top</span><span class="p">();</span>
+    <span class="kt">void</span>    <span class="nf">NoTop</span><span class="p">();</span>
+
+<span class="k">private</span><span class="o">:</span>
+    <span class="n">HWND</span>    <span class="n">HWnd_</span><span class="p">;</span>
+    <span class="kt">FILE</span><span class="o">*</span>   <span class="n">ConIn_</span><span class="p">;</span>
+    <span class="kt">FILE</span><span class="o">*</span>   <span class="n">ConOut_</span><span class="p">;</span>
+<span class="p">};</span>
+
+<span class="cp">#endif</span><span class="c1">//DBGCON_H</span>
+</code></pre></div>
+
+<div class="highlight"><pre><span></span><code><span class="c1">// DbgCon.cpp</span>
+
+<span class="cp">#include</span> <span class="cpf">&quot;DbgCon.h&quot;</span><span class="cp"></span>
+
+<span class="n">DbgCon</span><span class="o">::</span><span class="n">DbgCon</span><span class="p">()</span>
+<span class="o">:</span>   <span class="n">HWnd_</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="p">,</span>   <span class="n">ConIn_</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="p">,</span>   <span class="n">ConOut_</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+    <span class="c1">// 申请一个控制台</span>
+    <span class="k">if</span><span class="p">(</span> <span class="n">AllocConsole</span><span class="p">()</span> <span class="p">)</span> <span class="p">{</span>
+        <span class="n">HWnd_</span> <span class="o">=</span> <span class="n">GetConsoleWindow</span><span class="p">();</span>
+        <span class="c1">// 把管道转入该控制台</span>
+        <span class="n">freopen_s</span><span class="p">(</span><span class="o">&amp;</span><span class="n">ConIn_</span><span class="p">,</span> <span class="s">&quot;CONIN$&quot;</span><span class="p">,</span> <span class="s">&quot;r+t&quot;</span><span class="p">,</span> <span class="n">stdin</span><span class="p">);</span>
+        <span class="n">freopen_s</span><span class="p">(</span><span class="o">&amp;</span><span class="n">ConOut_</span><span class="p">,</span> <span class="s">&quot;CONOUT$&quot;</span><span class="p">,</span> <span class="s">&quot;w+t&quot;</span><span class="p">,</span> <span class="n">stdout</span><span class="p">);</span>
+        <span class="c1">// 去掉控制台窗口上的关闭功能</span>
+        <span class="c1">//（控制台窗口上的关闭操作会关掉整个进程）</span>
+        <span class="n">HMENU</span> <span class="n">HMenu</span> <span class="o">=</span> <span class="n">GetSystemMenu</span><span class="p">(</span><span class="n">HWnd_</span><span class="p">,</span> <span class="n">FALSE</span><span class="p">);</span>
+        <span class="n">RemoveMenu</span><span class="p">(</span><span class="n">HMenu</span><span class="p">,</span> <span class="n">SC_CLOSE</span><span class="p">,</span> <span class="n">MF_BYCOMMAND</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="n">DbgCon</span><span class="o">::~</span><span class="n">DbgCon</span><span class="p">()</span> <span class="p">{</span>
+    <span class="n">FreeConsole</span><span class="p">();</span>
+    <span class="k">if</span><span class="p">(</span> <span class="n">ConOut_</span> <span class="p">)</span> <span class="p">{</span>
+        <span class="n">fclose</span><span class="p">(</span><span class="n">ConOut_</span><span class="p">);</span>
+    <span class="p">}</span>
+    <span class="k">if</span><span class="p">(</span> <span class="n">ConIn_</span> <span class="p">)</span> <span class="p">{</span>
+        <span class="n">fclose</span><span class="p">(</span><span class="n">ConIn_</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="kt">void</span> <span class="n">DbgCon</span><span class="o">::</span><span class="n">Show</span><span class="p">()</span> <span class="p">{</span>
+    <span class="c1">// 显示控制台窗口（恢复到正常状态）</span>
+    <span class="n">ShowWindow</span><span class="p">(</span><span class="n">HWnd_</span><span class="p">,</span> <span class="n">SW_SHOWNORMAL</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="kt">void</span> <span class="n">DbgCon</span><span class="o">::</span><span class="n">Hide</span><span class="p">()</span> <span class="p">{</span>
+    <span class="c1">// 隐藏控制台窗口</span>
+    <span class="n">ShowWindow</span><span class="p">(</span><span class="n">HWnd_</span><span class="p">,</span> <span class="n">SW_HIDE</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="kt">void</span> <span class="n">DbgCon</span><span class="o">::</span><span class="n">Top</span><span class="p">()</span> <span class="p">{</span>
+    <span class="c1">// 置顶控制台窗口</span>
+    <span class="n">SetWindowPos</span><span class="p">(</span><span class="n">HWnd_</span><span class="p">,</span> <span class="n">HWND_TOPMOST</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">SWP_NOMOVE</span><span class="o">||</span><span class="n">SWP_NOSIZE</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="kt">void</span> <span class="n">DbgCon</span><span class="o">::</span><span class="n">NoTop</span><span class="p">()</span> <span class="p">{</span>
+    <span class="c1">// 取消置顶</span>
+    <span class="n">SetWindowPos</span><span class="p">(</span><span class="n">HWnd_</span><span class="p">,</span> <span class="n">HWND_NOTOPMOST</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">SWP_NOMOVE</span><span class="o">||</span><span class="n">SWP_NOSIZE</span><span class="p">);</span> 
+<span class="p">}</span>
+</code></pre></div>                </article>
+            </aside><!-- /#featured -->
+        <section id="extras" class="body">
+                <div class="blogroll">
+                        <h2>links</h2>
+                        <ul>
+                            <li><a href="https://funcman.me/">我的博客</a></li>
+                        </ul>
+                </div><!-- /.blogroll -->
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+
+                            <li><a href="mailto:hyq1986@gmail.com">E-Mail</a></li>
+                            <li><a href="https://twitter.com/funcman">Twitter</a></li>
+                            <li><a href="https://github.com/funcman">Github</a></li>
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="https://getpelican.com/">Pelican</a>, which takes great advantage of <a href="https://www.python.org/">Python</a>.
+                </address><!-- /#about -->
+
+                <p>The theme is by <a href="https://www.smashingmagazine.com/2009/08/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+        </footer><!-- /#contentinfo -->
+
+</body>
+</html>

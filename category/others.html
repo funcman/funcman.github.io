@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="zh_cn">
+<head>
+        <meta charset="utf-8" />
+        <meta name="generator" content="Pelican" />
+        <title>funcman's blog - others</title>
+        <link rel="stylesheet" href="/theme/css/main.css" />
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="/">funcman's blog</a></h1>
+                <nav><ul>
+                    <li><a href="/category/gamedev.html">gamedev</a></li>
+                    <li><a href="/category/mathematics.html">mathematics</a></li>
+                    <li class="active"><a href="/category/others.html">others</a></li>
+                    <li><a href="/category/programming.html">programming</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+
+            <aside id="featured" class="body">
+                <article>
+                    <h1 class="entry-title"><a href="/another_way_to_use_jekyll_on_windows_10.html">另一种在Windows10下使用Jekyll的方法</a></h1>
+<footer class="post-info">
+        <abbr class="published" title="2019-03-31T08:37:45+08:00">
+                Published: 周日 31 三月 2019
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/funcman.html">funcman</a>
+        </address>
+<p>In <a href="/category/others.html">others</a>.</p>
+<p>tags: <a href="/tag/jekyll.html">jekyll</a> <a href="/tag/ruby.html">Ruby</a> <a href="/tag/bian-cheng-huan-jing.html">编程环境</a> </p>
+</footer><!-- /.post-info --><p>最近准备继续记博客，需要安装Jekyll环境。</p>
+<p>手头既有Mac也有PC，考虑到上班期间带的是PC，所以还是要在Windows下配置一个Jekyll环境。</p>
+<p>按照Jekyll官网的方法，是去安装RubyInstaller。但是，RubyInstaller本身是基于MSYS2的，我的PC已经装了MSYS2，不想再多搞一套，于是决定基于MSYS2安装Ruby和Jekyll。</p>
+<p>MSYS2类似Cygwin（其实就是一个Cygwin分支），可以让用户在Windows下使用UNIX环境的套件。这里先介绍一下相关概念：</p>
+<ul>
+<li>
+<p>Pacman是一套流行于Arch Linux下的软件包管理软件。</p>
+</li>
+<li>
+<p>MinGW是一套在Windows使用的GNU工具链，MinGW-w64是新一代MinGW，同时支持32位和64位。</p>
+</li>
+<li>
+<p>MSYS是为帮助MinGW在Windows下使用，随MinGW提供的一套基本的POSIX操作环境。它是基于较旧的Cygwin项目创建的一个分支。MSYS2和MSYS并不是同一个项目的不同版本，它们各为独立项目。</p>
+</li>
+</ul>
+<p>MSYS2集成了Pacman和MinGW-w64。</p>
+<p>我们在中国使用MSYS2，最好设置一下国内的镜像，网上的文章基本都是让用<a href="https://lug.ustc.edu.cn/wiki/mirrors/help/msys2">中科大的镜像</a>，但目前他们的东西有点问题，只好改用<a href="https://mirrors.tuna.tsinghua.edu.cn/help/msys2">清华的镜像</a>。可惜了，实际上中科大离我很近。</p>
+<p>按照页面上的说明设置好镜像，并执行：</p>
+<div class="highlight"><pre><span></span><code>pacman -Syu
+</code></pre></div>
+
+<p>在最后提示关闭MSYS2时，点窗口的X进行关闭，再去MSYS2安装目录里运行一下autorebase.bat。然后打开MSYS2，执行一下更新：</p>
+<div class="highlight"><pre><span></span><code>pacman -Su
+</code></pre></div>
+
+<p>之后就安装一系列软件，我这里是：</p>
+<div class="highlight"><pre><span></span><code><span class="n">pacman</span> <span class="o">-</span><span class="n">S</span> <span class="n">vim</span> <span class="n">git</span> <span class="n">base</span><span class="o">-</span><span class="n">devel</span> <span class="n">mingw</span><span class="o">-</span><span class="n">w64</span><span class="o">-</span><span class="n">x86_64</span><span class="o">-</span><span class="n">toolchain</span> <span class="n">mingw</span><span class="o">-</span><span class="n">w64</span><span class="o">-</span><span class="n">x86_64</span><span class="o">-</span><span class="n">ruby</span> <span class="n">mingw</span><span class="o">-</span><span class="n">w64</span><span class="o">-</span><span class="n">x86_64</span><span class="o">-</span><span class="n">ruby</span><span class="o">-</span><span class="n">native</span><span class="o">-</span><span class="n">package</span><span class="o">-</span><span class="n">installer</span>
+</code></pre></div>
+
+<p>之所以是使用mingw64/mingw-w64-x86_64-ruby，而不是msys/ruby，是因为我先用它试了一番，在Gem安装Jekyll时总是有个库编不过去。我没有深究下去，先这么着吧，以后有空再找找解决方法。</p>
+<p>安装了这个版本的Ruby之后，需要将<a href="https://github.com/msys2/msys2/wiki/MSYS2-introduction#subsystems">shell type</a>设为mingw64进入MSYS2环境，也就是从“MSYS2 MinGW 64-bit”而不是“MSYS2 MSYS”进。前者会把/mingw64/bin加入到PATH里，而此版本Ruby安装在/mingw64/bin中。</p>
+<p>然后，我用Gem安装Bundler和Jekyll：</p>
+<div class="highlight"><pre><span></span><code>gem install bundler jekyll
+</code></pre></div>
+
+<p>我已经有个很久没写过的旧博客，需要升级一下，所以进入博客的目录，执行了一下：</p>
+<div class="highlight"><pre><span></span><code>bundle update
+</code></pre></div>
+
+<p>据说升级Gem是一件很折腾人的事情，Ruby程序员往往一次升级单个Gem，一次性bundle update，容易出问题。我也是反复在bundle install和bundle update之间折腾，才搞定了这件事。具体可以查一下<a href="https://bing.com/search?q=bundle%20install%20bundle%20update%20%E5%8C%BA%E5%88%AB">bundle install和bundle update之间的区别</a>。</p>
+<p>升级完成之后，就可以继续<a href="https://jekyllrb.com/docs/step-by-step/01-setup">用Jekyll写博客</a>了。</p>
+<p>PS：</p>
+<p>我为了复习怎么用Jekyll，粗略的看了一下<a href="https://jekyllrb.com/docs/step-by-step/01-setup">Jekyll Step by Step Tutorial</a>。它在第一步里讲使用jekyll serve来运行Jekyll，这和我们平常使用bundle exec jekyll serve的方式有点不一样。实际上在第十步里有解释<a href="https://jekyllrb.com/docs/step-by-step/10-deployment/#gemfile">怎么一回事</a>。我也不是很熟悉Ruby，使用Jekyll的很多人估计也是这样。反正Bundler大概是一个处理相同Gem的不同版本被同时引用的工具，我们记得用它就行了。</p>
+<p>另外，这一篇虽然标题是Windows10，并不是说不适用于之前的Windows版本，我只是没有试过。</p>                </article>
+            </aside><!-- /#featured -->
+                <section id="content" class="body">
+                    <h1>Other articles</h1>
+                    <hr />
+                    <ol id="posts-list" class="hfeed">
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/how_to_remember_english_words.html" rel="bookmark"
+                           title="Permalink to 如何背单词">如何背单词</a></h1>
+                </header>
+
+                <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2015-11-25T06:44:07+08:00">
+                Published: 周三 25 十一月 2015
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/funcman.html">funcman</a>
+        </address>
+<p>In <a href="/category/others.html">others</a>.</p>
+<p>tags: <a href="/tag/ying-yu.html">英语</a> <a href="/tag/bei-dan-ci.html">背单词</a> </p>
+</footer><!-- /.post-info -->                <p>我是个英语很烂的人，所有关于英语的能力，都来自于技术工作中对英文的不得不进行的接触。因为英语太烂，也失去了一些不错的机会。怎么学英语，我是不懂的。至于背单词，大多数英语好的人，应该都去尝试过。我也尝试过，但一直不得其法。</p>
+<p>现在，为了完成学业，我又准备拿起单词书，再次尝试一下。在开始做这件事时，我想了一下，到底是什么阻碍了我之前在背单词上的持续努力？</p>
+<p>我不是没有目的的去学习一个东西，相反，学好了英语对我来说有很多积极的意义。在我内心里，是有学习的冲动的。所以，之前的不顺利，应该是方法上出了问题。</p>
+<p>背单词是一种记忆活动，在记忆领域，人们有一个普遍的共识，就是人脑记忆新事物遵循着“艾宾浩斯记忆曲线”。我之前也采用了遵循这种规律的记忆复习方法，相信在这类方法的应用上，没有什么问题。</p>
+<p>在还没有想清楚这个问题的时候，我还在找背单词的工具。幸运的是我找到了一个叫<a href="https://itunes.apple.com/app/id888483369/">墨墨背单词</a>的手机应用，帮助我弄清了这个问题。</p>
+<p>人有一种既贪婪又懦弱的通性。人做一件事情，是由欲望驱使的，欲望总是使人在得到的同时还想得到更多。人的能力有限，无法驾驭所有，当欲望发展成贪婪，无法得到完全的满足时，人的懦弱的本性就开始产生作用 …</p>
+                <a class="readmore" href="/how_to_remember_english_words.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/review_of_4851_by_ai_weiwei.html" rel="bookmark"
+                           title="Permalink to 艾未未作品《4851》观后感">艾未未作品《4851》观后感</a></h1>
+                </header>
+
+                <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2010-01-10T02:44:00+08:00">
+                Published: 周日 10 一月 2010
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/funcman.html">funcman</a>
+        </address>
+<p>In <a href="/category/others.html">others</a>.</p>
+<p>tags: <a href="/tag/yi-zhu.html">艺术</a> <a href="/tag/ai-wei-wei.html">艾未未</a> </p>
+</footer><!-- /.post-info -->                <p>艾未未先生的《4851》是我看到的最深刻的艺术作品。</p>
+<p>87分钟的片长，可能没几个人会真的花87分钟完整地看完这部片子。</p>
+<p>没关系，你的观看方式已经是这部艺术作品的一部分。</p>
+<p>这是部完美的艺术作品，像一味催化剂。</p>
+<p>只要你对5·12的任何一点有所思考，它都会从理性和感性两方面触发你。</p>
+<p>你可以通过YouTube观看：<a href="https://www.youtube.com/watch?v=4IZpRHDOJpg">《4851》</a>（中国用户访问YouTube需要跨越GFW）</p>
+                <a class="readmore" href="/review_of_4851_by_ai_weiwei.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/logic_of_animal_protectionism.html" rel="bookmark"
+                           title="Permalink to 动物保护的逻辑──小论《海豚湾》的政治正确性">动物保护的逻辑──小论《海豚湾》的政治正确性</a></h1>
+                </header>
+
+                <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2009-12-21T19:34:00+08:00">
+                Published: 周一 21 十二月 2009
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/funcman.html">funcman</a>
+        </address>
+<p>In <a href="/category/others.html">others</a>.</p>
+<p>tags: <a href="/tag/dian-ying.html">电影</a> <a href="/tag/ji-lu-pian.html">纪录片</a> <a href="/tag/dong-wu-bao-hu.html">动物保护</a> <a href="/tag/zheng-zhi-zheng-que.html">政治正确</a> </p>
+</footer><!-- /.post-info -->                <p>一、某些动物性情趋向于人，人们能从这些动物身上获得人道情感，保护这些动物是在维护人道主义。之所有争取一些动物不作为牲畜屠宰，争取一些牲口在屠宰时更快死亡以减少受虐程度，是基于这样一个泛功利的动机。</p>
+<p>二、野生动物是地球生态的重要组成部分，保护野生动物，是为了地球生态能够正常运行下去。地球生态的正常运作，才能让人们和他们的后台得以更好地生存。这也是一个功利的理由。</p>
+<p>所以即使抛弃崇高的理念，以现实利益为名，动物保护主义也是完全站得住脚的。</p>
+<p>《海豚湾》作为一部动物保护主义题材的环保纪录片，它的拍摄，是在遵从上面两个重要逻辑的前提下展开的。海豚保护组织最终在国际规则制定会议（法的层面）上，展出血淋淋的证据，给日本滥杀海豚的恶行以有力一击。这种行事方式十分成熟。</p>
+                <a class="readmore" href="/logic_of_animal_protectionism.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+                </ol><!-- /#posts-list -->
+                </section><!-- /#content -->
+        <section id="extras" class="body">
+                <div class="blogroll">
+                        <h2>links</h2>
+                        <ul>
+                            <li><a href="https://funcman.me/">我的博客</a></li>
+                        </ul>
+                </div><!-- /.blogroll -->
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+
+                            <li><a href="mailto:hyq1986@gmail.com">E-Mail</a></li>
+                            <li><a href="https://twitter.com/funcman">Twitter</a></li>
+                            <li><a href="https://github.com/funcman">Github</a></li>
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="https://getpelican.com/">Pelican</a>, which takes great advantage of <a href="https://www.python.org/">Python</a>.
+                </address><!-- /#about -->
+
+                <p>The theme is by <a href="https://www.smashingmagazine.com/2009/08/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+        </footer><!-- /#contentinfo -->
+
+</body>
+</html>

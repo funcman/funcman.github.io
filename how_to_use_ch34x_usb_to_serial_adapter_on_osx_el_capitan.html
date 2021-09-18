@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="zh_cn">
+<head>
+        <meta charset="utf-8" />
+        <meta name="generator" content="Pelican" />
+        <title>如何在OSX El Capitan下使用基于CH34x芯片的USB串口适配线</title>
+        <link rel="stylesheet" href="/theme/css/main.css" />
+        <meta name="description" content="淘宝上有很多廉价的USB转串口的适配线，这其中不少使用的是南京的沁恒公司的CH34x芯片。..." />
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="/">funcman's blog</a></h1>
+                <nav><ul>
+                    <li><a href="/category/gamedev.html">gamedev</a></li>
+                    <li><a href="/category/mathematics.html">mathematics</a></li>
+                    <li><a href="/category/others.html">others</a></li>
+                    <li class="active"><a href="/category/programming.html">programming</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+  <article>
+    <header>
+      <h1 class="entry-title">
+        <a href="/how_to_use_ch34x_usb_to_serial_adapter_on_osx_el_capitan.html" rel="bookmark"
+           title="Permalink to 如何在OSX El Capitan下使用基于CH34x芯片的USB串口适配线">如何在OSX El Capitan下使用基于CH34x芯片的USB串口适配线</a></h1>
+    </header>
+
+    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2015-12-10T07:47:23+08:00">
+                Published: 周四 10 十二月 2015
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/funcman.html">funcman</a>
+        </address>
+<p>In <a href="/category/programming.html">programming</a>.</p>
+<p>tags: <a href="/tag/osx-el-capitan.html">OSX El Capitan</a> <a href="/tag/ch34x.html">CH34x</a> <a href="/tag/chuan-kou.html">串口</a> </p>
+</footer><!-- /.post-info -->      <p>淘宝上有很多廉价的USB转串口的适配线，这其中不少使用的是南京的沁恒公司的CH34x芯片。</p>
+<p>我们可以在“关于本机”-“系统报告”-“硬件”-“USB”里查看适配线的VID（厂商ID），来确定适配线是否基于CH34x芯片。CH34x的VID是0x1a86，我这根的PID（产品ID）是0x7523，你的PID可能不同，0x5523也是一个可用的PID。</p>
+<p>确定芯片后，就可以去找驱动程序了。沁恒的网址是<a href="http://www.wch.cn">http://www.wch.cn</a>，我们可以从上面找到我们需要的驱动。<a href="http://www.wch.cn/download/CH341SER_MAC_ZIP.html">Mac的驱动也是有的</a>，不过太老了，未经签名，所以通过不了苹果在OSX 10.11上加入的SIP<sup id="fnref:1"><a class="footnote-ref" href="#fn:1">1</a></sup>保护技术。如果直接安装这个驱动，肯定是用不了的。必须屏蔽SIP对kext<sup id="fnref:2"><a class="footnote-ref" href="#fn:2">2</a></sup>的保护。</p>
+<p>设置SIP，我们需要用到csrutil，它就是SIP的配置修改工具。使用csrutil，必须进入恢复模式。恢复模式的进入方法是：开机（重启）时，同时按CMD键和R键。进入恢复模式之后，在“实用工具”里找到“终端”，在终端里输入：</p>
+<div class="highlight"><pre><span></span><code>csrutil enable --without kext
+</code></pre></div>
+
+<p>然后重启。这时再去安装从沁恒公司网站下载的那个Mac驱动。安装完成后，再次重启，进入系统之后就能在<strong>/dev</strong>下面找到<strong>tty.wchusbserial14130</strong>了。注意，因为我的PID是0x7523，所以tty.wchusbserial后面的数字是14130（即0x7523的十进制数）。你也可能看到别的类似的设备文件名。</p>
+<p>这样操作之后，就能正常使用CH34x适配线了。但是也丧失了SIP对系统的某些保护，降低了系统的安全性。如果手头宽裕，还是建议购买贵一些的，持续支持Mac系统的适配线。购买之前，先搞清楚要买的线能不能很方便的在最新的Mac上使用。不要像我，买的时候没花时间直接下单，到货了折腾半天才用起来。</p>
+<div class="footnote">
+<hr>
+<ol>
+<li id="fn:1">
+<p>System Integrity Protection&#160;<a class="footnote-backref" href="#fnref:1" title="Jump back to footnote 1 in the text">&#8617;</a></p>
+</li>
+<li id="fn:2">
+<p>OSX的内核扩展，驱动一般是以这种形式存在的&#160;<a class="footnote-backref" href="#fnref:2" title="Jump back to footnote 2 in the text">&#8617;</a></p>
+</li>
+</ol>
+</div>
+    </div><!-- /.entry-content -->
+
+  </article>
+</section>
+        <section id="extras" class="body">
+                <div class="blogroll">
+                        <h2>links</h2>
+                        <ul>
+                            <li><a href="https://funcman.me/">我的博客</a></li>
+                        </ul>
+                </div><!-- /.blogroll -->
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+
+                            <li><a href="mailto:hyq1986@gmail.com">E-Mail</a></li>
+                            <li><a href="https://twitter.com/funcman">Twitter</a></li>
+                            <li><a href="https://github.com/funcman">Github</a></li>
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="https://getpelican.com/">Pelican</a>, which takes great advantage of <a href="https://www.python.org/">Python</a>.
+                </address><!-- /#about -->
+
+                <p>The theme is by <a href="https://www.smashingmagazine.com/2009/08/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+        </footer><!-- /#contentinfo -->
+
+</body>
+</html>

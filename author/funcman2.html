@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="zh_cn">
+<head>
+        <meta charset="utf-8" />
+        <meta name="generator" content="Pelican" />
+        <title>funcman's blog - funcman</title>
+        <link rel="stylesheet" href="/theme/css/main.css" />
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="/">funcman's blog</a></h1>
+                <nav><ul>
+                    <li><a href="/category/gamedev.html">gamedev</a></li>
+                    <li><a href="/category/mathematics.html">mathematics</a></li>
+                    <li><a href="/category/others.html">others</a></li>
+                    <li><a href="/category/programming.html">programming</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+
+                <section id="content" class="body">
+                    <ol id="posts-list" class="hfeed" start="6">
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/about_logos_of_the_rational_number_and_irrational_number.html" rel="bookmark"
+                           title="Permalink to 关于有理数、无理数中的“理”字">关于有理数、无理数中的“理”字</a></h1>
+                </header>
+
+                <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2014-12-17T15:00:00+08:00">
+                Published: 周三 17 十二月 2014
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/funcman.html">funcman</a>
+        </address>
+<p>In <a href="/category/mathematics.html">mathematics</a>.</p>
+<p>tags: <a href="/tag/you-li-shu.html">有理数</a> <a href="/tag/shu-xue.html">数学</a> </p>
+</footer><!-- /.post-info -->                <p>我们知道有理数就是可以用整数比值表示的数字。但对于无理数，我们就不好下定义，只好说不能用整数比值表示的数字就是无理数。</p>
+<p>对于有理数、无理数中间这个“理”字，我们也不太容易理解，数字不具备位格，怎么还能讲道理。其实这两个名词，来自日文。我们知道，很多汉语里采用的日式外来词，和汉语字词意思多少有些出入，理解起来就会有点“无厘头”。</p>
+<p>我在网上随便搜索了一下，据说这个日式外来词，在翻译时也受到了徐光启和利玛窦翻译的《几何原本》的影响。根据网上的说法，在徐、利版本的《几何原本》中，将比值作为“理”字翻译出来。但是我不太确信这样的解释，我不清楚文言文中的“理”字可作比值的意思。</p>
+<p>我所知道的，这个“理”字，在最早希腊文中，是用logos表示。logos大概就是事物本质规律的意思，也有话语、可被语言表达的事物的意思。圣经里，面向希腊语地区读者的《约翰福音》，用logos来关联上帝的话语，中文版本圣经里翻作“道 …</p>
+                <a class="readmore" href="/about_logos_of_the_rational_number_and_irrational_number.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/about_sqrt_of_std_list.html" rel="bookmark"
+                           title="Permalink to 关于std::list的排序">关于std::list的排序</a></h1>
+                </header>
+
+                <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2010-09-04T12:58:00+08:00">
+                Published: 周六 04 九月 2010
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/funcman.html">funcman</a>
+        </address>
+<p>In <a href="/category/programming.html">programming</a>.</p>
+<p>tags: <a href="/tag/stl.html">STL</a> <a href="/tag/list.html">list</a> <a href="/tag/rong-qi.html">容器</a> </p>
+</footer><!-- /.post-info -->                <p>std::list和std::vector不同，无法使用STL算法库里的sort()，因为std::list不支持随机访问（random access）。</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// std::list排序示例</span>
+
+<span class="cp">#include</span> <span class="cpf">&lt;stdio.h&gt;</span><span class="cp"></span>
+<span class="cp">#include</span> <span class="cpf">&lt;stdlib.h&gt;</span><span class="cp"></span>
+<span class="cp">#include</span> <span class="cpf">&lt;time.h&gt;</span><span class="cp"></span>
+<span class="cp">#include</span> <span class="cpf">&lt;list&gt;</span><span class="cp"></span>
+
+<span class="c1">// 它是个仿函数</span>
+<span class="k">struct</span> <span class="nc">mycmp</span> <span class="p">{</span>
+    <span class="kt">bool</span> <span class="nf">operator</span><span class="p">()(</span><span class="kt">int</span><span class="o">*</span> <span class="n">a</span><span class="p">,</span> <span class="kt">int</span><span class="o">*</span> <span class="n">b</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="o">*</span><span class="n">a</span> <span class="o">&lt;</span> <span class="o">*</span><span class="n">b</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">};</span> 
+
+<span class="kt">int</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+    <span class="n">std</span><span class="o">::</span><span class="n">list</span> <span class="n">il</span><span class="p">;</span>
+    <span class="kt">int</span> <span class="n">ia</span><span class="p">[</span><span class="mi">10</span><span class="p">];</span>
+
+    <span class="kt">time_t</span> <span class="n">t</span><span class="p">;</span>
+    <span class="n">time</span><span class="p">(</span><span class="o">&amp;</span><span class="n">t</span><span class="p">);</span>
+    <span class="n">srand</span><span class="p">((</span><span class="kt">unsigned</span> <span class="kt">int</span><span class="p">)</span><span class="n">t</span><span class="p">);</span>
+
+    <span class="n">printf …</span></code></pre></div>
+                <a class="readmore" href="/about_sqrt_of_std_list.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/win32_console_class.html" rel="bookmark"
+                           title="Permalink to 一个Win32控制台类">一个Win32控制台类</a></h1>
+                </header>
+
+                <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2010-06-06T10:54:00+08:00">
+                Published: 周日 06 六月 2010
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/funcman.html">funcman</a>
+        </address>
+<p>In <a href="/category/programming.html">programming</a>.</p>
+<p>tags: <a href="/tag/c.html">C++</a> <a href="/tag/win32.html">Win32</a> <a href="/tag/kong-zhi-tai.html">控制台</a> </p>
+</footer><!-- /.post-info -->                <p>对于编写Win32程序，尤其是游戏这种实时性高的程序来说，断点调试未必是最合适的调试方法。很多时候，我们更渴望看到实时打印的调试信息。</p>
+<p>一种方法是使用VC的调试函数OutputDebugString()，将信息输出给VC调试控制台。还有一种方法是在Win32控制台工程的基础上创建窗口程序（入口为main而非WinMain）。可以用宏来控制编译，使Debug版本时有控制台，Release版本没有控制台，像这样：</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// 一个简单的方法</span>
+<span class="cp">#ifndef _DEBUG</span>
+<span class="kt">int</span> <span class="n">WINAPI</span> <span class="n">WinMain</span><span class="p">(</span><span class="n">HINSTANCE</span> <span class="n">hInstance</span><span class="p">,</span> <span class="n">HINSTANCE</span> <span class="n">hPrevInstance</span><span class="p">,</span> <span class="n">LPSTR</span> <span class="n">lpCmdLine</span><span class="p">,</span> <span class="kt">int</span> <span class="n">nCmdShow</span><span class="p">)</span> <span class="p">{</span>
+<span class="cp">#else</span>
+    <span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span><span class="o">**</span> <span class="n">argv</span><span class="p">)</span> <span class="p">{</span>
+<span class="cp">#endif</span><span class="c1">//_DEBUG</span>
+</code></pre></div>
+
+<p>但这种方法并不灵活，这里介绍一个直接用Win32 API获得控制台的方法。一切皆在代码中：</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// DbgCon.h</span>
+
+<span class="cp">#ifndef DBGCON_H</span>
+<span class="cp">#define DBGCON_H</span>
+
+<span class="cp">#include</span> <span class="cpf">&lt;windows.h&gt;</span><span class="c1">;</span><span class="cp"></span>
+<span class="cp">#include …</span></code></pre></div>
+                <a class="readmore" href="/win32_console_class.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/data_hiding_in_c.html" rel="bookmark"
+                           title="Permalink to C语言对数据的隐藏封装">C语言对数据的隐藏封装</a></h1>
+                </header>
+
+                <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2010-05-16T19:48:00+08:00">
+                Published: 周日 16 五月 2010
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/funcman.html">funcman</a>
+        </address>
+<p>In <a href="/category/programming.html">programming</a>.</p>
+<p>tags: <a href="/tag/cyu-yan.html">C语言</a> <a href="/tag/jie-kou.html">接口</a> <a href="/tag/feng-zhuang.html">封装</a> </p>
+</footer><!-- /.post-info -->                <p>在C++中，如果我们想把数据结构隐藏起来，只为用户提供接口，可以通过实现继承接口类的方式到达目的。那C中，可以采用什么方式呢。下面有一例：</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// demo.h</span>
+
+<span class="cp">#ifndef DEMO_H</span>
+<span class="cp">#define DEMO_H</span>
+
+<span class="k">typedef</span> <span class="k">struct</span> <span class="nc">Demo</span><span class="o">*</span> <span class="n">Demo</span><span class="p">;</span>
+
+<span class="k">extern</span> <span class="n">Demo</span> <span class="nf">DemoCreate</span><span class="p">(</span><span class="kt">int</span> <span class="n">num</span><span class="p">);</span>
+<span class="k">extern</span> <span class="kt">void</span> <span class="nf">DemoDestory</span><span class="p">(</span><span class="n">Demo</span> <span class="n">demo</span><span class="p">);</span>
+<span class="k">extern</span> <span class="kt">void</span> <span class="nf">DemoShow</span><span class="p">(</span><span class="n">Demo</span> <span class="n">demo</span><span class="p">);</span>
+
+<span class="cp">#endif</span><span class="c1">//DEMO_H</span>
+</code></pre></div>
+
+<div class="highlight"><pre><span></span><code><span class="c1">// demo.c</span>
+
+<span class="cp">#include</span> <span class="cpf">&quot;demo.h&quot;</span><span class="cp"></span>
+<span class="cp">#include</span> <span class="cpf">&lt;stdio.h&gt;</span><span class="cp"></span>
+<span class="cp">#include</span> <span class="cpf">&lt;stdlib.h&gt;</span><span class="cp"></span>
+
+<span class="k">typedef</span> <span class="k">struct</span> <span class="nc">Demo_</span> <span class="p">{</span>
+    <span class="kt">int …</span></code></pre></div>
+                <a class="readmore" href="/data_hiding_in_c.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/review_of_4851_by_ai_weiwei.html" rel="bookmark"
+                           title="Permalink to 艾未未作品《4851》观后感">艾未未作品《4851》观后感</a></h1>
+                </header>
+
+                <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2010-01-10T02:44:00+08:00">
+                Published: 周日 10 一月 2010
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/funcman.html">funcman</a>
+        </address>
+<p>In <a href="/category/others.html">others</a>.</p>
+<p>tags: <a href="/tag/yi-zhu.html">艺术</a> <a href="/tag/ai-wei-wei.html">艾未未</a> </p>
+</footer><!-- /.post-info -->                <p>艾未未先生的《4851》是我看到的最深刻的艺术作品。</p>
+<p>87分钟的片长，可能没几个人会真的花87分钟完整地看完这部片子。</p>
+<p>没关系，你的观看方式已经是这部艺术作品的一部分。</p>
+<p>这是部完美的艺术作品，像一味催化剂。</p>
+<p>只要你对5·12的任何一点有所思考，它都会从理性和感性两方面触发你。</p>
+<p>你可以通过YouTube观看：<a href="https://www.youtube.com/watch?v=4IZpRHDOJpg">《4851》</a>（中国用户访问YouTube需要跨越GFW）</p>
+                <a class="readmore" href="/review_of_4851_by_ai_weiwei.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/logic_of_animal_protectionism.html" rel="bookmark"
+                           title="Permalink to 动物保护的逻辑──小论《海豚湾》的政治正确性">动物保护的逻辑──小论《海豚湾》的政治正确性</a></h1>
+                </header>
+
+                <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2009-12-21T19:34:00+08:00">
+                Published: 周一 21 十二月 2009
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/funcman.html">funcman</a>
+        </address>
+<p>In <a href="/category/others.html">others</a>.</p>
+<p>tags: <a href="/tag/dian-ying.html">电影</a> <a href="/tag/ji-lu-pian.html">纪录片</a> <a href="/tag/dong-wu-bao-hu.html">动物保护</a> <a href="/tag/zheng-zhi-zheng-que.html">政治正确</a> </p>
+</footer><!-- /.post-info -->                <p>一、某些动物性情趋向于人，人们能从这些动物身上获得人道情感，保护这些动物是在维护人道主义。之所有争取一些动物不作为牲畜屠宰，争取一些牲口在屠宰时更快死亡以减少受虐程度，是基于这样一个泛功利的动机。</p>
+<p>二、野生动物是地球生态的重要组成部分，保护野生动物，是为了地球生态能够正常运行下去。地球生态的正常运作，才能让人们和他们的后台得以更好地生存。这也是一个功利的理由。</p>
+<p>所以即使抛弃崇高的理念，以现实利益为名，动物保护主义也是完全站得住脚的。</p>
+<p>《海豚湾》作为一部动物保护主义题材的环保纪录片，它的拍摄，是在遵从上面两个重要逻辑的前提下展开的。海豚保护组织最终在国际规则制定会议（法的层面）上，展出血淋淋的证据，给日本滥杀海豚的恶行以有力一击。这种行事方式十分成熟。</p>
+                <a class="readmore" href="/logic_of_animal_protectionism.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/when_should_determine_whether_a-pointer_is_null.html" rel="bookmark"
+                           title="Permalink to 应该在何时判断一个指针是否为NULL">应该在何时判断一个指针是否为NULL</a></h1>
+                </header>
+
+                <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2007-10-12T11:20:00+08:00">
+                Published: 周五 12 十月 2007
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/funcman.html">funcman</a>
+        </address>
+<p>In <a href="/category/programming.html">programming</a>.</p>
+<p>tags: <a href="/tag/c.html">C</a> <a href="/tag/c.html">C++</a> <a href="/tag/zhi-zhen.html">指针</a> <a href="/tag/pointer.html">pointer</a> </p>
+</footer><!-- /.post-info -->                <p>今天看到一篇Blog：<a href="http://fsfoundry.org/codefreak/2007/09/16/a-couple-of-things-about-pointer-to-null/">《NULL指标两三事》</a>，文中谈的主题即是我这篇Blog的题目，我这里也只是对原文的做些简单的记录。</p>
+<p>文中谈到的问题，也是我们平常出现的问题，即在操作一个指针前，我们常常在不需要判断指针是否为NULL时做了判断，而在需要判断时却想当然地把它漏掉了。</p>
+<p>例如：delete时，完全可以对一个NULL指针进行操作，而我们却要多余地加上一个<code>if(ptr!=NULL)</code>判断；
+又如：strlen时，如果参数给了一个NULL指针，就可能造成整个程序崩掉，我们却以为strlen自己会做NULL指针判读，并在获得一个NULL参数时return。</p>
+<p>另外，在原文的评论栏中有一问一答，合理地解释了为什么strlen这样的接受指针参数的函数，会不做<code>if(NULL==ptr)return;</code>这样的操作。嗯，为了效率，这么做充分体验了C的精神。想像一下，对于一个错误的参数，检测函数的返回难道比在调用前就检测参数更省事么；何况如果同一个参数穿过层层的函数调用，一个个检测函数返回是多么可怕的事，不如在调用函数事先来个参数检测。实际上，像strlen这样的函数，也不是没有在函数内部做参数检测，只不过它用的是非常合理的assert断言机制，即满足了功能，又满足了效率。</p>
+<p>以后再操作指针时，要记得有这么回事~</p>
+                <a class="readmore" href="/when_should_determine_whether_a-pointer_is_null.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+                </ol><!-- /#posts-list -->
+<p class="paginator">
+        <a href="/author/funcman.html">&#8647;</a>
+        <a href="/author/funcman.html">&laquo;</a>
+    Page 2 / 2
+</p>
+                </section><!-- /#content -->
+        <section id="extras" class="body">
+                <div class="blogroll">
+                        <h2>links</h2>
+                        <ul>
+                            <li><a href="https://funcman.me/">我的博客</a></li>
+                        </ul>
+                </div><!-- /.blogroll -->
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+
+                            <li><a href="mailto:hyq1986@gmail.com">E-Mail</a></li>
+                            <li><a href="https://twitter.com/funcman">Twitter</a></li>
+                            <li><a href="https://github.com/funcman">Github</a></li>
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="https://getpelican.com/">Pelican</a>, which takes great advantage of <a href="https://www.python.org/">Python</a>.
+                </address><!-- /#about -->
+
+                <p>The theme is by <a href="https://www.smashingmagazine.com/2009/08/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+        </footer><!-- /#contentinfo -->
+
+</body>
+</html>
