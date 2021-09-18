@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="zh_cn">
+<head>
+        <meta charset="utf-8" />
+        <meta name="generator" content="Pelican" />
+        <title>改用Pelican重建这个博客</title>
+        <link rel="stylesheet" href="/theme/css/main.css" />
+        <meta name="description" content="这里简单发一篇博客，讲一下我在使用了Pelican来重建这个博客。至于回归博客的感言什么的，回头再说了。 之所以不再使用Jekyll，主要是不想在电脑上安装过多的开发环境了。而且Github Pages会是不是升级Jekyll环境，我还得跟着升级，太麻烦了。..." />
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="/">funcman's blog</a></h1>
+                <nav><ul>
+                    <li><a href="/category/gamedev.html">gamedev</a></li>
+                    <li><a href="/category/mathematics.html">mathematics</a></li>
+                    <li class="active"><a href="/category/others.html">others</a></li>
+                    <li><a href="/category/programming.html">programming</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+  <article>
+    <header>
+      <h1 class="entry-title">
+        <a href="/replace_jekyll_with_pelican_for_my_blog.html" rel="bookmark"
+           title="Permalink to 改用Pelican重建这个博客">改用Pelican重建这个博客</a></h1>
+    </header>
+
+    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2021-09-19T03:53:55+08:00">
+                Published: 周日 19 九月 2021
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/funcman.html">funcman</a>
+        </address>
+<p>In <a href="/category/others.html">others</a>.</p>
+<p>tags: <a href="/tag/pelican.html">Pelican</a> </p>
+</footer><!-- /.post-info -->      <p>这里简单发一篇博客，讲一下我在使用了Pelican来重建这个博客。至于回归博客的感言什么的，回头再说了。</p>
+<p>之所以不再使用Jekyll，主要是不想在电脑上安装过多的开发环境了。而且Github Pages会是不是升级Jekyll环境，我还得跟着升级，太麻烦了。</p>
+<p>Pelican的好处是非常简单，很容易生成静态页面，且我会用到Python。</p>
+<p>Pelican的用法网上很多，这里主要记录一下特别的地方。</p>
+<p>首先是图片等涉及静态路径的，需要在<strong>pelicanconf.py</strong>里设置<strong>STATIC_PATHS</strong>：</p>
+<div class="highlight"><pre><span></span><code><span class="n">STATIC_PATHS</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s1">&#39;images&#39;</span><span class="p">,</span>
+<span class="p">]</span>
+</code></pre></div>
+
+<p>并且Markdown中，引用图片需要这样：</p>
+<div class="highlight"><pre><span></span><code>![<span class="nt">JUSE FUCKING DO IT</span>](<span class="na">{static}/images/just_fucking_do_it.png</span>)
+</code></pre></div>
+
+<p>然后是favicon，我是这么设置的，并且把<strong>favicon.ico</strong>放在<strong>/content/extra/</strong>目录下：</p>
+<div class="highlight"><pre><span></span><code><span class="n">STATIC_PATHS</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s1">&#39;images&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;extra&#39;</span><span class="p">,</span>
+<span class="p">]</span>
+
+<span class="n">EXTRA_PATH_METADATA</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;extra/robots.txt&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;path&#39;</span><span class="p">:</span> <span class="s1">&#39;robots.txt&#39;</span><span class="p">},</span>
+    <span class="s1">&#39;extra/favicon.ico&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;path&#39;</span><span class="p">:</span> <span class="s1">&#39;favicon.ico&#39;</span><span class="p">},</span>
+    <span class="s1">&#39;extra/CNAME&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;path&#39;</span><span class="p">:</span> <span class="s1">&#39;CNAME&#39;</span><span class="p">},</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>显而易见，我的<strong>extra</strong>目录下还放了<strong>CNAME</strong>和<strong>rebots.txt</strong>，Pelican在生成时，会把他们都放到<strong>output</strong>目录的根部。</p>
+<p>通过运行<code>pelican content</code>很容易就在<strong>output</strong>下生成了全部的静态网页，把这些页面通过git更新到Github Pages上即可完成发布。因为我之前用的是Jekyll，所以我删除了原有的全部文件。另外，这个博客的Pelican的工程需要单独开仓库存储。</p>
+<p>另外，Pelican可以更换主题，可以通过网站<a href="http://www.pelicanthemes.com">Pelican Themes</a>找到你喜欢的主题。等我发完这篇，我就来弄主题。</p>
+<p>大致就是这样。</p>
+    </div><!-- /.entry-content -->
+
+  </article>
+</section>
+        <section id="extras" class="body">
+                <div class="blogroll">
+                        <h2>links</h2>
+                        <ul>
+                            <li><a href="https://funcman.me/">我的博客</a></li>
+                        </ul>
+                </div><!-- /.blogroll -->
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+
+                            <li><a href="mailto:hyq1986@gmail.com">E-Mail</a></li>
+                            <li><a href="https://twitter.com/funcman">Twitter</a></li>
+                            <li><a href="https://github.com/funcman">Github</a></li>
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="https://getpelican.com/">Pelican</a>, which takes great advantage of <a href="https://www.python.org/">Python</a>.
+                </address><!-- /#about -->
+
+                <p>The theme is by <a href="https://www.smashingmagazine.com/2009/08/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+        </footer><!-- /#contentinfo -->
+
+</body>
+</html>

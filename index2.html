@@ -22,6 +22,31 @@
                     <ol id="posts-list" class="hfeed" start="6">
             <li><article class="hentry">
                 <header>
+                    <h1><a href="/talk_about_my_next_interests_in_game_technologys.html" rel="bookmark"
+                           title="Permalink to 谈一谈个人在接下来几年的游戏技术方向">谈一谈个人在接下来几年的游戏技术方向</a></h1>
+                </header>
+
+                <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2015-01-08T14:46:00+08:00">
+                Published: 周四 08 一月 2015
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/funcman.html">funcman</a>
+        </address>
+<p>In <a href="/category/gamedev.html">gamedev</a>.</p>
+<p>tags: <a href="/tag/ji-zhu-xuan-xing.html">技术选型</a> </p>
+</footer><!-- /.post-info -->                <p>我对目前火爆的手游和之前火爆的端游、页游通通不感兴趣。除非项目非常nice，或者团队的人非常有趣，否则我不太会积极地回到游戏行业中。理想的状态是，我是一群酷爱游戏且专业的人的之一，做着一款看着就好玩的电视、电脑游戏。虽然Xbox ONE已经来中国了，PS4也要上市了，但是中国电视游戏的春天恐怕还要等上几年。所以，我考虑在这几年积攒一下技术。</p>
+<p>所谓的积攒技术，就是做一个2D引擎，其实也就是造轮子。如果是即刻投身商业开发，那么造轮子，一定是件可耻的事情。Unity或者cocos2d-x已经足够好了。而这对于我来说，只是个人私事。理由不具体直接解释了，反正我就是爱折腾。</p>
+<p>我个人很喜欢Unity的快捷和强大，但也感到如果Unity和cocos2d-x一样开源，很多事会好办很多。而对于后者，我不太喜欢它的设计。cocos2d吸收了很多Cocoa的特点，但对于一个游戏引擎来说，有些地方还是简洁点好。</p>
+<p>对于一个2D引擎来说，图形底层并不复杂，只要把Sprite做出来，这个引擎就能用来做游戏了。一个成熟的2D引擎，必不可少要有一套动画系统。以前的2D游戏多采用序列帧，现在基本上是实时演算的关键帧插值动画。动画编辑器的开发量是不小的，我考虑使用Flash作为动画编辑器，用JSFL做数据导出。Flash可做的事情非常多，比如还可以作为UI布局器使用，甚至粒子特效编辑器也省了。使用通用编辑器来取代内部编辑器，是节省成本的一个好方法 …</p>
+                <a class="readmore" href="/talk_about_my_next_interests_in_game_technologys.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+
+            <li><article class="hentry">
+                <header>
                     <h1><a href="/about_logos_of_the_rational_number_and_irrational_number.html" rel="bookmark"
                            title="Permalink to 关于有理数、无理数中的“理”字">关于有理数、无理数中的“理”字</a></h1>
                 </header>
@@ -224,38 +249,13 @@
                 <a class="readmore" href="/logic_of_animal_protectionism.html">read more</a>
                 </div><!-- /.entry-content -->
             </article></li>
-
-            <li><article class="hentry">
-                <header>
-                    <h1><a href="/when_should_determine_whether_a-pointer_is_null.html" rel="bookmark"
-                           title="Permalink to 应该在何时判断一个指针是否为NULL">应该在何时判断一个指针是否为NULL</a></h1>
-                </header>
-
-                <div class="entry-content">
-<footer class="post-info">
-        <abbr class="published" title="2007-10-12T11:20:00+08:00">
-                Published: 周五 12 十月 2007
-        </abbr>
-
-        <address class="vcard author">
-                By                         <a class="url fn" href="/author/funcman.html">funcman</a>
-        </address>
-<p>In <a href="/category/programming.html">programming</a>.</p>
-<p>tags: <a href="/tag/c.html">C</a> <a href="/tag/c.html">C++</a> <a href="/tag/zhi-zhen.html">指针</a> <a href="/tag/pointer.html">pointer</a> </p>
-</footer><!-- /.post-info -->                <p>今天看到一篇Blog：<a href="http://fsfoundry.org/codefreak/2007/09/16/a-couple-of-things-about-pointer-to-null/">《NULL指标两三事》</a>，文中谈的主题即是我这篇Blog的题目，我这里也只是对原文的做些简单的记录。</p>
-<p>文中谈到的问题，也是我们平常出现的问题，即在操作一个指针前，我们常常在不需要判断指针是否为NULL时做了判断，而在需要判断时却想当然地把它漏掉了。</p>
-<p>例如：delete时，完全可以对一个NULL指针进行操作，而我们却要多余地加上一个<code>if(ptr!=NULL)</code>判断；
-又如：strlen时，如果参数给了一个NULL指针，就可能造成整个程序崩掉，我们却以为strlen自己会做NULL指针判读，并在获得一个NULL参数时return。</p>
-<p>另外，在原文的评论栏中有一问一答，合理地解释了为什么strlen这样的接受指针参数的函数，会不做<code>if(NULL==ptr)return;</code>这样的操作。嗯，为了效率，这么做充分体验了C的精神。想像一下，对于一个错误的参数，检测函数的返回难道比在调用前就检测参数更省事么；何况如果同一个参数穿过层层的函数调用，一个个检测函数返回是多么可怕的事，不如在调用函数事先来个参数检测。实际上，像strlen这样的函数，也不是没有在函数内部做参数检测，只不过它用的是非常合理的assert断言机制，即满足了功能，又满足了效率。</p>
-<p>以后再操作指针时，要记得有这么回事~</p>
-                <a class="readmore" href="/when_should_determine_whether_a-pointer_is_null.html">read more</a>
-                </div><!-- /.entry-content -->
-            </article></li>
                 </ol><!-- /#posts-list -->
 <p class="paginator">
         <a href="/index.html">&#8647;</a>
         <a href="/index.html">&laquo;</a>
-    Page 2 / 2
+    Page 2 / 3
+        <a href="/index3.html">&raquo;</a>
+        <a href="/index3.html">&#8649;</a>
 </p>
                 </section><!-- /#content -->
         <section id="extras" class="body">
