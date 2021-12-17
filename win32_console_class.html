@@ -33,7 +33,7 @@
 		<!-- Analytics -->
 	</head>
 
-	<body class="theme-base-0d">
+	<body class="theme-base-0e">
 <div class="sidebar">
 	<div class="container sidebar-sticky">
 		<div class="sidebar-about">
@@ -48,8 +48,6 @@
 			<p class="lead">一个游戏程序员。曾经参与开发过<a href='https://www.bing.com/search?q=%E4%BB%99%E4%BE%A3%E5%A5%87%E7%BC%983'>仙侣奇缘3</a>、<a href='http://sh.70yx.com'>水浒传</a>、<a href='https://itunes.apple.com/cn/app/id938688461'>小米运动</a>、<a href='https://itunes.apple.com/cn/app/id1034182617'>米动</a>和<a href='https://www.taptap.com/app/143658'>无限激战</a> </p>
 			<p></p>
 		</div>
-			<ul class="sidebar-nav">
-			</ul>
 		<nav class="sidebar-social">
 					<a class="sidebar-social-item" href="mailto:hyq1986@gmail.com">
 						<i class="fa fa-envelope"></i>
@@ -73,9 +71,9 @@
 <p>一种方法是使用VC的调试函数OutputDebugString()，将信息输出给VC调试控制台。还有一种方法是在Win32控制台工程的基础上创建窗口程序（入口为main而非WinMain）。可以用宏来控制编译，使Debug版本时有控制台，Release版本没有控制台，像这样：</p>
 <div class="highlight"><pre><span></span><code><span class="c1">// 一个简单的方法</span>
 <span class="cp">#ifndef _DEBUG</span>
-<span class="kt">int</span> <span class="n">WINAPI</span> <span class="n">WinMain</span><span class="p">(</span><span class="n">HINSTANCE</span> <span class="n">hInstance</span><span class="p">,</span> <span class="n">HINSTANCE</span> <span class="n">hPrevInstance</span><span class="p">,</span> <span class="n">LPSTR</span> <span class="n">lpCmdLine</span><span class="p">,</span> <span class="kt">int</span> <span class="n">nCmdShow</span><span class="p">)</span> <span class="p">{</span>
+<span class="kt">int</span><span class="w"> </span><span class="n">WINAPI</span><span class="w"> </span><span class="n">WinMain</span><span class="p">(</span><span class="n">HINSTANCE</span><span class="w"> </span><span class="n">hInstance</span><span class="p">,</span><span class="w"> </span><span class="n">HINSTANCE</span><span class="w"> </span><span class="n">hPrevInstance</span><span class="p">,</span><span class="w"> </span><span class="n">LPSTR</span><span class="w"> </span><span class="n">lpCmdLine</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">nCmdShow</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
 <span class="cp">#else</span>
-    <span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span><span class="o">**</span> <span class="n">argv</span><span class="p">)</span> <span class="p">{</span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">argc</span><span class="p">,</span><span class="w"> </span><span class="kt">char</span><span class="o">**</span><span class="w"> </span><span class="n">argv</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
 <span class="cp">#endif</span><span class="c1">//_DEBUG</span>
 </code></pre></div>
 
@@ -85,79 +83,79 @@
 <span class="cp">#ifndef DBGCON_H</span>
 <span class="cp">#define DBGCON_H</span>
 
-<span class="cp">#include</span> <span class="cpf">&lt;windows.h&gt;</span><span class="c1">;</span><span class="cp"></span>
-<span class="cp">#include</span> <span class="cpf">&lt;stdio.h&gt;</span><span class="c1">;</span><span class="cp"></span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;windows.h&gt;</span><span class="c1">;</span><span class="cp"></span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;stdio.h&gt;</span><span class="c1">;</span><span class="cp"></span>
 
-<span class="k">class</span> <span class="nc">DbgCon</span> <span class="p">{</span>
-<span class="k">public</span><span class="o">:</span>
-    <span class="n">DbgCon</span><span class="p">();</span>
-    <span class="o">~</span><span class="n">DbgCon</span><span class="p">();</span>
+<span class="k">class</span> <span class="nc">DbgCon</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="k">public</span><span class="o">:</span><span class="w"></span>
+<span class="w">    </span><span class="n">DbgCon</span><span class="p">();</span><span class="w"></span>
+<span class="w">    </span><span class="o">~</span><span class="n">DbgCon</span><span class="p">();</span><span class="w"></span>
 
-    <span class="kt">void</span>    <span class="nf">Show</span><span class="p">();</span>
-    <span class="kt">void</span>    <span class="nf">Hide</span><span class="p">();</span>
+<span class="w">    </span><span class="kt">void</span><span class="w">    </span><span class="nf">Show</span><span class="p">();</span><span class="w"></span>
+<span class="w">    </span><span class="kt">void</span><span class="w">    </span><span class="nf">Hide</span><span class="p">();</span><span class="w"></span>
 
-    <span class="kt">void</span>    <span class="nf">Top</span><span class="p">();</span>
-    <span class="kt">void</span>    <span class="nf">NoTop</span><span class="p">();</span>
+<span class="w">    </span><span class="kt">void</span><span class="w">    </span><span class="nf">Top</span><span class="p">();</span><span class="w"></span>
+<span class="w">    </span><span class="kt">void</span><span class="w">    </span><span class="nf">NoTop</span><span class="p">();</span><span class="w"></span>
 
-<span class="k">private</span><span class="o">:</span>
-    <span class="n">HWND</span>    <span class="n">HWnd_</span><span class="p">;</span>
-    <span class="kt">FILE</span><span class="o">*</span>   <span class="n">ConIn_</span><span class="p">;</span>
-    <span class="kt">FILE</span><span class="o">*</span>   <span class="n">ConOut_</span><span class="p">;</span>
-<span class="p">};</span>
+<span class="k">private</span><span class="o">:</span><span class="w"></span>
+<span class="w">    </span><span class="n">HWND</span><span class="w">    </span><span class="n">HWnd_</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="kt">FILE</span><span class="o">*</span><span class="w">   </span><span class="n">ConIn_</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="kt">FILE</span><span class="o">*</span><span class="w">   </span><span class="n">ConOut_</span><span class="p">;</span><span class="w"></span>
+<span class="p">};</span><span class="w"></span>
 
 <span class="cp">#endif</span><span class="c1">//DBGCON_H</span>
 </code></pre></div>
 
 <div class="highlight"><pre><span></span><code><span class="c1">// DbgCon.cpp</span>
 
-<span class="cp">#include</span> <span class="cpf">&quot;DbgCon.h&quot;</span><span class="cp"></span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;DbgCon.h&quot;</span><span class="cp"></span>
 
-<span class="n">DbgCon</span><span class="o">::</span><span class="n">DbgCon</span><span class="p">()</span>
-<span class="o">:</span>   <span class="n">HWnd_</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
-<span class="p">,</span>   <span class="n">ConIn_</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
-<span class="p">,</span>   <span class="n">ConOut_</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
-    <span class="c1">// 申请一个控制台</span>
-    <span class="k">if</span><span class="p">(</span> <span class="n">AllocConsole</span><span class="p">()</span> <span class="p">)</span> <span class="p">{</span>
-        <span class="n">HWnd_</span> <span class="o">=</span> <span class="n">GetConsoleWindow</span><span class="p">();</span>
-        <span class="c1">// 把管道转入该控制台</span>
-        <span class="n">freopen_s</span><span class="p">(</span><span class="o">&amp;</span><span class="n">ConIn_</span><span class="p">,</span> <span class="s">&quot;CONIN$&quot;</span><span class="p">,</span> <span class="s">&quot;r+t&quot;</span><span class="p">,</span> <span class="n">stdin</span><span class="p">);</span>
-        <span class="n">freopen_s</span><span class="p">(</span><span class="o">&amp;</span><span class="n">ConOut_</span><span class="p">,</span> <span class="s">&quot;CONOUT$&quot;</span><span class="p">,</span> <span class="s">&quot;w+t&quot;</span><span class="p">,</span> <span class="n">stdout</span><span class="p">);</span>
-        <span class="c1">// 去掉控制台窗口上的关闭功能</span>
-        <span class="c1">//（控制台窗口上的关闭操作会关掉整个进程）</span>
-        <span class="n">HMENU</span> <span class="n">HMenu</span> <span class="o">=</span> <span class="n">GetSystemMenu</span><span class="p">(</span><span class="n">HWnd_</span><span class="p">,</span> <span class="n">FALSE</span><span class="p">);</span>
-        <span class="n">RemoveMenu</span><span class="p">(</span><span class="n">HMenu</span><span class="p">,</span> <span class="n">SC_CLOSE</span><span class="p">,</span> <span class="n">MF_BYCOMMAND</span><span class="p">);</span>
-    <span class="p">}</span>
-<span class="p">}</span>
+<span class="n">DbgCon</span><span class="o">::</span><span class="n">DbgCon</span><span class="p">()</span><span class="w"></span>
+<span class="o">:</span><span class="w">   </span><span class="n">HWnd_</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="w"></span>
+<span class="p">,</span><span class="w">   </span><span class="n">ConIn_</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="w"></span>
+<span class="p">,</span><span class="w">   </span><span class="n">ConOut_</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="c1">// 申请一个控制台</span>
+<span class="w">    </span><span class="k">if</span><span class="p">(</span><span class="w"> </span><span class="n">AllocConsole</span><span class="p">()</span><span class="w"> </span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="n">HWnd_</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">GetConsoleWindow</span><span class="p">();</span><span class="w"></span>
+<span class="w">        </span><span class="c1">// 把管道转入该控制台</span>
+<span class="w">        </span><span class="n">freopen_s</span><span class="p">(</span><span class="o">&amp;</span><span class="n">ConIn_</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;CONIN$&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;r+t&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">stdin</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="n">freopen_s</span><span class="p">(</span><span class="o">&amp;</span><span class="n">ConOut_</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;CONOUT$&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;w+t&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">stdout</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="c1">// 去掉控制台窗口上的关闭功能</span>
+<span class="w">        </span><span class="c1">//（控制台窗口上的关闭操作会关掉整个进程）</span>
+<span class="w">        </span><span class="n">HMENU</span><span class="w"> </span><span class="n">HMenu</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">GetSystemMenu</span><span class="p">(</span><span class="n">HWnd_</span><span class="p">,</span><span class="w"> </span><span class="n">FALSE</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="n">RemoveMenu</span><span class="p">(</span><span class="n">HMenu</span><span class="p">,</span><span class="w"> </span><span class="n">SC_CLOSE</span><span class="p">,</span><span class="w"> </span><span class="n">MF_BYCOMMAND</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
 
-<span class="n">DbgCon</span><span class="o">::~</span><span class="n">DbgCon</span><span class="p">()</span> <span class="p">{</span>
-    <span class="n">FreeConsole</span><span class="p">();</span>
-    <span class="k">if</span><span class="p">(</span> <span class="n">ConOut_</span> <span class="p">)</span> <span class="p">{</span>
-        <span class="n">fclose</span><span class="p">(</span><span class="n">ConOut_</span><span class="p">);</span>
-    <span class="p">}</span>
-    <span class="k">if</span><span class="p">(</span> <span class="n">ConIn_</span> <span class="p">)</span> <span class="p">{</span>
-        <span class="n">fclose</span><span class="p">(</span><span class="n">ConIn_</span><span class="p">);</span>
-    <span class="p">}</span>
-<span class="p">}</span>
+<span class="n">DbgCon</span><span class="o">::~</span><span class="n">DbgCon</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">FreeConsole</span><span class="p">();</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="p">(</span><span class="w"> </span><span class="n">ConOut_</span><span class="w"> </span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="n">fclose</span><span class="p">(</span><span class="n">ConOut_</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="p">(</span><span class="w"> </span><span class="n">ConIn_</span><span class="w"> </span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="n">fclose</span><span class="p">(</span><span class="n">ConIn_</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
 
-<span class="kt">void</span> <span class="n">DbgCon</span><span class="o">::</span><span class="n">Show</span><span class="p">()</span> <span class="p">{</span>
-    <span class="c1">// 显示控制台窗口（恢复到正常状态）</span>
-    <span class="n">ShowWindow</span><span class="p">(</span><span class="n">HWnd_</span><span class="p">,</span> <span class="n">SW_SHOWNORMAL</span><span class="p">);</span>
-<span class="p">}</span>
+<span class="kt">void</span><span class="w"> </span><span class="n">DbgCon</span><span class="o">::</span><span class="n">Show</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="c1">// 显示控制台窗口（恢复到正常状态）</span>
+<span class="w">    </span><span class="n">ShowWindow</span><span class="p">(</span><span class="n">HWnd_</span><span class="p">,</span><span class="w"> </span><span class="n">SW_SHOWNORMAL</span><span class="p">);</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
 
-<span class="kt">void</span> <span class="n">DbgCon</span><span class="o">::</span><span class="n">Hide</span><span class="p">()</span> <span class="p">{</span>
-    <span class="c1">// 隐藏控制台窗口</span>
-    <span class="n">ShowWindow</span><span class="p">(</span><span class="n">HWnd_</span><span class="p">,</span> <span class="n">SW_HIDE</span><span class="p">);</span>
-<span class="p">}</span>
+<span class="kt">void</span><span class="w"> </span><span class="n">DbgCon</span><span class="o">::</span><span class="n">Hide</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="c1">// 隐藏控制台窗口</span>
+<span class="w">    </span><span class="n">ShowWindow</span><span class="p">(</span><span class="n">HWnd_</span><span class="p">,</span><span class="w"> </span><span class="n">SW_HIDE</span><span class="p">);</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
 
-<span class="kt">void</span> <span class="n">DbgCon</span><span class="o">::</span><span class="n">Top</span><span class="p">()</span> <span class="p">{</span>
-    <span class="c1">// 置顶控制台窗口</span>
-    <span class="n">SetWindowPos</span><span class="p">(</span><span class="n">HWnd_</span><span class="p">,</span> <span class="n">HWND_TOPMOST</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">SWP_NOMOVE</span><span class="o">||</span><span class="n">SWP_NOSIZE</span><span class="p">);</span>
-<span class="p">}</span>
+<span class="kt">void</span><span class="w"> </span><span class="n">DbgCon</span><span class="o">::</span><span class="n">Top</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="c1">// 置顶控制台窗口</span>
+<span class="w">    </span><span class="n">SetWindowPos</span><span class="p">(</span><span class="n">HWnd_</span><span class="p">,</span><span class="w"> </span><span class="n">HWND_TOPMOST</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="n">SWP_NOMOVE</span><span class="o">||</span><span class="n">SWP_NOSIZE</span><span class="p">);</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
 
-<span class="kt">void</span> <span class="n">DbgCon</span><span class="o">::</span><span class="n">NoTop</span><span class="p">()</span> <span class="p">{</span>
-    <span class="c1">// 取消置顶</span>
-    <span class="n">SetWindowPos</span><span class="p">(</span><span class="n">HWnd_</span><span class="p">,</span> <span class="n">HWND_NOTOPMOST</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">SWP_NOMOVE</span><span class="o">||</span><span class="n">SWP_NOSIZE</span><span class="p">);</span> 
-<span class="p">}</span>
+<span class="kt">void</span><span class="w"> </span><span class="n">DbgCon</span><span class="o">::</span><span class="n">NoTop</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="c1">// 取消置顶</span>
+<span class="w">    </span><span class="n">SetWindowPos</span><span class="p">(</span><span class="n">HWnd_</span><span class="p">,</span><span class="w"> </span><span class="n">HWND_NOTOPMOST</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="n">SWP_NOMOVE</span><span class="o">||</span><span class="n">SWP_NOSIZE</span><span class="p">);</span><span class="w"> </span>
+<span class="p">}</span><span class="w"></span>
 </code></pre></div>
 </div>
 		</div>

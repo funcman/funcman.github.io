@@ -33,7 +33,7 @@
 		<!-- Analytics -->
 	</head>
 
-	<body class="theme-base-0d">
+	<body class="theme-base-0e">
 <div class="sidebar">
 	<div class="container sidebar-sticky">
 		<div class="sidebar-about">
@@ -48,8 +48,6 @@
 			<p class="lead">一个游戏程序员。曾经参与开发过<a href='https://www.bing.com/search?q=%E4%BB%99%E4%BE%A3%E5%A5%87%E7%BC%983'>仙侣奇缘3</a>、<a href='http://sh.70yx.com'>水浒传</a>、<a href='https://itunes.apple.com/cn/app/id938688461'>小米运动</a>、<a href='https://itunes.apple.com/cn/app/id1034182617'>米动</a>和<a href='https://www.taptap.com/app/143658'>无限激战</a> </p>
 			<p></p>
 		</div>
-			<ul class="sidebar-nav">
-			</ul>
 		<nav class="sidebar-social">
 					<a class="sidebar-social-item" href="mailto:hyq1986@gmail.com">
 						<i class="fa fa-envelope"></i>
@@ -74,9 +72,7 @@
 				<span class="post-date">周五 22 七月 2016</span>
 				<p>
 					<p>还没找到工作，面了几家，都没下文。我脸皮厚，写点总结发博客。</p>
-<p>像标题这样的面试问题，这些天遇到不止一两次。第一次我略懵，毕竟好久没被面了，没什么准备，所以没做出全面的回答。不过，就算到现在，我也没能在面试时把这个问题回答得很到位。可能这个问题对我来说已经不是什么困扰，平时想得也不多，遇到了我也能解决。这里做一下笔记，这样再遇到这个问题，我可以表现得好一些。</p>
-<p>首先破题，为什么需要考虑管理内存的事，因为C/C++主要提供的是一种很原始的手工释放内存的方式。人难免出错，如果申请了内存，最后忘记释放，就会造成内存泄漏。此外，对于那些在好几个模块之间共享的内存，怎样才能做到正确且合理地释放，也是个问题。如果其中某个模块做了解引用（dereference）操作，还要专门去通知别的模块，再根据情况的不同决定是否需要真的释放内存，那模块之间必然是紧耦合的。所以，并不是小心谨慎就能解决好内存管理问题，好的内存管理一定要借助合适的方法和工具。</p>
-<p>我这里第一个要谈的工具，是内存池。内存池实际上是在一开始申请一大块内存，再将这大块的内存按照一定规则划分成几个尺寸的小块内存集合。同一尺寸的小块内存用一个叫FreeList的东西串起来，有几种尺寸就搞几条FreeList。当我们需要内存时，根据需要的尺寸 …</p>
+<p>像标题这样的面试问题，这些天遇到不止一两次。第一次我略 …</p>
 				</p>
 				<a class="read-more" href="how_do_you_manage_memory.html">Continue reading »</a>
 			</div>

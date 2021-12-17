@@ -33,7 +33,7 @@
 		<!-- Analytics -->
 	</head>
 
-	<body class="theme-base-0d">
+	<body class="theme-base-0e">
 <div class="sidebar">
 	<div class="container sidebar-sticky">
 		<div class="sidebar-about">
@@ -48,8 +48,6 @@
 			<p class="lead">一个游戏程序员。曾经参与开发过<a href='https://www.bing.com/search?q=%E4%BB%99%E4%BE%A3%E5%A5%87%E7%BC%983'>仙侣奇缘3</a>、<a href='http://sh.70yx.com'>水浒传</a>、<a href='https://itunes.apple.com/cn/app/id938688461'>小米运动</a>、<a href='https://itunes.apple.com/cn/app/id1034182617'>米动</a>和<a href='https://www.taptap.com/app/143658'>无限激战</a> </p>
 			<p></p>
 		</div>
-			<ul class="sidebar-nav">
-			</ul>
 		<nav class="sidebar-social">
 					<a class="sidebar-social-item" href="mailto:hyq1986@gmail.com">
 						<i class="fa fa-envelope"></i>
@@ -74,27 +72,7 @@
 				<span class="post-date">周日 19 九月 2021</span>
 				<p>
 					<p>这里简单发一篇博客，讲一下我在使用了Pelican来重建这个博客。至于回归博客的感言什么的，回头再说了。</p>
-<p>之所以不再使用Jekyll，主要是不想在电脑上安装过多的开发环境了。而且Github Pages会是不是升级Jekyll环境，我还得跟着升级，太麻烦了。</p>
-<p>Pelican的好处是非常简单，很容易生成静态页面，且我会用到Python。</p>
-<p>Pelican的用法网上很多，这里主要记录一下特别的地方。</p>
-<p>首先是图片等涉及静态路径的，需要在<strong>pelicanconf.py</strong>里设置<strong>STATIC_PATHS</strong>：</p>
-<div class="highlight"><pre><span></span><code><span class="n">STATIC_PATHS</span> <span class="o">=</span> <span class="p">[</span>
-    <span class="s1">&#39;images&#39;</span><span class="p">,</span>
-<span class="p">]</span>
-</code></pre></div>
-
-<p>并且Markdown中，引用图片需要这样：</p>
-<div class="highlight"><pre><span></span><code>![<span class="nt">JUSE FUCKING DO IT</span>](<span class="na">{static}/images/just_fucking_do_it.png</span>)
-</code></pre></div>
-
-<p>然后是favicon，我是这么设置的，并且把<strong>favicon.ico</strong>放在<strong>/content/extra/</strong>目录下：</p>
-<div class="highlight"><pre><span></span><code><span class="n">STATIC_PATHS</span> <span class="o">=</span> <span class="p">[</span>
-    <span class="s1">&#39;images&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;extra&#39;</span><span class="p">,</span>
-<span class="p">]</span>
-
-<span class="n">EXTRA_PATH_METADATA</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s1">&#39;extra/robots.txt&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;path …</span></code></pre></div>
+<p>之所以不再使用Jekyll …</p>
 				</p>
 				<a class="read-more" href="replace_jekyll_with_pelican_for_my_blog.html">Continue reading »</a>
 			</div>
@@ -105,31 +83,7 @@
 				<span class="post-date">周日 31 三月 2019</span>
 				<p>
 					<p>最近准备继续记博客，需要安装Jekyll环境。</p>
-<p>手头既有Mac也有PC，考虑到上班期间带的是PC，所以还是要在Windows下配置一个Jekyll环境。</p>
-<p>按照Jekyll官网的方法，是去安装RubyInstaller。但是，RubyInstaller本身是基于MSYS2的，我的PC已经装了MSYS2，不想再多搞一套，于是决定基于MSYS2安装Ruby和Jekyll。</p>
-<p>MSYS2类似Cygwin（其实就是一个Cygwin分支），可以让用户在Windows下使用UNIX环境的套件。这里先介绍一下相关概念：</p>
-<ul>
-<li>
-<p>Pacman是一套流行于Arch Linux下的软件包管理软件。</p>
-</li>
-<li>
-<p>MinGW是一套在Windows使用的GNU工具链，MinGW-w64是新一代MinGW，同时支持32位和64位。</p>
-</li>
-<li>
-<p>MSYS是为帮助MinGW在Windows下使用，随MinGW提供的一套基本的POSIX操作环境。它是基于较旧的Cygwin项目创建的一个分支。MSYS2和MSYS并不是同一个项目的不同版本，它们各为独立项目。</p>
-</li>
-</ul>
-<p>MSYS2集成了Pacman和MinGW-w64。</p>
-<p>我们在中国使用MSYS2，最好设置一下国内的镜像，网上的文章基本都是让用<a href="https://lug.ustc.edu.cn/wiki/mirrors/help/msys2">中科大的镜像</a>，但目前他们的东西有点问题，只好改用<a href="https://mirrors.tuna.tsinghua.edu.cn/help/msys2">清华的镜像</a>。可惜了，实际上中科大离我很近。</p>
-<p>按照页面上的说明设置好镜像，并执行：</p>
-<div class="highlight"><pre><span></span><code>pacman -Syu
-</code></pre></div>
-
-<p>在最后提示关闭MSYS2时，点窗口的X进行关闭，再去MSYS2安装目录里运行一下autorebase.bat。然后打开MSYS2，执行一下更新：</p>
-<div class="highlight"><pre><span></span><code>pacman -Su
-</code></pre></div>
-
-<p>之后就安装一系列软件，我这里是 …</p>
+<p>手头既有Mac也有PC，考虑到上班期间带的是PC，所以还是要在Windows下配置一个Jekyll环境 …</p>
 				</p>
 				<a class="read-more" href="another_way_to_use_jekyll_on_windows_10.html">Continue reading »</a>
 			</div>
@@ -139,12 +93,7 @@
 				</h1>
 				<span class="post-date">周三 25 十一月 2015</span>
 				<p>
-					<p>我是个英语很烂的人，所有关于英语的能力，都来自于技术工作中对英文的不得不进行的接触。因为英语太烂，也失去了一些不错的机会。怎么学英语，我是不懂的。至于背单词，大多数英语好的人，应该都去尝试过。我也尝试过，但一直不得其法。</p>
-<p>现在，为了完成学业，我又准备拿起单词书，再次尝试一下。在开始做这件事时，我想了一下，到底是什么阻碍了我之前在背单词上的持续努力？</p>
-<p>我不是没有目的的去学习一个东西，相反，学好了英语对我来说有很多积极的意义。在我内心里，是有学习的冲动的。所以，之前的不顺利，应该是方法上出了问题。</p>
-<p>背单词是一种记忆活动，在记忆领域，人们有一个普遍的共识，就是人脑记忆新事物遵循着“艾宾浩斯记忆曲线”。我之前也采用了遵循这种规律的记忆复习方法，相信在这类方法的应用上，没有什么问题。</p>
-<p>在还没有想清楚这个问题的时候，我还在找背单词的工具。幸运的是我找到了一个叫<a href="https://itunes.apple.com/app/id888483369/">墨墨背单词</a>的手机应用，帮助我弄清了这个问题。</p>
-<p>人有一种既贪婪又懦弱的通性。人做一件事情，是由欲望驱使的，欲望总是使人在得到的同时还想得到更多。人的能力有限，无法驾驭所有，当欲望发展成贪婪，无法得到完全的满足时，人的懦弱的本性就开始产生作用 …</p>
+					<p>我是个英语很烂的人，所有关于英语的能力，都来自于技术工作中对英文的不得不进行的接触。因为英语太烂，也失去了一 …</p>
 				</p>
 				<a class="read-more" href="how_to_remember_english_words.html">Continue reading »</a>
 			</div>
@@ -156,10 +105,7 @@
 				<p>
 					<p>艾未未先生的《4851》是我看到的最深刻的艺术作品。</p>
 <p>87分钟的片长，可能没几个人会真的花87分钟完整地看完这部片子。</p>
-<p>没关系，你的观看方式已经是这部艺术作品的一部分。</p>
-<p>这是部完美的艺术作品，像一味催化剂。</p>
-<p>只要你对5·12的任何一点有所思考，它都会从理性和感性两方面触发你。</p>
-<p>你可以通过YouTube观看：<a href="https://www.youtube.com/watch?v=4IZpRHDOJpg">《4851》</a>（中国用户访问YouTube需要跨越GFW）</p>
+<p>没关 …</p>
 				</p>
 				<a class="read-more" href="review_of_4851_by_ai_weiwei.html">Continue reading »</a>
 			</div>
@@ -169,10 +115,7 @@
 				</h1>
 				<span class="post-date">周一 21 十二月 2009</span>
 				<p>
-					<p>一、某些动物性情趋向于人，人们能从这些动物身上获得人道情感，保护这些动物是在维护人道主义。之所有争取一些动物不作为牲畜屠宰，争取一些牲口在屠宰时更快死亡以减少受虐程度，是基于这样一个泛功利的动机。</p>
-<p>二、野生动物是地球生态的重要组成部分，保护野生动物，是为了地球生态能够正常运行下去。地球生态的正常运作，才能让人们和他们的后台得以更好地生存。这也是一个功利的理由。</p>
-<p>所以即使抛弃崇高的理念，以现实利益为名，动物保护主义也是完全站得住脚的。</p>
-<p>《海豚湾》作为一部动物保护主义题材的环保纪录片，它的拍摄，是在遵从上面两个重要逻辑的前提下展开的。海豚保护组织最终在国际规则制定会议（法的层面）上，展出血淋淋的证据，给日本滥杀海豚的恶行以有力一击。这种行事方式十分成熟。</p>
+					<p>一、某些动物性情趋向于人，人们能从这些动物身上获得人道情感，保护这些动物是在维护人道主义。之所有争取一些动物 …</p>
 				</p>
 				<a class="read-more" href="logic_of_animal_protectionism.html">Continue reading »</a>
 			</div>

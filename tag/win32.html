@@ -33,7 +33,7 @@
 		<!-- Analytics -->
 	</head>
 
-	<body class="theme-base-0d">
+	<body class="theme-base-0e">
 <div class="sidebar">
 	<div class="container sidebar-sticky">
 		<div class="sidebar-about">
@@ -48,8 +48,6 @@
 			<p class="lead">一个游戏程序员。曾经参与开发过<a href='https://www.bing.com/search?q=%E4%BB%99%E4%BE%A3%E5%A5%87%E7%BC%983'>仙侣奇缘3</a>、<a href='http://sh.70yx.com'>水浒传</a>、<a href='https://itunes.apple.com/cn/app/id938688461'>小米运动</a>、<a href='https://itunes.apple.com/cn/app/id1034182617'>米动</a>和<a href='https://www.taptap.com/app/143658'>无限激战</a> </p>
 			<p></p>
 		</div>
-			<ul class="sidebar-nav">
-			</ul>
 		<nav class="sidebar-social">
 					<a class="sidebar-social-item" href="mailto:hyq1986@gmail.com">
 						<i class="fa fa-envelope"></i>
@@ -73,24 +71,7 @@
 				</h1>
 				<span class="post-date">周日 06 六月 2010</span>
 				<p>
-					<p>对于编写Win32程序，尤其是游戏这种实时性高的程序来说，断点调试未必是最合适的调试方法。很多时候，我们更渴望看到实时打印的调试信息。</p>
-<p>一种方法是使用VC的调试函数OutputDebugString()，将信息输出给VC调试控制台。还有一种方法是在Win32控制台工程的基础上创建窗口程序（入口为main而非WinMain）。可以用宏来控制编译，使Debug版本时有控制台，Release版本没有控制台，像这样：</p>
-<div class="highlight"><pre><span></span><code><span class="c1">// 一个简单的方法</span>
-<span class="cp">#ifndef _DEBUG</span>
-<span class="kt">int</span> <span class="n">WINAPI</span> <span class="n">WinMain</span><span class="p">(</span><span class="n">HINSTANCE</span> <span class="n">hInstance</span><span class="p">,</span> <span class="n">HINSTANCE</span> <span class="n">hPrevInstance</span><span class="p">,</span> <span class="n">LPSTR</span> <span class="n">lpCmdLine</span><span class="p">,</span> <span class="kt">int</span> <span class="n">nCmdShow</span><span class="p">)</span> <span class="p">{</span>
-<span class="cp">#else</span>
-    <span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span><span class="o">**</span> <span class="n">argv</span><span class="p">)</span> <span class="p">{</span>
-<span class="cp">#endif</span><span class="c1">//_DEBUG</span>
-</code></pre></div>
-
-<p>但这种方法并不灵活，这里介绍一个直接用Win32 API获得控制台的方法。一切皆在代码中：</p>
-<div class="highlight"><pre><span></span><code><span class="c1">// DbgCon.h</span>
-
-<span class="cp">#ifndef DBGCON_H</span>
-<span class="cp">#define DBGCON_H</span>
-
-<span class="cp">#include</span> <span class="cpf">&lt;windows.h&gt;</span><span class="c1">;</span><span class="cp"></span>
-<span class="cp">#include …</span></code></pre></div>
+					<p>对于编写Win32程序，尤其是游戏这种实时性高的程序来说，断点调试未必是最合适的调试方法。很多时候，我们更渴望看到实 …</p>
 				</p>
 				<a class="read-more" href="win32_console_class.html">Continue reading »</a>
 			</div>

@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="zh_cn" prefix="og: http://ogp.me/ns#">
+	<head>
+		<link href="http://gmpg.org/xfn/11" rel="profile">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta http-equiv="content-type" content="text/html; charset=utf-8">
+
+		<!-- Metadata -->
+	<meta name="description" content="一个游戏程序员。曾经参与开发过<a href='https://www.bing.com/search?q=%E4%BB%99%E4%BE%A3%E5%A5%87%E7%BC%983'>仙侣奇缘3</a>、<a href='http://sh.70yx.com'>水浒传</a>、<a href='https://itunes.apple.com/cn/app/id938688461'>小米运动</a>、<a href='https://itunes.apple.com/cn/app/id1034182617'>米动</a>和<a href='https://www.taptap.com/app/143658'>无限激战</a>">
+	<meta property="og:description" content="一个游戏程序员。曾经参与开发过<a href='https://www.bing.com/search?q=%E4%BB%99%E4%BE%A3%E5%A5%87%E7%BC%983'>仙侣奇缘3</a>、<a href='http://sh.70yx.com'>水浒传</a>、<a href='https://itunes.apple.com/cn/app/id938688461'>小米运动</a>、<a href='https://itunes.apple.com/cn/app/id1034182617'>米动</a>和<a href='https://www.taptap.com/app/143658'>无限激战</a>">
+	<meta property="og:title" content="Orthodox C++" />
+	<meta property="og:type" content="article" />
+	<meta property="og:url" content="https://funcman.me/orthodox_cpp.html" />
+		<meta property="og:image" content="https://funcman.me/images/avatar.png" />
+
+		<!-- Enable responsiveness on mobile devices-->
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+
+		<title>funcman's blog</title>
+
+		<!-- CSS -->
+		<link href="//fonts.googleapis.com/" rel="dns-prefetch">
+		<link href="//fonts.googleapis.com/css?family=Droid+Serif:400,700,400italic|Abril+Fatface|PT+Sans:400,400italic,700&amp;subset=latin,latin-ext" rel="stylesheet">
+
+		<link rel="stylesheet" href="https://funcman.me/theme/css/poole.css" />
+		<link rel="stylesheet" href="https://funcman.me/theme/css/hyde.css" />
+		<link rel="stylesheet" href="https://funcman.me/theme/css/syntax.css" />
+			<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fork-awesome@1.1.7/css/fork-awesome.min.css" crossorigin="anonymous">
+
+		<!-- Feeds -->
+<link href="https://funcman.me/rss.xml" type="application/atom+xml" rel="alternate" title="funcman's blog Full Atom Feed" />
+
+		<!-- Analytics -->
+	</head>
+
+	<body class="theme-base-0e">
+<div class="sidebar">
+	<div class="container sidebar-sticky">
+		<div class="sidebar-about">
+
+			<h1>
+				<a href="/">
+					<img class="profile-picture" src="https://funcman.me/images/avatar.png">
+					funcman's blog
+				</a>
+			</h1>
+			<p class="lead"></p>
+			<p class="lead">一个游戏程序员。曾经参与开发过<a href='https://www.bing.com/search?q=%E4%BB%99%E4%BE%A3%E5%A5%87%E7%BC%983'>仙侣奇缘3</a>、<a href='http://sh.70yx.com'>水浒传</a>、<a href='https://itunes.apple.com/cn/app/id938688461'>小米运动</a>、<a href='https://itunes.apple.com/cn/app/id1034182617'>米动</a>和<a href='https://www.taptap.com/app/143658'>无限激战</a> </p>
+			<p></p>
+		</div>
+		<nav class="sidebar-social">
+					<a class="sidebar-social-item" href="mailto:hyq1986@gmail.com">
+						<i class="fa fa-envelope"></i>
+					</a>
+					<a class="sidebar-social-item" href="https://twitter.com/funcman" target="_blank">
+						<i class="fa fa-twitter"></i>
+					</a>
+					<a class="sidebar-social-item" href="https://github.com/funcman" target="_blank">
+						<i class="fa fa-github"></i>
+					</a>
+			<a class="sidebar-social-item" href="https://funcman.me/rss.xml">
+				<i class="fa fa-rss"></i>
+			</a>
+		</nav>
+	</div>
+</div>		<div class="content container">
+<div class="post">
+	<h1 class="post-title">Orthodox C++</h1>
+	<span class="post-date">周五 17 十二月 2021</span>
+	<p>本文翻译自<a href="https://gist.github.com/bkaradzic/2e39896bc7d8c34e042b">https://gist.github.com/bkaradzic/2e39896bc7d8c34e042b</a>，原作者是<a href="https://twitter.com/bkaradzic">Бранимир Караџић</a>。</p>
+<h2>什么是Orthodox C++？</h2>
+<p>Orthodox C++（有时被称为<strong>C+</strong>）是C++的最小子集，它改进了C，但避免了所谓的现代C++中所有不必要的东西。它与<a href="https://stackoverflow.com/questions/3661237/what-is-modern-c">现代C++</a>的预设恰好相反。</p>
+<h2>为什么否定现代C++?</h2>
+<p>在1990年末，我们也是当时的现代C++潮人，我们会用最新的功能。我们告诉大家就应该用这些特性。随着时间的推移，我们搞清了使用一些语言特性其实是大可不必的，这很明显，我们用的特性已经被证明是不好的（像RTTI、异常和流），非必要的代码复杂性搞得适得其反。如果你认为这是无稽之谈，那就再多等几年，到时<a href="http://archive.md/2016.05.17-214038/https://www.linkedin.com/pulse/why-i-dont-spend-time-modern-c-anymore-henrique-bucher-phd">你也会讨厌现代C++</a>（LinkedIn的归档文章：《为什么我不再花时间研究现代C++了》）。</p>
+<p><img alt="一副漫画" src="https://funcman.me/images/modern_cpp_caricature.png"></p>
+<h2>为什么要用Orthodox C++？</h2>
+<p>基于Orthodox C++限制所编写的代码，将更容易理解，更简单，并且可以用更老的编译器构建。用Orthodox C++子集编写的项目，将更容易被其他C++项目接受，因为Orthodox C++用到的子集，不太会与采用者的C++子集偏好相冲突。</p>
+<h2>使用Orthodox C++编写的Hello World</h2>
+<div class="highlight"><pre><span></span><code><span class="w">    </span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;stdio.h&gt;</span><span class="cp"></span>
+
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span><span class="w"></span>
+<span class="w">    </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;hello, world</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+</code></pre></div>
+
+<h2>我该使用什么？</h2>
+<ul>
+<li>类C的C++是个好的开始，如果代码不需要更多的复杂性，就不要增加不必要的C++复杂性。一般情况下，代码对于熟知C语言的人来说，应该是可读的。</li>
+<li>不要做<a href="http://archive.md/2014.04.28-125041/http://www.boost.org/doc/libs/1_55_0/libs/geometry/doc/html/geometry/design.html">这事</a>，Orthodox C++“设计原理”的结尾，应该紧跟“很简单，且可用。<strong>EOF</strong>”。</li>
+<li>不要使用<a href="https://web.archive.org/web/20190116034706/http://www.lighterra.com/papers/exceptionsharmful/">异常</a>。</li>
+</ul>
+<blockquote>
+<p>异常处理是唯一的需要复杂的运行时系统支撑的C++语言特性，也是唯一的即使你不用也要付出运行时消耗的C++特性——很多时候，它会在每个对象的构造、析构以及try块的进入/退出时，额外地加入隐藏代码，还总是很大地限制编译器能做的优化。然而，C++的异常又是编译期是不执行的，所以你甚至不知道是否忘了处理一些错误的情况！从风格上看，处理错误的异常，与C的错误返回码风格并不匹配，这导致了编程风格的真实分裂，因为C++代码必然会调用底层C库。</p>
+</blockquote>
+<ul>
+<li>不要使用RTTI。</li>
+<li>不要使用被C++运行时包装的C运行时，包括（<code>&lt;cstdio&gt;</code>、<code>&lt;cmath&gt;</code>等），要使用C运行时（<code>&lt;stdio.h&gt;</code>、<code>&lt;math.h&gt;</code>等）。</li>
+<li>不要使用流（<code>&lt;iostream&gt;</code>、<code>&lt;stringstream&gt;</code>等），使用printf风格的函数代替。</li>
+<li>不要使用任何由STL分配的内存，除非你不关心内存管理。详见<a href="https://www.youtube.com/watch?v=LIb3L4vKZ7U">CppCon 2015：《std::allocator归于分配，std::vector归于纠结》（Andrei Alexandrescu）</a>这个讲座，以了解更多信息。</li>
+<li>不要过度使用元编程来进行学术自慰。要适度，只在必要时，在能降低代码复杂度时，使用它。</li>
+<li>对当前的标准C++&lt;年份&gt;中引入的任何特性，要有警惕性，最好等到这些特性在标准的下一次迭代中得到了改进。例如，C++11中的“constexpr”待到C++14中再采用（<a href="http://archive.md/2018.02.01-171248/https://twitter.com/lefticus/status/958931109009440768">来自Jason Turner</a>，cppbestpractices.com的站长）。</li>
+</ul>
+<h2>使用现代C++&lt;年份&gt;的功能都还安全吗？</h2>
+<p>由于编译器、操作系统发行版等，对C++标准采用的滞后。通常不能立即开始使用那些新的、有用的语言特性。一般性指导是：如果今年是C++<em>年份</em>+5，就可以安全地开始<strong>有选择性地</strong>使用C++_年份_的特性。例如，如果标准是C++11，而今年&gt;=2016，则基本是安全的。如果编译你的代码需要的标准是C++17，并且今年是2016年，那么显然你是在实践“简历驱动开发”方法论。如果你在做开源项目，那你就不是在造别人能用的东西。</p>
+<p><strong>更新</strong> 截至2019年1月14日, Orthodox C++委员会已认可对C++14的使用。</p>
+<h2>还有其他类似的想法？</h2>
+<ul>
+<li><a href="https://en.wikipedia.org/wiki/Embedded_C%2B%2B">Embedded C++</a></li>
+<li><a href="http://archive.md/2016.08.07-162105/https://namandixit.github.io/blog/nominal-c++/">Nominal C++</a></li>
+<li><a href="http://archive.md/2016.08.07-162220/http://flohofwoe.blogspot.nl/2013/06/sane-c.html">Sane C++</a></li>
+<li><a href="http://archive.md/2017.03.19-055108/https://hacksoflife.blogspot.nl/2017/03/why-your-c-should-be-simple.html">为什么你的C++应该变简单</a></li>
+<li><a href="https://web.archive.org/web/20190227061553/https://c0de517e.blogspot.com/2019/02/c-its-not-you-its-me.html">C++，非你。是我。</a></li>
+<li><a href="https://www.youtube.com/watch?v=lTXHOOwfTAo">《保持C-mple》Alexander Radchenko于悉尼C++聚会</a></li>
+<li><a href="https://web.archive.org/web/20200521234043/https://satish.net.in/20180302/">一种C++方言</a></li>
+</ul>
+<h2>代码示例</h2>
+<ul>
+<li>任何被C++编译器通过的C源码</li>
+<li><a href="https://github.com/id-Software/DOOM-3-BFG">DOOM 3 BFG</a></li>
+<li><a href="https://github.com/qtproject">Qt</a> (使用无RTTI、无异常构建的)</li>
+<li><a href="https://github.com/ocornut/imgui">dear imgui</a></li>
+<li><a href="https://github.com/bkaradzic/bgfx">bgfx</a></li>
+<li><a href="https://github.com/ConfettiFX/The-Forge">TheForge</a></li>
+<li><a href="https://github.com/floooh/oryol">Oryol</a></li>
+<li><a href="https://github.com/networknext/sdk">Network Next SDK</a></li>
+</ul>
+</div>
+		</div>
+	</body>
+</html>
