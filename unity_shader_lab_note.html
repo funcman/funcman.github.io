@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="zh_cn" prefix="og: http://ogp.me/ns#">
+	<head>
+		<link href="http://gmpg.org/xfn/11" rel="profile">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta http-equiv="content-type" content="text/html; charset=utf-8">
+
+		<!-- Metadata -->
+	<meta name="description" content="一个游戏程序员。曾经参与开发过<a href='https://www.bing.com/search?q=%E4%BB%99%E4%BE%A3%E5%A5%87%E7%BC%983'>仙侣奇缘3</a>、<a href='http://sh.70yx.com'>水浒传</a>、<a href='https://itunes.apple.com/cn/app/id938688461'>小米运动</a>、<a href='https://itunes.apple.com/cn/app/id1034182617'>米动</a>和<a href='https://www.taptap.com/app/143658'>无限激战</a>">
+	<meta property="og:description" content="一个游戏程序员。曾经参与开发过<a href='https://www.bing.com/search?q=%E4%BB%99%E4%BE%A3%E5%A5%87%E7%BC%983'>仙侣奇缘3</a>、<a href='http://sh.70yx.com'>水浒传</a>、<a href='https://itunes.apple.com/cn/app/id938688461'>小米运动</a>、<a href='https://itunes.apple.com/cn/app/id1034182617'>米动</a>和<a href='https://www.taptap.com/app/143658'>无限激战</a>">
+	<meta property="og:title" content="Unity ShaderLab 个人学习笔记" />
+	<meta property="og:type" content="article" />
+	<meta property="og:url" content="https://funcman.me/unity_shader_lab_note.html" />
+		<meta property="og:image" content="https://funcman.me/images/avatar.png" />
+
+		<!-- Enable responsiveness on mobile devices-->
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+
+		<title>funcman's blog</title>
+
+		<!-- CSS -->
+		<link href="//fonts.googleapis.com/" rel="dns-prefetch">
+		<link href="//fonts.googleapis.com/css?family=Droid+Serif:400,700,400italic|Abril+Fatface|PT+Sans:400,400italic,700&amp;subset=latin,latin-ext" rel="stylesheet">
+
+		<link rel="stylesheet" href="https://funcman.me/theme/css/poole.css" />
+		<link rel="stylesheet" href="https://funcman.me/theme/css/hyde.css" />
+		<link rel="stylesheet" href="https://funcman.me/theme/css/syntax.css" />
+			<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fork-awesome@1.1.7/css/fork-awesome.min.css" crossorigin="anonymous">
+
+		<!-- Feeds -->
+<link href="https://funcman.me/rss.xml" type="application/atom+xml" rel="alternate" title="funcman's blog Full Atom Feed" />
+
+		<!-- Analytics -->
+	</head>
+
+	<body class="theme-base-0e">
+<div class="sidebar">
+	<div class="container sidebar-sticky">
+		<div class="sidebar-about">
+
+			<h1>
+				<a href="/">
+					<img class="profile-picture" src="https://funcman.me/images/avatar.png">
+					funcman's blog
+				</a>
+			</h1>
+			<p class="lead"></p>
+			<p class="lead">一个游戏程序员。曾经参与开发过<a href='https://www.bing.com/search?q=%E4%BB%99%E4%BE%A3%E5%A5%87%E7%BC%983'>仙侣奇缘3</a>、<a href='http://sh.70yx.com'>水浒传</a>、<a href='https://itunes.apple.com/cn/app/id938688461'>小米运动</a>、<a href='https://itunes.apple.com/cn/app/id1034182617'>米动</a>和<a href='https://www.taptap.com/app/143658'>无限激战</a> </p>
+			<p></p>
+		</div>
+		<nav class="sidebar-social">
+					<a class="sidebar-social-item" href="mailto:hyq1986@gmail.com">
+						<i class="fa fa-envelope"></i>
+					</a>
+					<a class="sidebar-social-item" href="https://twitter.com/funcman" target="_blank">
+						<i class="fa fa-twitter"></i>
+					</a>
+					<a class="sidebar-social-item" href="https://github.com/funcman" target="_blank">
+						<i class="fa fa-github"></i>
+					</a>
+			<a class="sidebar-social-item" href="https://funcman.me/rss.xml">
+				<i class="fa fa-rss"></i>
+			</a>
+		</nav>
+	</div>
+</div>		<div class="content container">
+<div class="post">
+	<h1 class="post-title">Unity ShaderLab 个人学习笔记</h1>
+	<span class="post-date">周二 21 十二月 2021</span>
+	<p>最近在回顾Unity的着色器知识。</p>
+<p>这里主要记录个人在ShaderLab中遇到的一些重点内容。</p>
+<p>这篇会做持续记录，直到完成此遍回顾。</p>
+<h2>ShaderLab的基本结构</h2>
+<p>ShaderLab是基于Cg（HLSL）的，但不等同于Cg。它在此基础上又添加了一套东西，是高于Shader的东西。</p>
+<p>某种程度可以把ShaderLab代码等同于Unity的材质。它包含了整套东西，概念上像是HLSL基础之上的D3D Effects。</p>
+<div class="highlight"><pre><span></span><code><span class="n">Shader</span><span class="w"> </span><span class="s">&quot;ShaderName&quot;</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">Properties</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="c1">// 属性</span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="w">    </span><span class="n">SubShader</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="n">Pass</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">            </span><span class="c1">// 具体的Shader程序</span>
+<span class="w">        </span><span class="p">}</span><span class="w"></span>
+<span class="w">        </span><span class="n">Pass</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">            </span><span class="c1">// 有时会用到多个Pass</span>
+<span class="w">        </span><span class="p">}</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="w">    </span><span class="n">SubShader</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="c1">// 因为硬件的差异，有的旧硬件不支持某些Shader</span>
+<span class="w">        </span><span class="c1">// 可能需要提供多个子Shader供Unity选择</span>
+<span class="w">        </span><span class="c1">// Unity会选择第一个能运行的子Shader</span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="w">    </span><span class="c1">// 当所有子Shader都不能运行时</span>
+<span class="w">    </span><span class="c1">// 提供一个应急方案，双引号里是Shader名称</span>
+<span class="w">    </span><span class="c1">// 或者关掉这个功能</span>
+<span class="w">    </span><span class="c1">// 代码是：Fallback off</span>
+<span class="w">    </span><span class="n">Fallback</span><span class="w"> </span><span class="s">&quot;Diffuse&quot;</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</code></pre></div>
+
+<p>注意这里Fallback有个隐藏影响，在Unity预计算阴影时，会在SubShader里找相关Pass，找不到就会用Fallback提供的。</p>
+<h2>Properties 属性设置</h2>
+<p>如果把Shader看成一套功能，或者广义的函数，那Properties就是Shader被提交给GPU执行时携带的参数。</p>
+<div class="highlight"><pre><span></span><code><span class="p">...</span><span class="w"></span>
+
+<span class="n">Properies</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="c1">// 形式：</span>
+<span class="w">    </span><span class="c1">// Name(&quot;DisplayName&quot;, PropertyType) = DefaultValue</span>
+<span class="w">    </span><span class="c1">// 例如：</span>
+<span class="w">    </span><span class="n">_pos</span><span class="p">(</span><span class="s">&quot;Position&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">Vector</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+
+<span class="p">...</span><span class="w"></span>
+</code></pre></div>
+
+<p>这里<code>_pos</code>可以在后面的Shader代码里作为“变量名”使用。</p>
+<p>PropertyType支持<code>Int</code>、<code>Float</code>、<code>Range(min,max)</code>、<code>Color</code>、<code>Vector</code>、<code>2D</code>、<code>Cube</code>、<code>3D</code>这些类型，其中后3种是纹理类型。</p>
+<p>贴图类型可以像这样：<code>_tex("Texture", 2D) = "white"{}</code>，指定默认纹理。<code>"white"</code>是默认纹理名称。</p>
+<p>代码种的属性会对应到Unity材质属性设置面板中。</p>
+<h2>SubShader的一般结构</h2>
+<div class="highlight"><pre><span></span><code><span class="p">...</span><span class="w"></span>
+
+<span class="n">SubShader</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+
+<span class="w">    </span><span class="c1">// 不一定要有</span>
+<span class="w">    </span><span class="n">Tags</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="c1">// 标签块</span>
+<span class="w">        </span><span class="c1">// 键值对形式        </span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">    </span><span class="c1">// 不一定要有</span>
+<span class="w">    </span><span class="n">RenderSetup</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="c1">// 状态设置块</span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">Pass</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+
+<span class="w">        </span><span class="c1">// Pass的名字，不一定要给</span>
+<span class="w">        </span><span class="n">Name</span><span class="w"> </span><span class="s">&quot;Pass1&quot;</span><span class="w"></span>
+
+<span class="w">        </span><span class="c1">// Pass的Tags</span>
+<span class="w">        </span><span class="c1">// 注意和和SubRender的不一样</span>
+
+<span class="w">        </span><span class="c1">// 也可以有Pass自己的RenderSetup</span>
+
+<span class="w">        </span><span class="c1">// CGPROGAM/ENDCG 表示该块是Cg代码</span>
+<span class="w">        </span><span class="c1">// GLSLPROGAM/ENDGLSL 表示该块是glsl代码</span>
+<span class="w">        </span><span class="c1">// 但是不推荐使用glsl，因为Unity能够将Cg交叉编译给glsl，反之不能</span>
+<span class="w">        </span><span class="n">CGPROGRAM</span><span class="w"></span>
+
+<span class="w">        </span><span class="c1">// 指定具体的功能函数入口</span>
+<span class="w">        </span><span class="cp">#pragma vertex      vert</span>
+<span class="w">        </span><span class="cp">#pragma fragment    frag</span>
+
+<span class="w">        </span><span class="n">float4</span><span class="w"> </span><span class="n">vert</span><span class="p">(</span><span class="n">float4</span><span class="w"> </span><span class="nl">v</span> <span class="p">:</span><span class="w"> </span><span class="n">POSITION</span><span class="p">)</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">SV_POSITION</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">            </span><span class="k">return</span><span class="w"> </span><span class="n">mul</span><span class="p">(</span><span class="n">UNITY_MATRIX_MVP</span><span class="p">,</span><span class="w"> </span><span class="n">v</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">        </span><span class="n">fixed4</span><span class="w"> </span><span class="n">frag</span><span class="p">()</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">SV_Target</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">            </span><span class="k">return</span><span class="w"> </span><span class="n">fixed4</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">        </span><span class="n">ENDCG</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+
+<span class="p">...</span><span class="w"></span>
+</code></pre></div>
+
+<p>Tags和RenderSetup放到后面记录。</p>
+<p>其实ShaderLab还支持固定渲染管线，但是毕竟现在几乎已经没有了非可编程管线的硬件，就不做记录了。</p>
+<h2>RenderSetup 渲染状态设置</h2>
+<p>常用的状态表：</p>
+<table>
+<thead>
+<tr>
+<th>状态名</th>
+<th>设置项目</th>
+<th>解释</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Cull</td>
+<td>Back, Front, Off</td>
+<td>剔除模式：背面、正面、关闭</td>
+</tr>
+<tr>
+<td>ZTest</td>
+<td>Less, Greater, LEqual, GEqual, Equal, NotEqual, Always</td>
+<td>深度测试: &lt;、&gt;、&lt;=、&gt;=、==、!=、总是</td>
+</tr>
+<tr>
+<td>ZWrit</td>
+<td>On, Off</td>
+<td>深度写入开关</td>
+</tr>
+<tr>
+<td>Blend</td>
+<td>原模式，目的模式</td>
+<td>打开并设置混合模式</td>
+</tr>
+</tbody>
+</table>
+</div>
+		</div>
+	</body>
+</html>

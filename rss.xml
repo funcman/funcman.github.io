@@ -1,5 +1,142 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>funcman's blog</title><link href="https://funcman.me/" rel="alternate"></link><link href="https://funcman.me/rss.xml" rel="self"></link><id>https://funcman.me/</id><updated>2021-12-17T09:40:38+08:00</updated><entry><title>Orthodox C++</title><link href="https://funcman.me/orthodox_cpp.html" rel="alternate"></link><published>2021-12-17T09:40:38+08:00</published><updated>2021-12-17T09:40:38+08:00</updated><author><name>funcman</name></author><id>tag:funcman.me,2021-12-17:/orthodox_cpp.html</id><summary type="html">&lt;p&gt;本文翻译自&lt;a href="https://gist.github.com/bkaradzic/2e39896bc7d8c34e042b"&gt;https://gist.github.com/bkaradzic/2e39896bc7d8c34e042b&lt;/a&gt;，原作者是&lt;a href="https://twitter.com/bkaradzic"&gt;Бранимир Караџић&lt;/a&gt;。&lt;/p&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>funcman's blog</title><link href="https://funcman.me/" rel="alternate"></link><link href="https://funcman.me/rss.xml" rel="self"></link><id>https://funcman.me/</id><updated>2021-12-21T11:44:12+08:00</updated><entry><title>Unity ShaderLab 个人学习笔记</title><link href="https://funcman.me/unity_shader_lab_note.html" rel="alternate"></link><published>2021-12-21T11:44:12+08:00</published><updated>2021-12-21T11:44:12+08:00</updated><author><name>funcman</name></author><id>tag:funcman.me,2021-12-21:/unity_shader_lab_note.html</id><summary type="html">&lt;p&gt;最近在回顾Unity的着色器知识。&lt;/p&gt;
+&lt;p&gt;这里主要记录个人在ShaderLab中遇到的一些重点内容。&lt;/p&gt;
+&lt;p&gt;这篇会做持续记录，直到完成此遍回顾。&lt;/p&gt;
+&lt;h2&gt;ShaderLab的 …&lt;/h2&gt;</summary><content type="html">&lt;p&gt;最近在回顾Unity的着色器知识。&lt;/p&gt;
+&lt;p&gt;这里主要记录个人在ShaderLab中遇到的一些重点内容。&lt;/p&gt;
+&lt;p&gt;这篇会做持续记录，直到完成此遍回顾。&lt;/p&gt;
+&lt;h2&gt;ShaderLab的基本结构&lt;/h2&gt;
+&lt;p&gt;ShaderLab是基于Cg（HLSL）的，但不等同于Cg。它在此基础上又添加了一套东西，是高于Shader的东西。&lt;/p&gt;
+&lt;p&gt;某种程度可以把ShaderLab代码等同于Unity的材质。它包含了整套东西，概念上像是HLSL基础之上的D3D Effects。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="n"&gt;Shader&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s"&gt;&amp;quot;ShaderName&amp;quot;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="n"&gt;Properties&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="c1"&gt;// 属性&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="n"&gt;SubShader&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="n"&gt;Pass&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="w"&gt;            &lt;/span&gt;&lt;span class="c1"&gt;// 具体的Shader程序&lt;/span&gt;
+&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="n"&gt;Pass&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="w"&gt;            &lt;/span&gt;&lt;span class="c1"&gt;// 有时会用到多个Pass&lt;/span&gt;
+&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="n"&gt;SubShader&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="c1"&gt;// 因为硬件的差异，有的旧硬件不支持某些Shader&lt;/span&gt;
+&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="c1"&gt;// 可能需要提供多个子Shader供Unity选择&lt;/span&gt;
+&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="c1"&gt;// Unity会选择第一个能运行的子Shader&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="c1"&gt;// 当所有子Shader都不能运行时&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="c1"&gt;// 提供一个应急方案，双引号里是Shader名称&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="c1"&gt;// 或者关掉这个功能&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="c1"&gt;// 代码是：Fallback off&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="n"&gt;Fallback&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s"&gt;&amp;quot;Diffuse&amp;quot;&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;注意这里Fallback有个隐藏影响，在Unity预计算阴影时，会在SubShader里找相关Pass，找不到就会用Fallback提供的。&lt;/p&gt;
+&lt;h2&gt;Properties 属性设置&lt;/h2&gt;
+&lt;p&gt;如果把Shader看成一套功能，或者广义的函数，那Properties就是Shader被提交给GPU执行时携带的参数。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="p"&gt;...&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+
+&lt;span class="n"&gt;Properies&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="c1"&gt;// 形式：&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="c1"&gt;// Name(&amp;quot;DisplayName&amp;quot;, PropertyType) = DefaultValue&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="c1"&gt;// 例如：&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="n"&gt;_pos&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;Position&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;Vector&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+
+&lt;span class="p"&gt;...&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;这里&lt;code&gt;_pos&lt;/code&gt;可以在后面的Shader代码里作为“变量名”使用。&lt;/p&gt;
+&lt;p&gt;PropertyType支持&lt;code&gt;Int&lt;/code&gt;、&lt;code&gt;Float&lt;/code&gt;、&lt;code&gt;Range(min,max)&lt;/code&gt;、&lt;code&gt;Color&lt;/code&gt;、&lt;code&gt;Vector&lt;/code&gt;、&lt;code&gt;2D&lt;/code&gt;、&lt;code&gt;Cube&lt;/code&gt;、&lt;code&gt;3D&lt;/code&gt;这些类型，其中后3种是纹理类型。&lt;/p&gt;
+&lt;p&gt;贴图类型可以像这样：&lt;code&gt;_tex("Texture", 2D) = "white"{}&lt;/code&gt;，指定默认纹理。&lt;code&gt;"white"&lt;/code&gt;是默认纹理名称。&lt;/p&gt;
+&lt;p&gt;代码种的属性会对应到Unity材质属性设置面板中。&lt;/p&gt;
+&lt;h2&gt;SubShader的一般结构&lt;/h2&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="p"&gt;...&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+
+&lt;span class="n"&gt;SubShader&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="c1"&gt;// 不一定要有&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="n"&gt;Tags&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="c1"&gt;// 标签块&lt;/span&gt;
+&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="c1"&gt;// 键值对形式        &lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="c1"&gt;// 不一定要有&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="n"&gt;RenderSetup&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="c1"&gt;// 状态设置块&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="n"&gt;Pass&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+
+&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="c1"&gt;// Pass的名字，不一定要给&lt;/span&gt;
+&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="n"&gt;Name&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s"&gt;&amp;quot;Pass1&amp;quot;&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+
+&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="c1"&gt;// Pass的Tags&lt;/span&gt;
+&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="c1"&gt;// 注意和和SubRender的不一样&lt;/span&gt;
+
+&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="c1"&gt;// 也可以有Pass自己的RenderSetup&lt;/span&gt;
+
+&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="c1"&gt;// CGPROGAM/ENDCG 表示该块是Cg代码&lt;/span&gt;
+&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="c1"&gt;// GLSLPROGAM/ENDGLSL 表示该块是glsl代码&lt;/span&gt;
+&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="c1"&gt;// 但是不推荐使用glsl，因为Unity能够将Cg交叉编译给glsl，反之不能&lt;/span&gt;
+&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="n"&gt;CGPROGRAM&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+
+&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="c1"&gt;// 指定具体的功能函数入口&lt;/span&gt;
+&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="cp"&gt;#pragma vertex      vert&lt;/span&gt;
+&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="cp"&gt;#pragma fragment    frag&lt;/span&gt;
+
+&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="n"&gt;float4&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;vert&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;float4&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nl"&gt;v&lt;/span&gt; &lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;POSITION&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;SV_POSITION&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="w"&gt;            &lt;/span&gt;&lt;span class="k"&gt;return&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;mul&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;UNITY_MATRIX_MVP&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;v&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+
+&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="n"&gt;fixed4&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;frag&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;SV_Target&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="w"&gt;            &lt;/span&gt;&lt;span class="k"&gt;return&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;fixed4&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mf"&gt;1.0&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mf"&gt;0.0&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mf"&gt;0.0&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mf"&gt;1.0&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+
+&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="n"&gt;ENDCG&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+
+&lt;span class="p"&gt;...&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Tags和RenderSetup放到后面记录。&lt;/p&gt;
+&lt;p&gt;其实ShaderLab还支持固定渲染管线，但是毕竟现在几乎已经没有了非可编程管线的硬件，就不做记录了。&lt;/p&gt;
+&lt;h2&gt;RenderSetup 渲染状态设置&lt;/h2&gt;
+&lt;p&gt;常用的状态表：&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;状态名&lt;/th&gt;
+&lt;th&gt;设置项目&lt;/th&gt;
+&lt;th&gt;解释&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;Cull&lt;/td&gt;
+&lt;td&gt;Back, Front, Off&lt;/td&gt;
+&lt;td&gt;剔除模式：背面、正面、关闭&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;ZTest&lt;/td&gt;
+&lt;td&gt;Less, Greater, LEqual, GEqual, Equal, NotEqual, Always&lt;/td&gt;
+&lt;td&gt;深度测试: &amp;lt;、&amp;gt;、&amp;lt;=、&amp;gt;=、==、!=、总是&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;ZWrit&lt;/td&gt;
+&lt;td&gt;On, Off&lt;/td&gt;
+&lt;td&gt;深度写入开关&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;Blend&lt;/td&gt;
+&lt;td&gt;原模式，目的模式&lt;/td&gt;
+&lt;td&gt;打开并设置混合模式&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;</content><category term="gamedev"></category><category term="Unity"></category><category term="ShaderLab"></category></entry><entry><title>Orthodox C++</title><link href="https://funcman.me/orthodox_cpp.html" rel="alternate"></link><published>2021-12-17T09:40:38+08:00</published><updated>2021-12-17T09:40:38+08:00</updated><author><name>funcman</name></author><id>tag:funcman.me,2021-12-17:/orthodox_cpp.html</id><summary type="html">&lt;p&gt;本文翻译自&lt;a href="https://gist.github.com/bkaradzic/2e39896bc7d8c34e042b"&gt;https://gist.github.com/bkaradzic/2e39896bc7d8c34e042b&lt;/a&gt;，原作者是&lt;a href="https://twitter.com/bkaradzic"&gt;Бранимир Караџић&lt;/a&gt;。&lt;/p&gt;
 &lt;h2&gt;什么是Orthodox C++？&lt;/h2&gt;
 &lt;p&gt;Orthodox C++（有时被称为&lt;strong&gt;C+&lt;/strong&gt;）是C++的最小子集，它改进了C，但避免了所谓的现 …&lt;/p&gt;</summary><content type="html">&lt;p&gt;本文翻译自&lt;a href="https://gist.github.com/bkaradzic/2e39896bc7d8c34e042b"&gt;https://gist.github.com/bkaradzic/2e39896bc7d8c34e042b&lt;/a&gt;，原作者是&lt;a href="https://twitter.com/bkaradzic"&gt;Бранимир Караџић&lt;/a&gt;。&lt;/p&gt;
 &lt;h2&gt;什么是Orthodox C++？&lt;/h2&gt;
