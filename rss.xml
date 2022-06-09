@@ -1,5 +1,89 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>funcman's blog</title><link href="https://funcman.me/" rel="alternate"></link><link href="https://funcman.me/rss.xml" rel="self"></link><id>https://funcman.me/</id><updated>2021-12-21T11:44:12+08:00</updated><entry><title>Unity ShaderLab 个人学习笔记</title><link href="https://funcman.me/unity_shader_lab_note.html" rel="alternate"></link><published>2021-12-21T11:44:12+08:00</published><updated>2021-12-21T11:44:12+08:00</updated><author><name>funcman</name></author><id>tag:funcman.me,2021-12-21:/unity_shader_lab_note.html</id><summary type="html">&lt;p&gt;最近在回顾Unity的着色器知识。&lt;/p&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>funcman's blog</title><link href="https://funcman.me/" rel="alternate"></link><link href="https://funcman.me/rss.xml" rel="self"></link><id>https://funcman.me/</id><updated>2022-06-09T15:56:42+08:00</updated><entry><title>如何配置运行在Docker中的GitLab的外部地址</title><link href="https://funcman.me/how_to_configure_gitlab_external_url_in_docker.html" rel="alternate"></link><published>2022-06-09T15:56:42+08:00</published><updated>2022-06-09T15:56:42+08:00</updated><author><name>funcman</name></author><id>tag:funcman.me,2022-06-09:/how_to_configure_gitlab_external_url_in_docker.html</id><summary type="html">&lt;p&gt;家里弄了个NAS服务器，在NAS上安装了一个Docker，于是弄了很多内部服务放在Docker上跑。&lt;/p&gt;
+&lt;p&gt;但是在设置GitLab时遇到了点问题，经过一番 …&lt;/p&gt;</summary><content type="html">&lt;p&gt;家里弄了个NAS服务器，在NAS上安装了一个Docker，于是弄了很多内部服务放在Docker上跑。&lt;/p&gt;
+&lt;p&gt;但是在设置GitLab时遇到了点问题，经过一番折腾，得到这个很简单的处理方式。&lt;/p&gt;
+&lt;p&gt;先说问题。大多数服务都是基于Web的，会要求暴露出80端口。Docker上有很多服务，IP共用主机的没问题，但是端口必须特别指定，然后映射到容器里的80端口上。&lt;/p&gt;
+&lt;p&gt;比如这样：&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="c1"&gt;# docker run --detach                       \&lt;/span&gt;
+    -p &lt;span class="m"&gt;11443&lt;/span&gt;:443 -p &lt;span class="m"&gt;11480&lt;/span&gt;:80 -p &lt;span class="m"&gt;11422&lt;/span&gt;:22    &lt;span class="se"&gt;\&lt;/span&gt;
+    --name gitlab                           &lt;span class="se"&gt;\&lt;/span&gt;
+    --restart always                        &lt;span class="se"&gt;\&lt;/span&gt;
+    -v /gitlab/config:/etc/gitlab           &lt;span class="se"&gt;\&lt;/span&gt;
+    -v /gitlab/logs:/var/log/gitlab         &lt;span class="se"&gt;\&lt;/span&gt;
+    -v /gitlab/data:/var/opt/gitlab         &lt;span class="se"&gt;\&lt;/span&gt;
+    gitlab/gitlab-ce
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;但是如此设置，GitLab中一旦建立项目后，项目的“克隆”里并不能自动提供合适的地址，只会给出这样的东西：&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;http://b483cf8abf26/some_projects/project.git
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;很恶心，不好用！&lt;/p&gt;
+&lt;p&gt;按照网上的一些文章，据说修改&lt;code&gt;/etc/gitlab/gitlab.rb&lt;/code&gt;中的&lt;code&gt;external_url&lt;/code&gt;那一行，就可以了。比如修改成：&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="n"&gt;external_url&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;http://192.168.1.114:11480&amp;quot;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;但是一旦应用修改：&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;gitlab-ctl reconfigure
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;服务直接访问不了啦。&lt;/p&gt;
+&lt;p&gt;怎么回事呢？实际上，这个&lt;code&gt;external_url&lt;/code&gt;设置一旦带有端口，服务原本的80端口是会被改成设置的端口的。那么按照创建容器时的设置的&lt;code&gt;-p 11480:80&lt;/code&gt;，肯定是不通的。&lt;/p&gt;
+&lt;p&gt;改一下容器的端口映射，直接&lt;code&gt;-p 11480:11480&lt;/code&gt;，OK了。另外注意一下，这个GitLab镜像内部还占用8080端口，所以最好不要用，否则还要配置&lt;code&gt;/etc/gitlab/gitlab.rb&lt;/code&gt;文件：&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="n"&gt;unicorn&lt;/span&gt;&lt;span class="o"&gt;[&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;port&amp;#39;&lt;/span&gt;&lt;span class="o"&gt;]&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;8800&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;这个unicorn的端口配置我没有试验过，仅作为笔记摘录。&lt;/p&gt;
+&lt;p&gt;这样配置好&lt;code&gt;external_url&lt;/code&gt;，也只是解决了第一步，项目&lt;code&gt;克隆&lt;/code&gt;中的&lt;code&gt;使用HTTP克隆&lt;/code&gt;里的地址，&lt;code&gt;使用SSH克隆&lt;/code&gt;还不正常，端口不对。怎么改？继续配置&lt;code&gt;/etc/gitlab/gitlab.rb&lt;/code&gt;文件：&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="n"&gt;gitlab_rails&lt;/span&gt;&lt;span class="o"&gt;[&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;gitlab_shell_ssh_port&amp;#39;&lt;/span&gt;&lt;span class="o"&gt;]&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;11422&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;好了，重置、重启GitLab：&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;gitlab-ctl reconfigure
+gitlab-ctl restart
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;这里重启应该是没啥必要性的，多做无过。完事后，克隆里的地址应该都是正常可用的了。&lt;/p&gt;
+&lt;p&gt;事毕，我们可以查看一下端口信息：&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="c1"&gt;# netstat -l&lt;/span&gt;
+Active Internet connections &lt;span class="o"&gt;(&lt;/span&gt;only servers&lt;span class="o"&gt;)&lt;/span&gt;
+Proto Recv-Q Send-Q Local Address           Foreign Address         State
+tcp        &lt;span class="m"&gt;0&lt;/span&gt;      &lt;span class="m"&gt;0&lt;/span&gt; &lt;span class="m"&gt;0&lt;/span&gt;.0.0.0:22              &lt;span class="m"&gt;0&lt;/span&gt;.0.0.0:*               LISTEN
+tcp        &lt;span class="m"&gt;0&lt;/span&gt;      &lt;span class="m"&gt;0&lt;/span&gt; localhost:9229          &lt;span class="m"&gt;0&lt;/span&gt;.0.0.0:*               LISTEN
+tcp        &lt;span class="m"&gt;0&lt;/span&gt;      &lt;span class="m"&gt;0&lt;/span&gt; localhost:9236          &lt;span class="m"&gt;0&lt;/span&gt;.0.0.0:*               LISTEN
+tcp        &lt;span class="m"&gt;0&lt;/span&gt;      &lt;span class="m"&gt;0&lt;/span&gt; &lt;span class="m"&gt;0&lt;/span&gt;.0.0.0:8060            &lt;span class="m"&gt;0&lt;/span&gt;.0.0.0:*               LISTEN
+tcp        &lt;span class="m"&gt;0&lt;/span&gt;      &lt;span class="m"&gt;0&lt;/span&gt; localhost:9168          &lt;span class="m"&gt;0&lt;/span&gt;.0.0.0:*               LISTEN
+tcp        &lt;span class="m"&gt;0&lt;/span&gt;      &lt;span class="m"&gt;0&lt;/span&gt; localhost:9187          &lt;span class="m"&gt;0&lt;/span&gt;.0.0.0:*               LISTEN
+tcp        &lt;span class="m"&gt;0&lt;/span&gt;      &lt;span class="m"&gt;0&lt;/span&gt; localhost:9090          &lt;span class="m"&gt;0&lt;/span&gt;.0.0.0:*               LISTEN
+tcp        &lt;span class="m"&gt;0&lt;/span&gt;      &lt;span class="m"&gt;0&lt;/span&gt; localhost:9093          &lt;span class="m"&gt;0&lt;/span&gt;.0.0.0:*               LISTEN
+tcp        &lt;span class="m"&gt;0&lt;/span&gt;      &lt;span class="m"&gt;0&lt;/span&gt; localhost:9121          &lt;span class="m"&gt;0&lt;/span&gt;.0.0.0:*               LISTEN
+tcp        &lt;span class="m"&gt;0&lt;/span&gt;      &lt;span class="m"&gt;0&lt;/span&gt; localhost:8154          &lt;span class="m"&gt;0&lt;/span&gt;.0.0.0:*               LISTEN
+tcp        &lt;span class="m"&gt;0&lt;/span&gt;      &lt;span class="m"&gt;0&lt;/span&gt; localhost:8155          &lt;span class="m"&gt;0&lt;/span&gt;.0.0.0:*               LISTEN
+tcp        &lt;span class="m"&gt;0&lt;/span&gt;      &lt;span class="m"&gt;0&lt;/span&gt; localhost:8153          &lt;span class="m"&gt;0&lt;/span&gt;.0.0.0:*               LISTEN
+tcp        &lt;span class="m"&gt;0&lt;/span&gt;      &lt;span class="m"&gt;0&lt;/span&gt; localhost:8150          &lt;span class="m"&gt;0&lt;/span&gt;.0.0.0:*               LISTEN
+tcp        &lt;span class="m"&gt;0&lt;/span&gt;      &lt;span class="m"&gt;0&lt;/span&gt; localhost:8151          &lt;span class="m"&gt;0&lt;/span&gt;.0.0.0:*               LISTEN
+tcp        &lt;span class="m"&gt;0&lt;/span&gt;      &lt;span class="m"&gt;0&lt;/span&gt; localhost:8092          &lt;span class="m"&gt;0&lt;/span&gt;.0.0.0:*               LISTEN
+tcp        &lt;span class="m"&gt;0&lt;/span&gt;      &lt;span class="m"&gt;0&lt;/span&gt; localhost:8082          &lt;span class="m"&gt;0&lt;/span&gt;.0.0.0:*               LISTEN
+tcp        &lt;span class="m"&gt;0&lt;/span&gt;      &lt;span class="m"&gt;0&lt;/span&gt; localhost:8080          &lt;span class="m"&gt;0&lt;/span&gt;.0.0.0:*               LISTEN
+tcp        &lt;span class="m"&gt;0&lt;/span&gt;      &lt;span class="m"&gt;0&lt;/span&gt; &lt;span class="m"&gt;0&lt;/span&gt;.0.0.0:11480           &lt;span class="m"&gt;0&lt;/span&gt;.0.0.0:*               LISTEN
+tcp        &lt;span class="m"&gt;0&lt;/span&gt;      &lt;span class="m"&gt;0&lt;/span&gt; localhost:3000          &lt;span class="m"&gt;0&lt;/span&gt;.0.0.0:*               LISTEN
+tcp        &lt;span class="m"&gt;0&lt;/span&gt;      &lt;span class="m"&gt;0&lt;/span&gt; :::22                   :::*                    LISTEN
+tcp        &lt;span class="m"&gt;0&lt;/span&gt;      &lt;span class="m"&gt;0&lt;/span&gt; :::9094                 :::*                    LISTEN
+udp        &lt;span class="m"&gt;0&lt;/span&gt;      &lt;span class="m"&gt;0&lt;/span&gt; :::9094                 :::*
+Active UNIX domain sockets &lt;span class="o"&gt;(&lt;/span&gt;only servers&lt;span class="o"&gt;)&lt;/span&gt;
+Proto RefCnt Flags       Type       State         I-Node Path
+unix  &lt;span class="m"&gt;2&lt;/span&gt;      &lt;span class="o"&gt;[&lt;/span&gt; ACC &lt;span class="o"&gt;]&lt;/span&gt;     STREAM     LISTENING     &lt;span class="m"&gt;5584197&lt;/span&gt; /var/opt/gitlab/gitaly/gitaly.socket
+unix  &lt;span class="m"&gt;2&lt;/span&gt;      &lt;span class="o"&gt;[&lt;/span&gt; ACC &lt;span class="o"&gt;]&lt;/span&gt;     STREAM     LISTENING     &lt;span class="m"&gt;5588069&lt;/span&gt; /var/opt/gitlab/gitaly/run/gitaly-306/sock.d/ruby.1
+unix  &lt;span class="m"&gt;2&lt;/span&gt;      &lt;span class="o"&gt;[&lt;/span&gt; ACC &lt;span class="o"&gt;]&lt;/span&gt;     STREAM     LISTENING     &lt;span class="m"&gt;5584198&lt;/span&gt; /var/opt/gitlab/gitaly/run/gitaly-306/sock.d/intern
+unix  &lt;span class="m"&gt;2&lt;/span&gt;      &lt;span class="o"&gt;[&lt;/span&gt; ACC &lt;span class="o"&gt;]&lt;/span&gt;     STREAM     LISTENING     &lt;span class="m"&gt;5573442&lt;/span&gt; /var/opt/gitlab/gitaly/run/gitaly-306/sock.d/ruby.0
+unix  &lt;span class="m"&gt;2&lt;/span&gt;      &lt;span class="o"&gt;[&lt;/span&gt; ACC &lt;span class="o"&gt;]&lt;/span&gt;     STREAM     LISTENING     &lt;span class="m"&gt;5591350&lt;/span&gt; /var/opt/gitlab/postgresql/.s.PGSQL.5432
+unix  &lt;span class="m"&gt;2&lt;/span&gt;      &lt;span class="o"&gt;[&lt;/span&gt; ACC &lt;span class="o"&gt;]&lt;/span&gt;     STREAM     LISTENING     &lt;span class="m"&gt;5609652&lt;/span&gt; /var/opt/gitlab/gitlab-rails/sockets/gitlab.socket
+unix  &lt;span class="m"&gt;2&lt;/span&gt;      &lt;span class="o"&gt;[&lt;/span&gt; ACC &lt;span class="o"&gt;]&lt;/span&gt;     STREAM     LISTENING     &lt;span class="m"&gt;5591983&lt;/span&gt; /var/opt/gitlab/gitlab-workhorse/sockets/socket
+unix  &lt;span class="m"&gt;2&lt;/span&gt;      &lt;span class="o"&gt;[&lt;/span&gt; ACC &lt;span class="o"&gt;]&lt;/span&gt;     STREAM     LISTENING     &lt;span class="m"&gt;5589222&lt;/span&gt; /var/opt/gitlab/redis/redis.socket
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;因为&lt;code&gt;external_url&lt;/code&gt;的配置，GitLab完全没有用到&lt;code&gt;80&lt;/code&gt;端口，而是&lt;code&gt;11480&lt;/code&gt;。&lt;/p&gt;
+&lt;p&gt;GitLab居然会根据外部地址的端口，指定内部使用的端口，这谁能想到啊。&lt;/p&gt;</content><category term="others"></category><category term="GitLab"></category><category term="Docker"></category><category term="编程环境"></category></entry><entry><title>Unity ShaderLab 个人学习笔记</title><link href="https://funcman.me/unity_shader_lab_note.html" rel="alternate"></link><published>2021-12-21T11:44:12+08:00</published><updated>2021-12-21T11:44:12+08:00</updated><author><name>funcman</name></author><id>tag:funcman.me,2021-12-21:/unity_shader_lab_note.html</id><summary type="html">&lt;p&gt;最近在回顾Unity的着色器知识。&lt;/p&gt;
 &lt;p&gt;这里主要记录个人在ShaderLab中遇到的一些重点内容。&lt;/p&gt;
 &lt;p&gt;这篇会做持续记录，直到完成此遍回顾。&lt;/p&gt;
 &lt;h2&gt;ShaderLab的 …&lt;/h2&gt;</summary><content type="html">&lt;p&gt;最近在回顾Unity的着色器知识。&lt;/p&gt;

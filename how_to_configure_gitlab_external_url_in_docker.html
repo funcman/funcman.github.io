@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="zh_cn" prefix="og: http://ogp.me/ns#">
+	<head>
+		<link href="http://gmpg.org/xfn/11" rel="profile">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta http-equiv="content-type" content="text/html; charset=utf-8">
+
+		<!-- Metadata -->
+	<meta name="description" content="一个游戏程序员。曾经参与开发过<a href='https://www.bing.com/search?q=%E4%BB%99%E4%BE%A3%E5%A5%87%E7%BC%983'>仙侣奇缘3</a>、<a href='http://sh.70yx.com'>水浒传</a>、<a href='https://itunes.apple.com/cn/app/id938688461'>小米运动</a>、<a href='https://itunes.apple.com/cn/app/id1034182617'>米动</a>和<a href='https://www.taptap.com/app/143658'>无限激战</a>">
+	<meta property="og:description" content="一个游戏程序员。曾经参与开发过<a href='https://www.bing.com/search?q=%E4%BB%99%E4%BE%A3%E5%A5%87%E7%BC%983'>仙侣奇缘3</a>、<a href='http://sh.70yx.com'>水浒传</a>、<a href='https://itunes.apple.com/cn/app/id938688461'>小米运动</a>、<a href='https://itunes.apple.com/cn/app/id1034182617'>米动</a>和<a href='https://www.taptap.com/app/143658'>无限激战</a>">
+	<meta property="og:title" content="如何配置运行在Docker中的GitLab的外部地址" />
+	<meta property="og:type" content="article" />
+	<meta property="og:url" content="https://funcman.me/how_to_configure_gitlab_external_url_in_docker.html" />
+		<meta property="og:image" content="https://funcman.me/images/avatar.png" />
+
+		<!-- Enable responsiveness on mobile devices-->
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+
+		<title>funcman's blog</title>
+
+		<!-- CSS -->
+		<link href="//fonts.googleapis.com/" rel="dns-prefetch">
+		<link href="//fonts.googleapis.com/css?family=Droid+Serif:400,700,400italic|Abril+Fatface|PT+Sans:400,400italic,700&amp;subset=latin,latin-ext" rel="stylesheet">
+
+		<link rel="stylesheet" href="https://funcman.me/theme/css/poole.css" />
+		<link rel="stylesheet" href="https://funcman.me/theme/css/hyde.css" />
+		<link rel="stylesheet" href="https://funcman.me/theme/css/syntax.css" />
+			<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fork-awesome@1.1.7/css/fork-awesome.min.css" crossorigin="anonymous">
+
+		<!-- Feeds -->
+<link href="https://funcman.me/rss.xml" type="application/atom+xml" rel="alternate" title="funcman's blog Full Atom Feed" />
+
+		<!-- Analytics -->
+	</head>
+
+	<body class="theme-base-0e">
+<div class="sidebar">
+	<div class="container sidebar-sticky">
+		<div class="sidebar-about">
+
+			<h1>
+				<a href="/">
+					<img class="profile-picture" src="https://funcman.me/images/avatar.png">
+					funcman's blog
+				</a>
+			</h1>
+			<p class="lead"></p>
+			<p class="lead">一个游戏程序员。曾经参与开发过<a href='https://www.bing.com/search?q=%E4%BB%99%E4%BE%A3%E5%A5%87%E7%BC%983'>仙侣奇缘3</a>、<a href='http://sh.70yx.com'>水浒传</a>、<a href='https://itunes.apple.com/cn/app/id938688461'>小米运动</a>、<a href='https://itunes.apple.com/cn/app/id1034182617'>米动</a>和<a href='https://www.taptap.com/app/143658'>无限激战</a> </p>
+			<p></p>
+		</div>
+		<nav class="sidebar-social">
+					<a class="sidebar-social-item" href="mailto:hyq1986@gmail.com">
+						<i class="fa fa-envelope"></i>
+					</a>
+					<a class="sidebar-social-item" href="https://twitter.com/funcman" target="_blank">
+						<i class="fa fa-twitter"></i>
+					</a>
+					<a class="sidebar-social-item" href="https://github.com/funcman" target="_blank">
+						<i class="fa fa-github"></i>
+					</a>
+			<a class="sidebar-social-item" href="https://funcman.me/rss.xml">
+				<i class="fa fa-rss"></i>
+			</a>
+		</nav>
+	</div>
+</div>		<div class="content container">
+<div class="post">
+	<h1 class="post-title">如何配置运行在Docker中的GitLab的外部地址</h1>
+	<span class="post-date">周四 09 六月 2022</span>
+	<p>家里弄了个NAS服务器，在NAS上安装了一个Docker，于是弄了很多内部服务放在Docker上跑。</p>
+<p>但是在设置GitLab时遇到了点问题，经过一番折腾，得到这个很简单的处理方式。</p>
+<p>先说问题。大多数服务都是基于Web的，会要求暴露出80端口。Docker上有很多服务，IP共用主机的没问题，但是端口必须特别指定，然后映射到容器里的80端口上。</p>
+<p>比如这样：</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># docker run --detach                       \</span>
+    -p <span class="m">11443</span>:443 -p <span class="m">11480</span>:80 -p <span class="m">11422</span>:22    <span class="se">\</span>
+    --name gitlab                           <span class="se">\</span>
+    --restart always                        <span class="se">\</span>
+    -v /gitlab/config:/etc/gitlab           <span class="se">\</span>
+    -v /gitlab/logs:/var/log/gitlab         <span class="se">\</span>
+    -v /gitlab/data:/var/opt/gitlab         <span class="se">\</span>
+    gitlab/gitlab-ce
+</code></pre></div>
+
+<p>但是如此设置，GitLab中一旦建立项目后，项目的“克隆”里并不能自动提供合适的地址，只会给出这样的东西：</p>
+<div class="highlight"><pre><span></span><code>http://b483cf8abf26/some_projects/project.git
+</code></pre></div>
+
+<p>很恶心，不好用！</p>
+<p>按照网上的一些文章，据说修改<code>/etc/gitlab/gitlab.rb</code>中的<code>external_url</code>那一行，就可以了。比如修改成：</p>
+<div class="highlight"><pre><span></span><code><span class="n">external_url</span> <span class="s2">&quot;http://192.168.1.114:11480&quot;</span>
+</code></pre></div>
+
+<p>但是一旦应用修改：</p>
+<div class="highlight"><pre><span></span><code>gitlab-ctl reconfigure
+</code></pre></div>
+
+<p>服务直接访问不了啦。</p>
+<p>怎么回事呢？实际上，这个<code>external_url</code>设置一旦带有端口，服务原本的80端口是会被改成设置的端口的。那么按照创建容器时的设置的<code>-p 11480:80</code>，肯定是不通的。</p>
+<p>改一下容器的端口映射，直接<code>-p 11480:11480</code>，OK了。另外注意一下，这个GitLab镜像内部还占用8080端口，所以最好不要用，否则还要配置<code>/etc/gitlab/gitlab.rb</code>文件：</p>
+<div class="highlight"><pre><span></span><code><span class="n">unicorn</span><span class="o">[</span><span class="s1">&#39;port&#39;</span><span class="o">]</span> <span class="o">=</span> <span class="mi">8800</span>
+</code></pre></div>
+
+<p>这个unicorn的端口配置我没有试验过，仅作为笔记摘录。</p>
+<p>这样配置好<code>external_url</code>，也只是解决了第一步，项目<code>克隆</code>中的<code>使用HTTP克隆</code>里的地址，<code>使用SSH克隆</code>还不正常，端口不对。怎么改？继续配置<code>/etc/gitlab/gitlab.rb</code>文件：</p>
+<div class="highlight"><pre><span></span><code><span class="n">gitlab_rails</span><span class="o">[</span><span class="s1">&#39;gitlab_shell_ssh_port&#39;</span><span class="o">]</span> <span class="o">=</span> <span class="mi">11422</span>
+</code></pre></div>
+
+<p>好了，重置、重启GitLab：</p>
+<div class="highlight"><pre><span></span><code>gitlab-ctl reconfigure
+gitlab-ctl restart
+</code></pre></div>
+
+<p>这里重启应该是没啥必要性的，多做无过。完事后，克隆里的地址应该都是正常可用的了。</p>
+<p>事毕，我们可以查看一下端口信息：</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># netstat -l</span>
+Active Internet connections <span class="o">(</span>only servers<span class="o">)</span>
+Proto Recv-Q Send-Q Local Address           Foreign Address         State
+tcp        <span class="m">0</span>      <span class="m">0</span> <span class="m">0</span>.0.0.0:22              <span class="m">0</span>.0.0.0:*               LISTEN
+tcp        <span class="m">0</span>      <span class="m">0</span> localhost:9229          <span class="m">0</span>.0.0.0:*               LISTEN
+tcp        <span class="m">0</span>      <span class="m">0</span> localhost:9236          <span class="m">0</span>.0.0.0:*               LISTEN
+tcp        <span class="m">0</span>      <span class="m">0</span> <span class="m">0</span>.0.0.0:8060            <span class="m">0</span>.0.0.0:*               LISTEN
+tcp        <span class="m">0</span>      <span class="m">0</span> localhost:9168          <span class="m">0</span>.0.0.0:*               LISTEN
+tcp        <span class="m">0</span>      <span class="m">0</span> localhost:9187          <span class="m">0</span>.0.0.0:*               LISTEN
+tcp        <span class="m">0</span>      <span class="m">0</span> localhost:9090          <span class="m">0</span>.0.0.0:*               LISTEN
+tcp        <span class="m">0</span>      <span class="m">0</span> localhost:9093          <span class="m">0</span>.0.0.0:*               LISTEN
+tcp        <span class="m">0</span>      <span class="m">0</span> localhost:9121          <span class="m">0</span>.0.0.0:*               LISTEN
+tcp        <span class="m">0</span>      <span class="m">0</span> localhost:8154          <span class="m">0</span>.0.0.0:*               LISTEN
+tcp        <span class="m">0</span>      <span class="m">0</span> localhost:8155          <span class="m">0</span>.0.0.0:*               LISTEN
+tcp        <span class="m">0</span>      <span class="m">0</span> localhost:8153          <span class="m">0</span>.0.0.0:*               LISTEN
+tcp        <span class="m">0</span>      <span class="m">0</span> localhost:8150          <span class="m">0</span>.0.0.0:*               LISTEN
+tcp        <span class="m">0</span>      <span class="m">0</span> localhost:8151          <span class="m">0</span>.0.0.0:*               LISTEN
+tcp        <span class="m">0</span>      <span class="m">0</span> localhost:8092          <span class="m">0</span>.0.0.0:*               LISTEN
+tcp        <span class="m">0</span>      <span class="m">0</span> localhost:8082          <span class="m">0</span>.0.0.0:*               LISTEN
+tcp        <span class="m">0</span>      <span class="m">0</span> localhost:8080          <span class="m">0</span>.0.0.0:*               LISTEN
+tcp        <span class="m">0</span>      <span class="m">0</span> <span class="m">0</span>.0.0.0:11480           <span class="m">0</span>.0.0.0:*               LISTEN
+tcp        <span class="m">0</span>      <span class="m">0</span> localhost:3000          <span class="m">0</span>.0.0.0:*               LISTEN
+tcp        <span class="m">0</span>      <span class="m">0</span> :::22                   :::*                    LISTEN
+tcp        <span class="m">0</span>      <span class="m">0</span> :::9094                 :::*                    LISTEN
+udp        <span class="m">0</span>      <span class="m">0</span> :::9094                 :::*
+Active UNIX domain sockets <span class="o">(</span>only servers<span class="o">)</span>
+Proto RefCnt Flags       Type       State         I-Node Path
+unix  <span class="m">2</span>      <span class="o">[</span> ACC <span class="o">]</span>     STREAM     LISTENING     <span class="m">5584197</span> /var/opt/gitlab/gitaly/gitaly.socket
+unix  <span class="m">2</span>      <span class="o">[</span> ACC <span class="o">]</span>     STREAM     LISTENING     <span class="m">5588069</span> /var/opt/gitlab/gitaly/run/gitaly-306/sock.d/ruby.1
+unix  <span class="m">2</span>      <span class="o">[</span> ACC <span class="o">]</span>     STREAM     LISTENING     <span class="m">5584198</span> /var/opt/gitlab/gitaly/run/gitaly-306/sock.d/intern
+unix  <span class="m">2</span>      <span class="o">[</span> ACC <span class="o">]</span>     STREAM     LISTENING     <span class="m">5573442</span> /var/opt/gitlab/gitaly/run/gitaly-306/sock.d/ruby.0
+unix  <span class="m">2</span>      <span class="o">[</span> ACC <span class="o">]</span>     STREAM     LISTENING     <span class="m">5591350</span> /var/opt/gitlab/postgresql/.s.PGSQL.5432
+unix  <span class="m">2</span>      <span class="o">[</span> ACC <span class="o">]</span>     STREAM     LISTENING     <span class="m">5609652</span> /var/opt/gitlab/gitlab-rails/sockets/gitlab.socket
+unix  <span class="m">2</span>      <span class="o">[</span> ACC <span class="o">]</span>     STREAM     LISTENING     <span class="m">5591983</span> /var/opt/gitlab/gitlab-workhorse/sockets/socket
+unix  <span class="m">2</span>      <span class="o">[</span> ACC <span class="o">]</span>     STREAM     LISTENING     <span class="m">5589222</span> /var/opt/gitlab/redis/redis.socket
+</code></pre></div>
+
+<p>因为<code>external_url</code>的配置，GitLab完全没有用到<code>80</code>端口，而是<code>11480</code>。</p>
+<p>GitLab居然会根据外部地址的端口，指定内部使用的端口，这谁能想到啊。</p>
+</div>
+		</div>
+	</body>
+</html>
