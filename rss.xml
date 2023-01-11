@@ -24,7 +24,10 @@
 &lt;p&gt;你在游戏使用MMC3的IRQ之前，有几件事情你必须设置好。&lt;strong&gt;首先&lt;/strong&gt;，你要设置好ROM结尾中断向量表里的IRQ向量，指向IRQ发生时你想被调用的代码。IRQ向量的位置在$FFFE，在NMI向量和RESET向量的右边。当一个IRQ中断触发时，CPU会跳到的16位地址$FFFE上，并且CPU标志被自动存下来，在IRQ程序返回时自动恢复。但是CPU的寄存器不会被保存，所以你必须确保在IRQ程序结束时，它们会被恢复原样（开始时应该入栈AXY寄存器，结束时出栈YXA，注意顺序）。&lt;/p&gt;
 &lt;p&gt;&lt;strong&gt;第二&lt;/strong&gt;件你必须做的事情，使用MMC3的IRQ，就要阻止其他的在NES上产生的IRQ中断。NES有一个“帧计数器”，默认会在每帧结束时产生IRQ中断，非常像NMI。如果不禁用这个，你的IRQ代码次数，会比你要的更多，从而搞砸你的游戏。禁用帧计数器的IRQ中断，只需要在你的程序开始时，把&lt;code&gt;$40&lt;/code&gt;写入到&lt;code&gt;$4017&lt;/code&gt;。&lt;/p&gt;
 &lt;p&gt;&lt;strong&gt;最后&lt;/strong&gt;，为了能够使用IRQ，你一定要告诉NES的CPU，你有实际确认它们，而不是忽略了它们，因为它在默认情况下（这也是为什么你不必担心在简单的游戏里，帧计数器的IRQ的发生 - CPU实际上忽略了它们）会启用的IRQ。你必须用“CLI”指令清除CPU中的中断禁用标志。在某些时刻，如果你想重新禁用它们，要用“SEI”。&lt;/p&gt;
-&lt;p&gt;下面是一个在nbasic中使用MMC3 IRQ中断的最小例子。 它使用一个IRQ中断来改变屏幕上一半的背景颜色，而不需要使用&lt;code&gt;Sprite-0-Hits&lt;/code&gt;来确定你的位置。&lt;strong&gt;注意：&lt;/strong&gt;MMC3 IRQ的时机安排是大多数模拟器没有真正做到的事情（例如，一个倒数值X，可能会在扫描线X-1或X+1上，实际触发一个IRQ中断，这取决于你使用的模拟器）。如果你使用IRQ，请在各种模拟器多测试几遍你的游戏。&lt;/p&gt;
+&lt;p&gt;下面是一个在nbasic中使用MMC3 IRQ中断的最小例子。 它使用一个IRQ中断来改变屏幕上一半的背景颜色，而不需要使用&lt;code&gt;Sprite-0-Hits&lt;/code&gt;来确定你的位置。&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;&lt;strong&gt;注意：&lt;/strong&gt;MMC3 IRQ的时机安排是大多数模拟器没有真正做到的事情（例如，一个倒数值X，可能会在扫描线X-1或X+1上，实际触发一个IRQ中断，这取决于你使用的模拟器）。如果你使用IRQ，请在各种模拟器多测试几遍你的游戏。&lt;/p&gt;
+&lt;/blockquote&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="c1"&gt;;//nesasm文件头&lt;/span&gt;
 &lt;span class="nf"&gt;asm&lt;/span&gt;
 &lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="na"&gt;.inesprg&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="c1"&gt;;//1个PRG段&lt;/span&gt;
