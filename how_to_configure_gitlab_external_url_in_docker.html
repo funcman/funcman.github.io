@@ -72,13 +72,13 @@
 <p>先说问题。大多数服务都是基于Web的，会要求暴露出80端口。Docker上有很多服务，IP共用主机的没问题，但是端口必须特别指定，然后映射到容器里的80端口上。</p>
 <p>比如这样：</p>
 <div class="highlight"><pre><span></span><code><span class="c1"># docker run --detach                       \</span>
-    -p <span class="m">11443</span>:443 -p <span class="m">11480</span>:80 -p <span class="m">11422</span>:22    <span class="se">\</span>
-    --name gitlab                           <span class="se">\</span>
-    --restart always                        <span class="se">\</span>
-    -v /gitlab/config:/etc/gitlab           <span class="se">\</span>
-    -v /gitlab/logs:/var/log/gitlab         <span class="se">\</span>
-    -v /gitlab/data:/var/opt/gitlab         <span class="se">\</span>
-    gitlab/gitlab-ce
+<span class="w">    </span>-p<span class="w"> </span><span class="m">11443</span>:443<span class="w"> </span>-p<span class="w"> </span><span class="m">11480</span>:80<span class="w"> </span>-p<span class="w"> </span><span class="m">11422</span>:22<span class="w">    </span><span class="se">\</span>
+<span class="w">    </span>--name<span class="w"> </span>gitlab<span class="w">                           </span><span class="se">\</span>
+<span class="w">    </span>--restart<span class="w"> </span>always<span class="w">                        </span><span class="se">\</span>
+<span class="w">    </span>-v<span class="w"> </span>/gitlab/config:/etc/gitlab<span class="w">           </span><span class="se">\</span>
+<span class="w">    </span>-v<span class="w"> </span>/gitlab/logs:/var/log/gitlab<span class="w">         </span><span class="se">\</span>
+<span class="w">    </span>-v<span class="w"> </span>/gitlab/data:/var/opt/gitlab<span class="w">         </span><span class="se">\</span>
+<span class="w">    </span>gitlab/gitlab-ce
 </code></pre></div>
 
 <p>但是如此设置，GitLab中一旦建立项目后，项目的“克隆”里并不能自动提供合适的地址，只会给出这样的东西：</p>
@@ -87,66 +87,66 @@
 
 <p>很恶心，不好用！</p>
 <p>按照网上的一些文章，据说修改<code>/etc/gitlab/gitlab.rb</code>中的<code>external_url</code>那一行，就可以了。比如修改成：</p>
-<div class="highlight"><pre><span></span><code><span class="n">external_url</span> <span class="s2">&quot;http://192.168.1.114:11480&quot;</span>
+<div class="highlight"><pre><span></span><code><span class="n">external_url</span><span class="w"> </span><span class="s2">&quot;http://192.168.1.114:11480&quot;</span>
 </code></pre></div>
 
 <p>但是一旦应用修改：</p>
-<div class="highlight"><pre><span></span><code>gitlab-ctl reconfigure
+<div class="highlight"><pre><span></span><code>gitlab-ctl<span class="w"> </span>reconfigure
 </code></pre></div>
 
 <p>服务直接访问不了啦。</p>
 <p>怎么回事呢？实际上，这个<code>external_url</code>设置一旦带有端口，服务原本的80端口是会被改成设置的端口的。那么按照创建容器时的设置的<code>-p 11480:80</code>，肯定是不通的。</p>
 <p>改一下容器的端口映射，直接<code>-p 11480:11480</code>，OK了。另外注意一下，这个GitLab镜像内部还占用8080端口，所以最好不要用，否则还要配置<code>/etc/gitlab/gitlab.rb</code>文件：</p>
-<div class="highlight"><pre><span></span><code><span class="n">unicorn</span><span class="o">[</span><span class="s1">&#39;port&#39;</span><span class="o">]</span> <span class="o">=</span> <span class="mi">8800</span>
+<div class="highlight"><pre><span></span><code><span class="n">unicorn</span><span class="o">[</span><span class="s1">&#39;port&#39;</span><span class="o">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">8800</span>
 </code></pre></div>
 
 <p>这个unicorn的端口配置我没有试验过，仅作为笔记摘录。</p>
 <p>这样配置好<code>external_url</code>，也只是解决了第一步，项目<code>克隆</code>中的<code>使用HTTP克隆</code>里的地址，<code>使用SSH克隆</code>还不正常，端口不对。怎么改？继续配置<code>/etc/gitlab/gitlab.rb</code>文件：</p>
-<div class="highlight"><pre><span></span><code><span class="n">gitlab_rails</span><span class="o">[</span><span class="s1">&#39;gitlab_shell_ssh_port&#39;</span><span class="o">]</span> <span class="o">=</span> <span class="mi">11422</span>
+<div class="highlight"><pre><span></span><code><span class="n">gitlab_rails</span><span class="o">[</span><span class="s1">&#39;gitlab_shell_ssh_port&#39;</span><span class="o">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">11422</span>
 </code></pre></div>
 
 <p>好了，重置、重启GitLab：</p>
-<div class="highlight"><pre><span></span><code>gitlab-ctl reconfigure
-gitlab-ctl restart
+<div class="highlight"><pre><span></span><code>gitlab-ctl<span class="w"> </span>reconfigure
+gitlab-ctl<span class="w"> </span>restart
 </code></pre></div>
 
 <p>这里重启应该是没啥必要性的，多做无过。完事后，克隆里的地址应该都是正常可用的了。</p>
 <p>事毕，我们可以查看一下端口信息：</p>
 <div class="highlight"><pre><span></span><code><span class="c1"># netstat -l</span>
-Active Internet connections <span class="o">(</span>only servers<span class="o">)</span>
-Proto Recv-Q Send-Q Local Address           Foreign Address         State
-tcp        <span class="m">0</span>      <span class="m">0</span> <span class="m">0</span>.0.0.0:22              <span class="m">0</span>.0.0.0:*               LISTEN
-tcp        <span class="m">0</span>      <span class="m">0</span> localhost:9229          <span class="m">0</span>.0.0.0:*               LISTEN
-tcp        <span class="m">0</span>      <span class="m">0</span> localhost:9236          <span class="m">0</span>.0.0.0:*               LISTEN
-tcp        <span class="m">0</span>      <span class="m">0</span> <span class="m">0</span>.0.0.0:8060            <span class="m">0</span>.0.0.0:*               LISTEN
-tcp        <span class="m">0</span>      <span class="m">0</span> localhost:9168          <span class="m">0</span>.0.0.0:*               LISTEN
-tcp        <span class="m">0</span>      <span class="m">0</span> localhost:9187          <span class="m">0</span>.0.0.0:*               LISTEN
-tcp        <span class="m">0</span>      <span class="m">0</span> localhost:9090          <span class="m">0</span>.0.0.0:*               LISTEN
-tcp        <span class="m">0</span>      <span class="m">0</span> localhost:9093          <span class="m">0</span>.0.0.0:*               LISTEN
-tcp        <span class="m">0</span>      <span class="m">0</span> localhost:9121          <span class="m">0</span>.0.0.0:*               LISTEN
-tcp        <span class="m">0</span>      <span class="m">0</span> localhost:8154          <span class="m">0</span>.0.0.0:*               LISTEN
-tcp        <span class="m">0</span>      <span class="m">0</span> localhost:8155          <span class="m">0</span>.0.0.0:*               LISTEN
-tcp        <span class="m">0</span>      <span class="m">0</span> localhost:8153          <span class="m">0</span>.0.0.0:*               LISTEN
-tcp        <span class="m">0</span>      <span class="m">0</span> localhost:8150          <span class="m">0</span>.0.0.0:*               LISTEN
-tcp        <span class="m">0</span>      <span class="m">0</span> localhost:8151          <span class="m">0</span>.0.0.0:*               LISTEN
-tcp        <span class="m">0</span>      <span class="m">0</span> localhost:8092          <span class="m">0</span>.0.0.0:*               LISTEN
-tcp        <span class="m">0</span>      <span class="m">0</span> localhost:8082          <span class="m">0</span>.0.0.0:*               LISTEN
-tcp        <span class="m">0</span>      <span class="m">0</span> localhost:8080          <span class="m">0</span>.0.0.0:*               LISTEN
-tcp        <span class="m">0</span>      <span class="m">0</span> <span class="m">0</span>.0.0.0:11480           <span class="m">0</span>.0.0.0:*               LISTEN
-tcp        <span class="m">0</span>      <span class="m">0</span> localhost:3000          <span class="m">0</span>.0.0.0:*               LISTEN
-tcp        <span class="m">0</span>      <span class="m">0</span> :::22                   :::*                    LISTEN
-tcp        <span class="m">0</span>      <span class="m">0</span> :::9094                 :::*                    LISTEN
-udp        <span class="m">0</span>      <span class="m">0</span> :::9094                 :::*
-Active UNIX domain sockets <span class="o">(</span>only servers<span class="o">)</span>
-Proto RefCnt Flags       Type       State         I-Node Path
-unix  <span class="m">2</span>      <span class="o">[</span> ACC <span class="o">]</span>     STREAM     LISTENING     <span class="m">5584197</span> /var/opt/gitlab/gitaly/gitaly.socket
-unix  <span class="m">2</span>      <span class="o">[</span> ACC <span class="o">]</span>     STREAM     LISTENING     <span class="m">5588069</span> /var/opt/gitlab/gitaly/run/gitaly-306/sock.d/ruby.1
-unix  <span class="m">2</span>      <span class="o">[</span> ACC <span class="o">]</span>     STREAM     LISTENING     <span class="m">5584198</span> /var/opt/gitlab/gitaly/run/gitaly-306/sock.d/intern
-unix  <span class="m">2</span>      <span class="o">[</span> ACC <span class="o">]</span>     STREAM     LISTENING     <span class="m">5573442</span> /var/opt/gitlab/gitaly/run/gitaly-306/sock.d/ruby.0
-unix  <span class="m">2</span>      <span class="o">[</span> ACC <span class="o">]</span>     STREAM     LISTENING     <span class="m">5591350</span> /var/opt/gitlab/postgresql/.s.PGSQL.5432
-unix  <span class="m">2</span>      <span class="o">[</span> ACC <span class="o">]</span>     STREAM     LISTENING     <span class="m">5609652</span> /var/opt/gitlab/gitlab-rails/sockets/gitlab.socket
-unix  <span class="m">2</span>      <span class="o">[</span> ACC <span class="o">]</span>     STREAM     LISTENING     <span class="m">5591983</span> /var/opt/gitlab/gitlab-workhorse/sockets/socket
-unix  <span class="m">2</span>      <span class="o">[</span> ACC <span class="o">]</span>     STREAM     LISTENING     <span class="m">5589222</span> /var/opt/gitlab/redis/redis.socket
+Active<span class="w"> </span>Internet<span class="w"> </span>connections<span class="w"> </span><span class="o">(</span>only<span class="w"> </span>servers<span class="o">)</span>
+Proto<span class="w"> </span>Recv-Q<span class="w"> </span>Send-Q<span class="w"> </span>Local<span class="w"> </span>Address<span class="w">           </span>Foreign<span class="w"> </span>Address<span class="w">         </span>State
+tcp<span class="w">        </span><span class="m">0</span><span class="w">      </span><span class="m">0</span><span class="w"> </span><span class="m">0</span>.0.0.0:22<span class="w">              </span><span class="m">0</span>.0.0.0:*<span class="w">               </span>LISTEN
+tcp<span class="w">        </span><span class="m">0</span><span class="w">      </span><span class="m">0</span><span class="w"> </span>localhost:9229<span class="w">          </span><span class="m">0</span>.0.0.0:*<span class="w">               </span>LISTEN
+tcp<span class="w">        </span><span class="m">0</span><span class="w">      </span><span class="m">0</span><span class="w"> </span>localhost:9236<span class="w">          </span><span class="m">0</span>.0.0.0:*<span class="w">               </span>LISTEN
+tcp<span class="w">        </span><span class="m">0</span><span class="w">      </span><span class="m">0</span><span class="w"> </span><span class="m">0</span>.0.0.0:8060<span class="w">            </span><span class="m">0</span>.0.0.0:*<span class="w">               </span>LISTEN
+tcp<span class="w">        </span><span class="m">0</span><span class="w">      </span><span class="m">0</span><span class="w"> </span>localhost:9168<span class="w">          </span><span class="m">0</span>.0.0.0:*<span class="w">               </span>LISTEN
+tcp<span class="w">        </span><span class="m">0</span><span class="w">      </span><span class="m">0</span><span class="w"> </span>localhost:9187<span class="w">          </span><span class="m">0</span>.0.0.0:*<span class="w">               </span>LISTEN
+tcp<span class="w">        </span><span class="m">0</span><span class="w">      </span><span class="m">0</span><span class="w"> </span>localhost:9090<span class="w">          </span><span class="m">0</span>.0.0.0:*<span class="w">               </span>LISTEN
+tcp<span class="w">        </span><span class="m">0</span><span class="w">      </span><span class="m">0</span><span class="w"> </span>localhost:9093<span class="w">          </span><span class="m">0</span>.0.0.0:*<span class="w">               </span>LISTEN
+tcp<span class="w">        </span><span class="m">0</span><span class="w">      </span><span class="m">0</span><span class="w"> </span>localhost:9121<span class="w">          </span><span class="m">0</span>.0.0.0:*<span class="w">               </span>LISTEN
+tcp<span class="w">        </span><span class="m">0</span><span class="w">      </span><span class="m">0</span><span class="w"> </span>localhost:8154<span class="w">          </span><span class="m">0</span>.0.0.0:*<span class="w">               </span>LISTEN
+tcp<span class="w">        </span><span class="m">0</span><span class="w">      </span><span class="m">0</span><span class="w"> </span>localhost:8155<span class="w">          </span><span class="m">0</span>.0.0.0:*<span class="w">               </span>LISTEN
+tcp<span class="w">        </span><span class="m">0</span><span class="w">      </span><span class="m">0</span><span class="w"> </span>localhost:8153<span class="w">          </span><span class="m">0</span>.0.0.0:*<span class="w">               </span>LISTEN
+tcp<span class="w">        </span><span class="m">0</span><span class="w">      </span><span class="m">0</span><span class="w"> </span>localhost:8150<span class="w">          </span><span class="m">0</span>.0.0.0:*<span class="w">               </span>LISTEN
+tcp<span class="w">        </span><span class="m">0</span><span class="w">      </span><span class="m">0</span><span class="w"> </span>localhost:8151<span class="w">          </span><span class="m">0</span>.0.0.0:*<span class="w">               </span>LISTEN
+tcp<span class="w">        </span><span class="m">0</span><span class="w">      </span><span class="m">0</span><span class="w"> </span>localhost:8092<span class="w">          </span><span class="m">0</span>.0.0.0:*<span class="w">               </span>LISTEN
+tcp<span class="w">        </span><span class="m">0</span><span class="w">      </span><span class="m">0</span><span class="w"> </span>localhost:8082<span class="w">          </span><span class="m">0</span>.0.0.0:*<span class="w">               </span>LISTEN
+tcp<span class="w">        </span><span class="m">0</span><span class="w">      </span><span class="m">0</span><span class="w"> </span>localhost:8080<span class="w">          </span><span class="m">0</span>.0.0.0:*<span class="w">               </span>LISTEN
+tcp<span class="w">        </span><span class="m">0</span><span class="w">      </span><span class="m">0</span><span class="w"> </span><span class="m">0</span>.0.0.0:11480<span class="w">           </span><span class="m">0</span>.0.0.0:*<span class="w">               </span>LISTEN
+tcp<span class="w">        </span><span class="m">0</span><span class="w">      </span><span class="m">0</span><span class="w"> </span>localhost:3000<span class="w">          </span><span class="m">0</span>.0.0.0:*<span class="w">               </span>LISTEN
+tcp<span class="w">        </span><span class="m">0</span><span class="w">      </span><span class="m">0</span><span class="w"> </span>:::22<span class="w">                   </span>:::*<span class="w">                    </span>LISTEN
+tcp<span class="w">        </span><span class="m">0</span><span class="w">      </span><span class="m">0</span><span class="w"> </span>:::9094<span class="w">                 </span>:::*<span class="w">                    </span>LISTEN
+udp<span class="w">        </span><span class="m">0</span><span class="w">      </span><span class="m">0</span><span class="w"> </span>:::9094<span class="w">                 </span>:::*
+Active<span class="w"> </span>UNIX<span class="w"> </span>domain<span class="w"> </span>sockets<span class="w"> </span><span class="o">(</span>only<span class="w"> </span>servers<span class="o">)</span>
+Proto<span class="w"> </span>RefCnt<span class="w"> </span>Flags<span class="w">       </span>Type<span class="w">       </span>State<span class="w">         </span>I-Node<span class="w"> </span>Path
+unix<span class="w">  </span><span class="m">2</span><span class="w">      </span><span class="o">[</span><span class="w"> </span>ACC<span class="w"> </span><span class="o">]</span><span class="w">     </span>STREAM<span class="w">     </span>LISTENING<span class="w">     </span><span class="m">5584197</span><span class="w"> </span>/var/opt/gitlab/gitaly/gitaly.socket
+unix<span class="w">  </span><span class="m">2</span><span class="w">      </span><span class="o">[</span><span class="w"> </span>ACC<span class="w"> </span><span class="o">]</span><span class="w">     </span>STREAM<span class="w">     </span>LISTENING<span class="w">     </span><span class="m">5588069</span><span class="w"> </span>/var/opt/gitlab/gitaly/run/gitaly-306/sock.d/ruby.1
+unix<span class="w">  </span><span class="m">2</span><span class="w">      </span><span class="o">[</span><span class="w"> </span>ACC<span class="w"> </span><span class="o">]</span><span class="w">     </span>STREAM<span class="w">     </span>LISTENING<span class="w">     </span><span class="m">5584198</span><span class="w"> </span>/var/opt/gitlab/gitaly/run/gitaly-306/sock.d/intern
+unix<span class="w">  </span><span class="m">2</span><span class="w">      </span><span class="o">[</span><span class="w"> </span>ACC<span class="w"> </span><span class="o">]</span><span class="w">     </span>STREAM<span class="w">     </span>LISTENING<span class="w">     </span><span class="m">5573442</span><span class="w"> </span>/var/opt/gitlab/gitaly/run/gitaly-306/sock.d/ruby.0
+unix<span class="w">  </span><span class="m">2</span><span class="w">      </span><span class="o">[</span><span class="w"> </span>ACC<span class="w"> </span><span class="o">]</span><span class="w">     </span>STREAM<span class="w">     </span>LISTENING<span class="w">     </span><span class="m">5591350</span><span class="w"> </span>/var/opt/gitlab/postgresql/.s.PGSQL.5432
+unix<span class="w">  </span><span class="m">2</span><span class="w">      </span><span class="o">[</span><span class="w"> </span>ACC<span class="w"> </span><span class="o">]</span><span class="w">     </span>STREAM<span class="w">     </span>LISTENING<span class="w">     </span><span class="m">5609652</span><span class="w"> </span>/var/opt/gitlab/gitlab-rails/sockets/gitlab.socket
+unix<span class="w">  </span><span class="m">2</span><span class="w">      </span><span class="o">[</span><span class="w"> </span>ACC<span class="w"> </span><span class="o">]</span><span class="w">     </span>STREAM<span class="w">     </span>LISTENING<span class="w">     </span><span class="m">5591983</span><span class="w"> </span>/var/opt/gitlab/gitlab-workhorse/sockets/socket
+unix<span class="w">  </span><span class="m">2</span><span class="w">      </span><span class="o">[</span><span class="w"> </span>ACC<span class="w"> </span><span class="o">]</span><span class="w">     </span>STREAM<span class="w">     </span>LISTENING<span class="w">     </span><span class="m">5589222</span><span class="w"> </span>/var/opt/gitlab/redis/redis.socket
 </code></pre></div>
 
 <p>因为<code>external_url</code>的配置，GitLab完全没有用到<code>80</code>端口，而是<code>11480</code>。</p>

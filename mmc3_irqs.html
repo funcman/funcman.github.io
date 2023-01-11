@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="zh_cn" prefix="og: http://ogp.me/ns#">
+	<head>
+		<link href="http://gmpg.org/xfn/11" rel="profile">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta http-equiv="content-type" content="text/html; charset=utf-8">
+
+		<!-- Metadata -->
+	<meta name="description" content="一个游戏程序员。曾经参与开发过<a href='https://www.bing.com/search?q=%E4%BB%99%E4%BE%A3%E5%A5%87%E7%BC%983'>仙侣奇缘3</a>、<a href='http://sh.70yx.com'>水浒传</a>、<a href='https://itunes.apple.com/cn/app/id938688461'>小米运动</a>、<a href='https://itunes.apple.com/cn/app/id1034182617'>米动</a>和<a href='https://www.taptap.com/app/143658'>无限激战</a>">
+	<meta property="og:description" content="一个游戏程序员。曾经参与开发过<a href='https://www.bing.com/search?q=%E4%BB%99%E4%BE%A3%E5%A5%87%E7%BC%983'>仙侣奇缘3</a>、<a href='http://sh.70yx.com'>水浒传</a>、<a href='https://itunes.apple.com/cn/app/id938688461'>小米运动</a>、<a href='https://itunes.apple.com/cn/app/id1034182617'>米动</a>和<a href='https://www.taptap.com/app/143658'>无限激战</a>">
+	<meta property="og:title" content="MMC3的IRQ中断" />
+	<meta property="og:type" content="article" />
+	<meta property="og:url" content="https://funcman.me/mmc3_irqs.html" />
+		<meta property="og:image" content="https://funcman.me/images/avatar.png" />
+
+		<!-- Enable responsiveness on mobile devices-->
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+
+		<title>funcman's blog</title>
+
+		<!-- CSS -->
+		<link href="//fonts.googleapis.com/" rel="dns-prefetch">
+		<link href="//fonts.googleapis.com/css?family=Droid+Serif:400,700,400italic|Abril+Fatface|PT+Sans:400,400italic,700&amp;subset=latin,latin-ext" rel="stylesheet">
+
+		<link rel="stylesheet" href="https://funcman.me/theme/css/poole.css" />
+		<link rel="stylesheet" href="https://funcman.me/theme/css/hyde.css" />
+		<link rel="stylesheet" href="https://funcman.me/theme/css/syntax.css" />
+			<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fork-awesome@1.1.7/css/fork-awesome.min.css" crossorigin="anonymous">
+
+		<!-- Feeds -->
+<link href="https://funcman.me/rss.xml" type="application/atom+xml" rel="alternate" title="funcman's blog Full Atom Feed" />
+
+		<!-- Analytics -->
+	</head>
+
+	<body class="theme-base-0e">
+<div class="sidebar">
+	<div class="container sidebar-sticky">
+		<div class="sidebar-about">
+
+			<h1>
+				<a href="/">
+					<img class="profile-picture" src="https://funcman.me/images/avatar.png">
+					funcman's blog
+				</a>
+			</h1>
+			<p class="lead"></p>
+			<p class="lead">一个游戏程序员。曾经参与开发过<a href='https://www.bing.com/search?q=%E4%BB%99%E4%BE%A3%E5%A5%87%E7%BC%983'>仙侣奇缘3</a>、<a href='http://sh.70yx.com'>水浒传</a>、<a href='https://itunes.apple.com/cn/app/id938688461'>小米运动</a>、<a href='https://itunes.apple.com/cn/app/id1034182617'>米动</a>和<a href='https://www.taptap.com/app/143658'>无限激战</a> </p>
+			<p></p>
+		</div>
+		<nav class="sidebar-social">
+					<a class="sidebar-social-item" href="mailto:hyq1986@gmail.com">
+						<i class="fa fa-envelope"></i>
+					</a>
+					<a class="sidebar-social-item" href="https://twitter.com/funcman" target="_blank">
+						<i class="fa fa-twitter"></i>
+					</a>
+					<a class="sidebar-social-item" href="https://github.com/funcman" target="_blank">
+						<i class="fa fa-github"></i>
+					</a>
+			<a class="sidebar-social-item" href="https://funcman.me/rss.xml">
+				<i class="fa fa-rss"></i>
+			</a>
+		</nav>
+	</div>
+</div>		<div class="content container">
+<div class="post">
+	<h1 class="post-title">MMC3的IRQ中断</h1>
+	<span class="post-date">周三 11 一月 2023</span>
+	<p><a href="http://bobrost.com/nes/files/mmc3irqs.txt">原文</a>作者：Allan Blomquist</p>
+<p>iNES Mapper #4 (MMC3)提供了一种方便的方法，来对PPU进行帧间改变，以实现NES游戏中的<strong>分屏卷动</strong>等“特殊效果”。与其使用<code>Sprite-0 Hits</code>去择机写入PPU硬件，不如使用IRQ。这可以使CPU在一帧内就做完工作，而不是浪费时间去轮询<code>Sprite-0 Hits</code>标志。 MMC3有4个寄存器，是MMC3为IRQ触发而设的：</p>
+<p><code>$C000</code> - <strong>IRQ计数器</strong> - Mapper用它来倒计时以触发IRQ。每一条扫描线，该值减一；当它到0时，IRQ就触发。</p>
+<blockquote>
+<p><strong>注意：</strong> 背景和精灵必须启用，在<code>$2001</code>(<code>D3</code>、<code>D4</code>)，这样倒数才会进行。</p>
+</blockquote>
+<p><code>$C001</code> - <strong>IRQ计数锁存器</strong> - 写入你想要的值，也就是用来倒数的值；而不是直接往<code>IRQ计数寄存器</code>里写值。</p>
+<p><code>$E000</code> - <strong>IRQ禁用/确认器</strong> - 往这里写任意值，都能禁用IRQ的触发，但也能将<code>IRQ计数器锁存器</code>中的值复制到实际的<code>IRQ计数器</code>。一旦确认了一次IRQ，就会保证发生中断。</p>
+<p><code>$E001</code> - <strong>IRQ启动器</strong> - 往这里写入任意值，都能启用IRQ的触发。</p>
+<p>因此，大多数的商业游戏都是这样使用这些寄存器：</p>
+<p>当你想设置的IRQ时：（放在你的NMI/vblank程序中）
+1. 写<code>$E000</code>以确认任何当前待定的中断
+2. 向<code>$C000</code>和<code>$C001</code>写入你要等待的扫描线数
+3. 再次写<code>$E000</code>以锁定倒数值
+4. 写<code>$E001</code>以启用<code>IRQ计数器</code></p>
+<p>一旦你的IRQ发生了：（在你的IRQ程序中）
+1. 写<code>$E000</code>以确认IRQ并禁用<code>IRQ计数器</code></p>
+<p>你在游戏使用MMC3的IRQ之前，有几件事情你必须设置好。<strong>首先</strong>，你要设置好ROM结尾中断向量表里的IRQ向量，指向IRQ发生时你想被调用的代码。IRQ向量的位置在$FFFE，在NMI向量和RESET向量的右边。当一个IRQ中断触发时，CPU会跳到的16位地址$FFFE上，并且CPU标志被自动存下来，在IRQ程序返回时自动恢复。但是CPU的寄存器不会被保存，所以你必须确保在IRQ程序结束时，它们会被恢复原样（开始时应该入栈AXY寄存器，结束时出栈YXA，注意顺序）。</p>
+<p><strong>第二</strong>件你必须做的事情，使用MMC3的IRQ，就要阻止其他的在NES上产生的IRQ中断。NES有一个“帧计数器”，默认会在每帧结束时产生IRQ中断，非常像NMI。如果不禁用这个，你的IRQ代码次数，会比你要的更多，从而搞砸你的游戏。禁用帧计数器的IRQ中断，只需要在你的程序开始时，把<code>$40</code>写入到<code>$4017</code>。</p>
+<p><strong>最后</strong>，为了能够使用IRQ，你一定要告诉NES的CPU，你有实际确认它们，而不是忽略了它们，因为它在默认情况下（这也是为什么你不必担心在简单的游戏里，帧计数器的IRQ的发生 - CPU实际上忽略了它们）会启用的IRQ。你必须用“CLI”指令清除CPU中的中断禁用标志。在某些时刻，如果你想重新禁用它们，要用“SEI”。</p>
+<p>下面是一个在nbasic中使用MMC3 IRQ中断的最小例子。 它使用一个IRQ中断来改变屏幕上一半的背景颜色，而不需要使用<code>Sprite-0-Hits</code>来确定你的位置。<strong>注意：</strong>MMC3 IRQ的时机安排是大多数模拟器没有真正做到的事情（例如，一个倒数值X，可能会在扫描线X-1或X+1上，实际触发一个IRQ中断，这取决于你使用的模拟器）。如果你使用IRQ，请在各种模拟器多测试几遍你的游戏。</p>
+<div class="highlight"><pre><span></span><code><span class="c1">;//nesasm文件头</span>
+<span class="nf">asm</span>
+<span class="w">    </span><span class="na">.inesprg</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="c1">;//1个PRG段</span>
+<span class="w">    </span><span class="na">.ineschr</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="c1">;//0个CHR段</span>
+<span class="w">    </span><span class="na">.inesmir</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="c1">;//镜像类型0</span>
+<span class="w">    </span><span class="na">.inesmap</span><span class="w"> </span><span class="mi">4</span><span class="w"> </span><span class="c1">;//内存使用mapper 4 (MMC3)</span>
+<span class="w">    </span><span class="na">.org</span><span class="w"> </span><span class="no">$C000</span>
+<span class="w">    </span><span class="na">.bank</span><span class="w"> </span><span class="mi">0</span>
+<span class="nf">endasm</span>
+
+<span class="nl">start:</span>
+
+<span class="w">    </span><span class="nf">gosub</span><span class="w"> </span><span class="no">vwait</span>
+<span class="w">    </span><span class="nf">set</span><span class="w"> </span><span class="no">$2000</span><span class="w"> </span><span class="no">$80</span><span class="w">           </span><span class="c1">;// 打开NMI</span>
+<span class="w">    </span><span class="nf">set</span><span class="w"> </span><span class="no">$2001</span><span class="w"> </span><span class="no">$08</span><span class="w">           </span><span class="c1">;// 打开BG使MMC3能够计数</span>
+
+<span class="w">    </span><span class="nf">set</span><span class="w"> </span><span class="no">$4017</span><span class="w"> </span><span class="no">$40</span><span class="w">           </span><span class="c1">;// 禁用帧计数器IRQ</span>
+<span class="nf">asm</span>
+<span class="w">    </span><span class="nf">cli</span><span class="w">                     </span><span class="c1">;// 启用IRQ处理过程</span>
+<span class="nf">endasm</span>
+
+<span class="nl">gameloop:</span>
+<span class="w">    </span><span class="nf">goto</span><span class="w"> </span><span class="no">gameloop</span>
+
+<span class="c1">;// NMI程序</span>
+<span class="nl">nmi:</span>
+<span class="w">    </span><span class="nf">set</span><span class="w"> </span><span class="no">$2006</span><span class="w"> </span><span class="no">$3F</span>
+<span class="w">    </span><span class="nf">set</span><span class="w"> </span><span class="no">$2006</span><span class="w"> </span><span class="no">$00</span><span class="w">           </span><span class="c1">;// 设置背景色为红色</span>
+<span class="w">    </span><span class="nf">set</span><span class="w"> </span><span class="no">$2007</span><span class="w"> </span><span class="no">$06</span>
+
+<span class="w">    </span><span class="nf">set</span><span class="w"> </span><span class="no">$E000</span><span class="w"> </span><span class="no">$01</span>
+<span class="w">    </span><span class="nf">set</span><span class="w"> </span><span class="no">$C000</span><span class="w"> </span><span class="no">$78</span><span class="w">           </span><span class="c1">;// 设置MMC3让IRQ中断发生在</span>
+<span class="w">    </span><span class="nf">set</span><span class="w"> </span><span class="no">$C001</span><span class="w"> </span><span class="no">$78</span><span class="w">           </span><span class="c1">;// 120条扫描线之后</span>
+<span class="w">    </span><span class="nf">set</span><span class="w"> </span><span class="no">$E000</span><span class="w"> </span><span class="no">$01</span>
+<span class="w">    </span><span class="nf">set</span><span class="w"> </span><span class="no">$E001</span><span class="w"> </span><span class="no">$01</span>
+
+<span class="w">    </span><span class="nf">set</span><span class="w"> </span><span class="no">$2006</span><span class="w"> </span><span class="no">$00</span>
+<span class="w">    </span><span class="nf">set</span><span class="w"> </span><span class="no">$2006</span><span class="w"> </span><span class="no">$00</span>
+
+<span class="w">    </span><span class="nf">set</span><span class="w"> </span><span class="no">$2001</span><span class="w"> </span><span class="no">$08</span><span class="w">           </span><span class="c1">;// 打开BG使MMC3能够计数</span>
+
+<span class="w">    </span><span class="nf">resume</span>
+
+<span class="c1">;// IRQ程序</span>
+<span class="nl">irq:</span>
+
+<span class="nf">asm</span>
+<span class="w">    </span><span class="nf">pha</span>
+<span class="w">    </span><span class="nf">txa</span>
+<span class="w">    </span><span class="nf">pha</span><span class="w">                     </span><span class="c1">;// 保存寄存器A,X和Y。你必须这么做，因为</span>
+<span class="w">    </span><span class="nf">tya</span><span class="w">                     </span><span class="c1">;// IRQ中断了你的主线程代码。改变你的</span>
+<span class="w">    </span><span class="nf">pha</span><span class="w">                     </span><span class="c1">;// 寄存器值，对主线程来说，这是可是</span>
+<span class="w">                            </span><span class="c1">;// 不太好的...</span>
+<span class="nf">endasm</span><span class="w">                      </span>
+
+<span class="w">    </span><span class="no">set</span><span class="w"> </span><span class="no">$2001</span><span class="w"> </span><span class="no">$00</span><span class="w">           </span><span class="c1">;// 强制关闭背景，迫使愚蠢的模拟器意识到我在改变背景色</span>
+
+<span class="w">    </span><span class="nf">set</span><span class="w"> </span><span class="no">$2006</span><span class="w"> </span><span class="no">$3F</span>
+<span class="w">    </span><span class="nf">set</span><span class="w"> </span><span class="no">$2006</span><span class="w"> </span><span class="no">$00</span><span class="w">           </span><span class="c1">;// 设置背景色为绿色</span>
+<span class="w">    </span><span class="nf">set</span><span class="w"> </span><span class="no">$2007</span><span class="w"> </span><span class="no">$0A</span>
+
+<span class="w">    </span><span class="nf">set</span><span class="w"> </span><span class="no">$E000</span><span class="w"> </span><span class="no">$01</span><span class="w">           </span><span class="c1">;// 确认IRQ并禁止进一步产生IRQ</span>
+
+<span class="w">    </span><span class="nf">set</span><span class="w"> </span><span class="no">$2006</span><span class="w"> </span><span class="no">$00</span>
+<span class="w">    </span><span class="nf">set</span><span class="w"> </span><span class="no">$2006</span><span class="w"> </span><span class="no">$00</span>
+
+<span class="nf">asm</span>
+<span class="w">    </span><span class="nf">pla</span>
+<span class="w">    </span><span class="nf">tay</span><span class="w">                     </span><span class="c1">;// 取回你的寄存器值</span>
+<span class="w">    </span><span class="nf">pla</span>
+<span class="w">    </span><span class="nf">tax</span>
+<span class="w">    </span><span class="nf">pla</span>
+<span class="nf">endasm</span>
+
+<span class="w">    </span><span class="nf">resume</span>
+
+
+<span class="c1">;//等待屏幕刷新</span>
+<span class="nl">vwait:</span>
+<span class="w">    </span><span class="nf">asm</span>
+<span class="w">        </span><span class="nf">lda</span><span class="w"> </span><span class="no">$2002</span>
+<span class="w">        </span><span class="nf">bpl</span><span class="w"> </span><span class="no">vwait</span><span class="w">   </span><span class="c1">;//等待回溯开始</span>
+<span class="w">    </span><span class="nl">vwait_1:</span>
+<span class="w">        </span><span class="nf">lda</span><span class="w"> </span><span class="no">$2002</span>
+<span class="w">        </span><span class="nf">bmi</span><span class="w"> </span><span class="no">vwait_1</span><span class="w"> </span><span class="c1">;//等待回溯结束</span>
+<span class="w">    </span><span class="nf">endasm</span>
+<span class="w">    </span><span class="nf">return</span>
+
+<span class="c1">;//文件脚部</span>
+<span class="nf">asm</span>
+<span class="w">    </span><span class="c1">;//跳转表指向NMI，Reset和IRQ开始位置</span>
+<span class="w">    </span><span class="na">.bank</span><span class="w"> </span><span class="mi">1</span>
+<span class="w">    </span><span class="na">.org</span><span class="w"> </span><span class="no">$fffa</span>
+<span class="w">    </span><span class="na">.dw</span><span class="w"> </span><span class="no">nmi</span><span class="p">,</span><span class="w"> </span><span class="no">start</span><span class="p">,</span><span class="w"> </span><span class="no">irq</span>
+<span class="nf">endasm</span>
+</code></pre></div>
+</div>
+		</div>
+	</body>
+</html>

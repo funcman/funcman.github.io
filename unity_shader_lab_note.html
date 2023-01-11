@@ -73,44 +73,44 @@
 <h2>ShaderLab的基本结构</h2>
 <p>ShaderLab是基于Cg（HLSL）的，但不等同于Cg。它在此基础上又添加了一套东西，是高于Shader的东西。</p>
 <p>某种程度可以把ShaderLab代码等同于Unity的材质。它包含了整套东西，概念上像是HLSL基础之上的D3D Effects。</p>
-<div class="highlight"><pre><span></span><code><span class="n">Shader</span><span class="w"> </span><span class="s">&quot;ShaderName&quot;</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="w">    </span><span class="n">Properties</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<div class="highlight"><pre><span></span><code><span class="n">Shader</span><span class="w"> </span><span class="s">&quot;ShaderName&quot;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">Properties</span><span class="w"> </span><span class="p">{</span>
 <span class="w">        </span><span class="c1">// 属性</span>
-<span class="w">    </span><span class="p">}</span><span class="w"></span>
-<span class="w">    </span><span class="n">SubShader</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="w">        </span><span class="n">Pass</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">    </span><span class="n">SubShader</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">Pass</span><span class="w"> </span><span class="p">{</span>
 <span class="w">            </span><span class="c1">// 具体的Shader程序</span>
-<span class="w">        </span><span class="p">}</span><span class="w"></span>
-<span class="w">        </span><span class="n">Pass</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">        </span><span class="n">Pass</span><span class="w"> </span><span class="p">{</span>
 <span class="w">            </span><span class="c1">// 有时会用到多个Pass</span>
-<span class="w">        </span><span class="p">}</span><span class="w"></span>
-<span class="w">    </span><span class="p">}</span><span class="w"></span>
-<span class="w">    </span><span class="n">SubShader</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">    </span><span class="n">SubShader</span><span class="w"> </span><span class="p">{</span>
 <span class="w">        </span><span class="c1">// 因为硬件的差异，有的旧硬件不支持某些Shader</span>
 <span class="w">        </span><span class="c1">// 可能需要提供多个子Shader供Unity选择</span>
 <span class="w">        </span><span class="c1">// Unity会选择第一个能运行的子Shader</span>
-<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span>
 <span class="w">    </span><span class="c1">// 当所有子Shader都不能运行时</span>
 <span class="w">    </span><span class="c1">// 提供一个应急方案，双引号里是Shader名称</span>
 <span class="w">    </span><span class="c1">// 或者关掉这个功能</span>
 <span class="w">    </span><span class="c1">// 代码是：Fallback off</span>
-<span class="w">    </span><span class="n">Fallback</span><span class="w"> </span><span class="s">&quot;Diffuse&quot;</span><span class="w"></span>
-<span class="p">}</span><span class="w"></span>
+<span class="w">    </span><span class="n">Fallback</span><span class="w"> </span><span class="s">&quot;Diffuse&quot;</span>
+<span class="p">}</span>
 </code></pre></div>
 
 <p>注意这里Fallback有个隐藏影响，在Unity预计算阴影时，会在SubShader里找相关Pass，找不到就会用Fallback提供的。</p>
 <h2>Properties 属性设置</h2>
 <p>如果把Shader看成一套功能，或者广义的函数，那Properties就是Shader被提交给GPU执行时携带的参数。</p>
-<div class="highlight"><pre><span></span><code><span class="p">...</span><span class="w"></span>
+<div class="highlight"><pre><span></span><code><span class="p">...</span>
 
-<span class="n">Properies</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="n">Properies</span><span class="w"> </span><span class="p">{</span>
 <span class="w">    </span><span class="c1">// 形式：</span>
 <span class="w">    </span><span class="c1">// Name(&quot;DisplayName&quot;, PropertyType) = DefaultValue</span>
 <span class="w">    </span><span class="c1">// 例如：</span>
-<span class="w">    </span><span class="n">_pos</span><span class="p">(</span><span class="s">&quot;Position&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">Vector</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"></span>
-<span class="p">}</span><span class="w"></span>
+<span class="w">    </span><span class="n">_pos</span><span class="p">(</span><span class="s">&quot;Position&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">Vector</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span>
+<span class="p">}</span>
 
-<span class="p">...</span><span class="w"></span>
+<span class="p">...</span>
 </code></pre></div>
 
 <p>这里<code>_pos</code>可以在后面的Shader代码里作为“变量名”使用。</p>
@@ -118,25 +118,25 @@
 <p>贴图类型可以像这样：<code>_tex("Texture", 2D) = "white"{}</code>，指定默认纹理。<code>"white"</code>是默认纹理名称。</p>
 <p>代码种的属性会对应到Unity材质属性设置面板中。</p>
 <h2>SubShader的一般结构</h2>
-<div class="highlight"><pre><span></span><code><span class="p">...</span><span class="w"></span>
+<div class="highlight"><pre><span></span><code><span class="p">...</span>
 
-<span class="n">SubShader</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="n">SubShader</span><span class="w"> </span><span class="p">{</span>
 
 <span class="w">    </span><span class="c1">// 不一定要有</span>
-<span class="w">    </span><span class="n">Tags</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">Tags</span><span class="w"> </span><span class="p">{</span>
 <span class="w">        </span><span class="c1">// 标签块</span>
 <span class="w">        </span><span class="c1">// 键值对形式        </span>
-<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span>
 
 <span class="w">    </span><span class="c1">// 不一定要有</span>
-<span class="w">    </span><span class="n">RenderSetup</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">RenderSetup</span><span class="w"> </span><span class="p">{</span>
 <span class="w">        </span><span class="c1">// 状态设置块</span>
-<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span>
 
-<span class="w">    </span><span class="n">Pass</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">Pass</span><span class="w"> </span><span class="p">{</span>
 
 <span class="w">        </span><span class="c1">// Pass的名字，不一定要给</span>
-<span class="w">        </span><span class="n">Name</span><span class="w"> </span><span class="s">&quot;Pass1&quot;</span><span class="w"></span>
+<span class="w">        </span><span class="n">Name</span><span class="w"> </span><span class="s">&quot;Pass1&quot;</span>
 
 <span class="w">        </span><span class="c1">// Pass的Tags</span>
 <span class="w">        </span><span class="c1">// 注意和和SubRender的不一样</span>
@@ -146,25 +146,25 @@
 <span class="w">        </span><span class="c1">// CGPROGAM/ENDCG 表示该块是Cg代码</span>
 <span class="w">        </span><span class="c1">// GLSLPROGAM/ENDGLSL 表示该块是glsl代码</span>
 <span class="w">        </span><span class="c1">// 但是不推荐使用glsl，因为Unity能够将Cg交叉编译给glsl，反之不能</span>
-<span class="w">        </span><span class="n">CGPROGRAM</span><span class="w"></span>
+<span class="w">        </span><span class="n">CGPROGRAM</span>
 
 <span class="w">        </span><span class="c1">// 指定具体的功能函数入口</span>
 <span class="w">        </span><span class="cp">#pragma vertex      vert</span>
 <span class="w">        </span><span class="cp">#pragma fragment    frag</span>
 
-<span class="w">        </span><span class="n">float4</span><span class="w"> </span><span class="n">vert</span><span class="p">(</span><span class="n">float4</span><span class="w"> </span><span class="nl">v</span> <span class="p">:</span><span class="w"> </span><span class="n">POSITION</span><span class="p">)</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">SV_POSITION</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="w">            </span><span class="k">return</span><span class="w"> </span><span class="n">mul</span><span class="p">(</span><span class="n">UNITY_MATRIX_MVP</span><span class="p">,</span><span class="w"> </span><span class="n">v</span><span class="p">);</span><span class="w"></span>
-<span class="w">        </span><span class="p">}</span><span class="w"></span>
+<span class="w">        </span><span class="n">float4</span><span class="w"> </span><span class="n">vert</span><span class="p">(</span><span class="n">float4</span><span class="w"> </span><span class="n">v</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">POSITION</span><span class="p">)</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">SV_POSITION</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="k">return</span><span class="w"> </span><span class="n">mul</span><span class="p">(</span><span class="n">UNITY_MATRIX_MVP</span><span class="p">,</span><span class="w"> </span><span class="n">v</span><span class="p">);</span>
+<span class="w">        </span><span class="p">}</span>
 
-<span class="w">        </span><span class="n">fixed4</span><span class="w"> </span><span class="n">frag</span><span class="p">()</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">SV_Target</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="w">            </span><span class="k">return</span><span class="w"> </span><span class="n">fixed4</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0</span><span class="p">);</span><span class="w"></span>
-<span class="w">        </span><span class="p">}</span><span class="w"></span>
+<span class="w">        </span><span class="n">fixed4</span><span class="w"> </span><span class="n">frag</span><span class="p">()</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">SV_Target</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="k">return</span><span class="w"> </span><span class="n">fixed4</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0</span><span class="p">);</span>
+<span class="w">        </span><span class="p">}</span>
 
-<span class="w">        </span><span class="n">ENDCG</span><span class="w"></span>
-<span class="w">    </span><span class="p">}</span><span class="w"></span>
-<span class="p">}</span><span class="w"></span>
+<span class="w">        </span><span class="n">ENDCG</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
 
-<span class="p">...</span><span class="w"></span>
+<span class="p">...</span>
 </code></pre></div>
 
 <p>Tags和RenderSetup放到后面记录。</p>
