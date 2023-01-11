@@ -93,7 +93,7 @@
 <p><strong>最后</strong>，为了能够使用IRQ，你一定要告诉NES的CPU，你有实际确认它们，而不是忽略了它们，因为它在默认情况下（这也是为什么你不必担心在简单的游戏里，帧计数器的IRQ的发生 - CPU实际上忽略了它们）会启用的IRQ。你必须用“CLI”指令清除CPU中的中断禁用标志。在某些时刻，如果你想重新禁用它们，要用“SEI”。</p>
 <p>下面是一个在nbasic中使用MMC3 IRQ中断的最小例子。 它使用一个IRQ中断来改变屏幕上一半的背景颜色，而不需要使用<code>Sprite-0-Hits</code>来确定你的位置。</p>
 <blockquote>
-<p><strong>注意：</strong>MMC3 IRQ的时机安排是大多数模拟器没有真正做到的事情（例如，一个倒数值X，可能会在扫描线X-1或X+1上，实际触发一个IRQ中断，这取决于你使用的模拟器）。如果你使用IRQ，请在各种模拟器多测试几遍你的游戏。</p>
+<p><strong>注意：</strong> MMC3 IRQ的时机安排是大多数模拟器没有真正做到的事情（例如，一个倒数值X，可能会在扫描线X-1或X+1上，实际触发一个IRQ中断，这取决于你使用的模拟器）。如果你使用IRQ，请在各种模拟器多测试几遍你的游戏。</p>
 </blockquote>
 <div class="highlight"><pre><span></span><code><span class="c1">;//nesasm文件头</span>
 <span class="nf">asm</span>
