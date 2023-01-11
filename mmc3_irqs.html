@@ -71,7 +71,7 @@
 <p>iNES Mapper #4 (MMC3)提供了一种方便的方法，来对PPU进行帧间改变，以实现NES游戏中的<strong>分屏卷动</strong>等“特殊效果”。与其使用<code>Sprite-0 Hits</code>去择机写入PPU硬件，不如使用IRQ。这可以使CPU在一帧内就做完工作，而不是浪费时间去轮询<code>Sprite-0 Hits</code>标志。 MMC3有4个寄存器，是MMC3为IRQ触发而设的：</p>
 <p><code>$C000</code> - <strong>IRQ计数器</strong> - Mapper用它来倒计时以触发IRQ。每一条扫描线，该值减一；当它到0时，IRQ就触发。</p>
 <blockquote>
-<p><strong>注意：</strong> 背景和精灵必须启用，在<code>$2001</code>(<code>D3</code>、<code>D4</code>)，这样倒数才会进行。</p>
+<p><strong>注意：</strong> 背景和精灵必须启用，在<code>$2001</code>(<code>D3</code>、<code>D4</code>)，这样倒数计数才会进行。</p>
 </blockquote>
 <p><code>$C001</code> - <strong>IRQ计数锁存器</strong> - 写入你想要的值，也就是用来倒数的值；而不是直接往<code>IRQ计数寄存器</code>里写值。</p>
 <p><code>$E000</code> - <strong>IRQ禁用/确认器</strong> - 往这里写任意值，都能禁用IRQ的触发，但也能将<code>IRQ计数器锁存器</code>中的值复制到实际的<code>IRQ计数器</code>。一旦确认了一次IRQ，就会保证发生中断。</p>
