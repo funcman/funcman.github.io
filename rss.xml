@@ -10,13 +10,17 @@
 &lt;p&gt;&lt;code&gt;$E000&lt;/code&gt; - &lt;strong&gt;IRQ禁用/确认器&lt;/strong&gt; - 往这里写任意值，都能禁用IRQ的触发，但也能将&lt;code&gt;IRQ计数器锁存器&lt;/code&gt;中的值复制到实际的&lt;code&gt;IRQ计数器&lt;/code&gt;。一旦确认了一次IRQ，就会保证发生中断。&lt;/p&gt;
 &lt;p&gt;&lt;code&gt;$E001&lt;/code&gt; - &lt;strong&gt;IRQ启动器&lt;/strong&gt; - 往这里写入任意值，都能启用IRQ的触发。&lt;/p&gt;
 &lt;p&gt;因此，大多数的商业游戏都是这样使用这些寄存器：&lt;/p&gt;
-&lt;p&gt;当你想设置的IRQ时：（放在你的NMI/vblank程序中）
-1. 写&lt;code&gt;$E000&lt;/code&gt;以确认任何当前待定的中断
-2. 向&lt;code&gt;$C000&lt;/code&gt;和&lt;code&gt;$C001&lt;/code&gt;写入你要等待的扫描线数
-3. 再次写&lt;code&gt;$E000&lt;/code&gt;以锁定倒数值
-4. 写&lt;code&gt;$E001&lt;/code&gt;以启用&lt;code&gt;IRQ计数器&lt;/code&gt;&lt;/p&gt;
-&lt;p&gt;一旦你的IRQ发生了：（在你的IRQ程序中）
-1. 写&lt;code&gt;$E000&lt;/code&gt;以确认IRQ并禁用&lt;code&gt;IRQ计数器&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;当你想设置的IRQ时：（放在你的NMI/vblank程序中）&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;写&lt;code&gt;$E000&lt;/code&gt;以确认任何当前待定的中断&lt;/li&gt;
+&lt;li&gt;向&lt;code&gt;$C000&lt;/code&gt;和&lt;code&gt;$C001&lt;/code&gt;写入你要等待的扫描线数&lt;/li&gt;
+&lt;li&gt;再次写&lt;code&gt;$E000&lt;/code&gt;以锁定倒数值&lt;/li&gt;
+&lt;li&gt;写&lt;code&gt;$E001&lt;/code&gt;以启用&lt;code&gt;IRQ计数器&lt;/code&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;一旦你的IRQ发生了：（在你的IRQ程序中）&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;写&lt;code&gt;$E000&lt;/code&gt;以确认IRQ并禁用&lt;code&gt;IRQ计数器&lt;/code&gt;&lt;/li&gt;
+&lt;/ol&gt;
 &lt;p&gt;你在游戏使用MMC3的IRQ之前，有几件事情你必须设置好。&lt;strong&gt;首先&lt;/strong&gt;，你要设置好ROM结尾中断向量表里的IRQ向量，指向IRQ发生时你想被调用的代码。IRQ向量的位置在$FFFE，在NMI向量和RESET向量的右边。当一个IRQ中断触发时，CPU会跳到的16位地址$FFFE上，并且CPU标志被自动存下来，在IRQ程序返回时自动恢复。但是CPU的寄存器不会被保存，所以你必须确保在IRQ程序结束时，它们会被恢复原样（开始时应该入栈AXY寄存器，结束时出栈YXA，注意顺序）。&lt;/p&gt;
 &lt;p&gt;&lt;strong&gt;第二&lt;/strong&gt;件你必须做的事情，使用MMC3的IRQ，就要阻止其他的在NES上产生的IRQ中断。NES有一个“帧计数器”，默认会在每帧结束时产生IRQ中断，非常像NMI。如果不禁用这个，你的IRQ代码次数，会比你要的更多，从而搞砸你的游戏。禁用帧计数器的IRQ中断，只需要在你的程序开始时，把&lt;code&gt;$40&lt;/code&gt;写入到&lt;code&gt;$4017&lt;/code&gt;。&lt;/p&gt;
 &lt;p&gt;&lt;strong&gt;最后&lt;/strong&gt;，为了能够使用IRQ，你一定要告诉NES的CPU，你有实际确认它们，而不是忽略了它们，因为它在默认情况下（这也是为什么你不必担心在简单的游戏里，帧计数器的IRQ的发生 - CPU实际上忽略了它们）会启用的IRQ。你必须用“CLI”指令清除CPU中的中断禁用标志。在某些时刻，如果你想重新禁用它们，要用“SEI”。&lt;/p&gt;
