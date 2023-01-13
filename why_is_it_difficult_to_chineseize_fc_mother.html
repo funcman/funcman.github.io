@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="zh_cn" prefix="og: http://ogp.me/ns#">
+	<head>
+		<link href="http://gmpg.org/xfn/11" rel="profile">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta http-equiv="content-type" content="text/html; charset=utf-8">
+
+		<!-- Metadata -->
+	<meta name="description" content="一个游戏程序员。曾经参与开发过<a href='https://www.bing.com/search?q=%E4%BB%99%E4%BE%A3%E5%A5%87%E7%BC%983'>仙侣奇缘3</a>、<a href='http://sh.70yx.com'>水浒传</a>、<a href='https://itunes.apple.com/cn/app/id938688461'>小米运动</a>、<a href='https://itunes.apple.com/cn/app/id1034182617'>米动</a>和<a href='https://www.taptap.com/app/143658'>无限激战</a>">
+	<meta property="og:description" content="一个游戏程序员。曾经参与开发过<a href='https://www.bing.com/search?q=%E4%BB%99%E4%BE%A3%E5%A5%87%E7%BC%983'>仙侣奇缘3</a>、<a href='http://sh.70yx.com'>水浒传</a>、<a href='https://itunes.apple.com/cn/app/id938688461'>小米运动</a>、<a href='https://itunes.apple.com/cn/app/id1034182617'>米动</a>和<a href='https://www.taptap.com/app/143658'>无限激战</a>">
+	<meta property="og:title" content="这可能是FC游戏《地球冒险》难以汉化的原因" />
+	<meta property="og:type" content="article" />
+	<meta property="og:url" content="https://funcman.me/why_is_it_difficult_to_chineseize_fc_mother.html" />
+		<meta property="og:image" content="https://funcman.me/images/avatar.png" />
+
+		<!-- Enable responsiveness on mobile devices-->
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+
+		<title>funcman's blog</title>
+
+		<!-- CSS -->
+		<link href="//fonts.googleapis.com/" rel="dns-prefetch">
+		<link href="//fonts.googleapis.com/css?family=Droid+Serif:400,700,400italic|Abril+Fatface|PT+Sans:400,400italic,700&amp;subset=latin,latin-ext" rel="stylesheet">
+
+		<link rel="stylesheet" href="https://funcman.me/theme/css/poole.css" />
+		<link rel="stylesheet" href="https://funcman.me/theme/css/hyde.css" />
+		<link rel="stylesheet" href="https://funcman.me/theme/css/syntax.css" />
+			<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fork-awesome@1.1.7/css/fork-awesome.min.css" crossorigin="anonymous">
+
+		<!-- Feeds -->
+<link href="https://funcman.me/rss.xml" type="application/atom+xml" rel="alternate" title="funcman's blog Full Atom Feed" />
+
+		<!-- Analytics -->
+	</head>
+
+	<body class="theme-base-0e">
+<div class="sidebar">
+	<div class="container sidebar-sticky">
+		<div class="sidebar-about">
+
+			<h1>
+				<a href="/">
+					<img class="profile-picture" src="https://funcman.me/images/avatar.png">
+					funcman's blog
+				</a>
+			</h1>
+			<p class="lead"></p>
+			<p class="lead">一个游戏程序员。曾经参与开发过<a href='https://www.bing.com/search?q=%E4%BB%99%E4%BE%A3%E5%A5%87%E7%BC%983'>仙侣奇缘3</a>、<a href='http://sh.70yx.com'>水浒传</a>、<a href='https://itunes.apple.com/cn/app/id938688461'>小米运动</a>、<a href='https://itunes.apple.com/cn/app/id1034182617'>米动</a>和<a href='https://www.taptap.com/app/143658'>无限激战</a> </p>
+			<p></p>
+		</div>
+		<nav class="sidebar-social">
+					<a class="sidebar-social-item" href="mailto:hyq1986@gmail.com">
+						<i class="fa fa-envelope"></i>
+					</a>
+					<a class="sidebar-social-item" href="https://twitter.com/funcman" target="_blank">
+						<i class="fa fa-twitter"></i>
+					</a>
+					<a class="sidebar-social-item" href="https://github.com/funcman" target="_blank">
+						<i class="fa fa-github"></i>
+					</a>
+			<a class="sidebar-social-item" href="https://funcman.me/rss.xml">
+				<i class="fa fa-rss"></i>
+			</a>
+		</nav>
+	</div>
+</div>		<div class="content container">
+<div class="post">
+	<h1 class="post-title">这可能是FC游戏《地球冒险》难以汉化的原因</h1>
+	<span class="post-date">周三 11 一月 2023</span>
+	<p>FC游戏《地球冒险》是红白机上的知名作品。作为一个RPG，它有大量的文字。这样的游戏理应出现汉化版，毕竟中文游戏圈已经做了这么多年汉化了。但是事实上就是没有弄出来。我作为一个红白机开发技术上的萌新，尝试一下从技术上分析，这个游戏的汉化难度。</p>
+<p><img alt="《地球冒险》标题" src="./images/fc-mother-title.png"> <img alt="《地球冒险》对话" src="./images/fc-mother-talk.png"> </p>
+<p>《地球冒险》的一些基本信息：它是个日版游戏，标题名称为“Mother”。没有出过官方英文版，但是有爱好者改制的英化版。从Mapper的角度看，它是一个Mapper4游戏，使用了MMC3芯片。</p>
+<p><a href="./mmc3_irqs.html">MMC3支持IRQ中断</a>，它可以对扫描线进行计数，可以在PPU绘制第N条扫描线时，触发IRQ中断。在IRQ中断执行代码中，我们可以更改PPU绘制时依赖的各种数据。这意味着，我们可以实现屏幕分区域的绘制。比如在第N条扫描线时，改变图样表（Pattern Table）对CHR-ROM的映射。然后在第M条扫描线时，把图样表改回来。这样就能跨段（Bank）绘制更多的CHR（在背景中）。</p>
+<p>下面我们来看《地球冒险》中战斗画面的一帧：</p>
+<p><img alt="战斗中" src="./images/mother-fighting-screenshot.png"></p>
+<p>我们对画面绘制过程进行分解，来看IRQ如何改变图样表实现屏幕分区域的绘制的：</p>
+<blockquote>
+<p>图片太大，如果看不清，请在图片上右键“在新标签中打开图片”然后放大观看。</p>
+</blockquote>
+<p><img alt="PPU在绘制《地球冒险》战斗中的一帧发生的变化" src="./images/ppu-changes-of-mother.png"></p>
+<p>用的是Mesen模拟器的PPU调试功能，它的好处是不仅能定位扫描线（scanline），还可以定位PPU时钟周期（cycle），这样我们就可以了解到一段IRQ中断代码在多少个PPU周期被执行完毕。</p>
+<p>一共截取了10个片段，下面逐一解释：</p>
+<blockquote>
+<p>这里要注意的是Mesen的Nametable Viewer，并不是用来显示扫描线在屏幕会绘像素点的实时结果的。
+它给出的就是可视化的PPU数据，大多数模拟器的调试功能都会这么做。</p>
+</blockquote>
+<ol>
+<li>一开始的情况，这和上一帧结束情况是一样的。</li>
+<li>当绘制扫描线1和运行到第340个PPU时钟循环时（下面用<code>S1C340</code>这样的形式表示），PPU的第一个图样表被切到CHR-ROM中敌人的相关段。</li>
+<li>第3到第6个截取时刻（从S2C40到S2C130），我们能看到图样表1已经被切得只剩敌人的相关段了。之所以全部切掉，我猜是因为后面有尺寸更大的敌人，比如BOSS。而程序都是一套。</li>
+<li>从第6个截取时刻，也就是S78C323一直往后，我们能看到图样表1在逐步切回文字界面的相关段。这样PPU又能绘制文字界面了。</li>
+</ol>
+<p>于是，就实现了屏幕分区域的绘制。</p>
+<p>高级一点的，比如<a href="https://en.wikipedia.org/wiki/Kirakira_(video_game)">《闪闪亮亮星星之夜DX》</a>。这张动图里的天空和地面就是采用屏幕分区域绘制的视差卷动效果。</p>
+<p><img alt="闪闪亮亮星星之夜DX" src="./images/kira-kira-star-night-dx.gif"></p>
+<p>PPU在一般情况下，绘制一个像素，计为一个PPU时钟周期。在NTSC电视制式下，三次PPU时钟周期的时间，对应一次CPU时钟周期。</p>
+<p>虽然红白机的屏幕像素是256x240点阵的，但是并不是每一个像素都计为一个PPU时钟周期。电视机电子束在进入下一条扫描线前（水平过扫描），在256个像素之外，还有84个额外的PPU时钟周期（可能不止84个，我也不确定，萌新了喂）。</p>
+<p>详细资料请参阅：<a href="https://www.nesdev.org/wiki/PPU_rendering">NESDev Wiki - PPU渲染</a></p>
+<blockquote>
+<p><strong>CPU时钟周期又是什么呢？</strong>
+简单来说，比如<code>LDA #$01</code>的执行需要2个CPU时钟周期。
+这和这段汇编的对应机器码<code>0xA9 0x01</code>是2个字节有关。
+详细资料请参阅：<a href="https://www.nesdev.org/wiki/Cycle_reference_chart">NESDev Wiki - 时钟周期参考小抄</a></p>
+</blockquote>
+<p>已经讲了这么多，那么《地球冒险》的汉化难度到底在哪里呢？</p>
+<p>我们来看一个游戏前期户外场景下，打开菜单界面的一帧：</p>
+<p><img alt="《地球冒险》菜单" src="./images/fc-mother-menu.png"></p>
+<p>看那个<strong>PSI</strong>选项，它的字模所在的CHR-ROM段，与哪些日文字模不在一起。我们用Mesen模拟器的调试功能查看一下这个PSI绘制的前后过程：</p>
+<p><img alt="《地球冒险》在绘制菜单项PSI时PPU前后变化" src="./images/ppu-changes-of-mother2.png"></p>
+<p>我们看到，在S64C8时，英文字模已经切到图样表1里了。这时PSI已经可以正常被PPU绘制了。</p>
+<p>而到了S64C56，图样表1中英文字模的段又被切回了场景的图样。</p>
+<p>这特么是在一条扫描线完成的！也就是说《地球冒险》不是以扫描线划分屏幕去切换对CHR-ROM的映射的。</p>
+<p>不管原始开发者这样做是不是很牛X，这给汉化《地球冒险》带来了困难。</p>
+<p>相对于英文、日文假名来说，中文字模尺寸庞大，无法在很短的PPU周期中做到切换。例子中PSI后面只有24个像素，也就是原始开发者在24个PPU时钟周期（8个CPU时钟周期）里完成了场景图样的切回工作。这对于中文是不可能的任务。除非说是菜单项这种，与大段文字不共用相同的图样地址空间，用非编码的方式。一帧里要显示大段的中文，对于红白机十分有限的图样表来说，仅通过切换CHR-ROM的段映射，是无法完成的。</p>
+<p>那么有没有办法完成这个任务？还是有的。我们查看那些中文RPG文字卡，就会发现它们实际上基本都带有CHR-RAM。</p>
+<p><img alt="CHR-RAM" src="./images/chr-ram.png"></p>
+<p>有了CHR-RAM，我们可以将中文字模放在PRG-ROM中，并且压缩起来（一个图样像素可以有4个值，所以字模可以叠加）。然后在NMI中断中，将下一帧需要的中文都腾挪到CHR-RAM上。最后PPU显示画面时，把图样表对CHR-RAM做映射切换即可。</p>
+<p><img alt="《重装机兵》" src="./images/fc-metal-max-zh-title.png"></p>
+<p>比如《重装机兵》的D商汉化版。它是<a href="https://www.nesdev.org/wiki/INES_Mapper_074">Mapper74</a>的，也算是MMC3的Mapper（仿制芯片），能发出IRQ。它还用了74LS138和74LS139芯片，将1KiB的CHR-ROM的段8和段9，重定向到2KiB的CHR-RAM上。</p>
+<blockquote>
+<p>是的，用74芯片也可以做出Mapper来。不知道能不能用通用逻辑芯片实现IRQ中断。</p>
+</blockquote>
+<p><img alt="《重装机兵》显示中文" src="./images/fc-metal-max-zh.png"></p>
+<p>比如《重装机兵》里对话的这一帧画面，我们能看到：</p>
+<p><img alt="《重装机兵》显示中文时PPU的前后变化" src="./images/ppu-changes-of-mother3.png"></p>
+<p>在S145C0时，PPU的图样表映射的内容，已经能够满足显示中文的需要。并且，只根据需要用到的文字，组织了CHR-RAM里的字模。</p>
+<blockquote>
+<p>处于共用的目的，ROM中（可能是PRG-ROM，也可能是CHR-ROM）里的字模图样肯定不是按照对话文字这样排列。
+这里点选了“Display as 8x16 sprites”，这样《重装机兵》里的字模才容易被看出来。</p>
+</blockquote>
+<p>当然，《重装机兵》没有像《地球冒险》一样，定位到PPU时钟循环去改变图样表映射。它的对话框直接完全覆盖了下半部分的游戏画面。</p>
+<p><img alt="对话框覆盖了场景" src="./images/fc-metal-max-zh2.png"> <img alt="场景全貌" src="./images/fc-metal-max-zh3.png"></p>
+<p>好了，说到这里，大致已经讲清了《地球冒险》的汉化难度。应该不是不可能，只是难度极高。游戏扩容时要加入CHR-RAM的支持，要选择合适的Mapper方案。模拟器也不一定能支持得好（看下图）。如果我们想把汉化后的游戏放进<a href="https://krikzz.com/our-products/cartridges/n8-pro-fami.html">N8烧录卡</a>，或者做一张MMC3实体卡带，达到运行无误也是有难度的。</p>
+<p><img alt="Mesen并不能很好支持对带CHR-RAM的游戏的CHR的查看" src="./images/mesen-donot-support-show-chr-with-ram.png"></p>
+<p>作为一个萌新，可能难免有所失误，希望得到指教。</p>
+</div>
+		</div>
+	</body>
+</html>
