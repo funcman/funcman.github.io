@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="zh_cn" prefix="og: http://ogp.me/ns#">
+	<head>
+		<link href="http://gmpg.org/xfn/11" rel="profile">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta http-equiv="content-type" content="text/html; charset=utf-8">
+
+		<!-- Metadata -->
+	<meta name="description" content="一个游戏程序员。曾经参与开发过<a href='https://www.bing.com/search?q=%E4%BB%99%E4%BE%A3%E5%A5%87%E7%BC%983'>仙侣奇缘3</a>、<a href='http://sh.70yx.com'>水浒传</a>、<a href='https://itunes.apple.com/cn/app/id938688461'>小米运动</a>、<a href='https://itunes.apple.com/cn/app/id1034182617'>米动</a>和<a href='https://www.taptap.com/app/143658'>无限激战</a>">
+	<meta property="og:description" content="一个游戏程序员。曾经参与开发过<a href='https://www.bing.com/search?q=%E4%BB%99%E4%BE%A3%E5%A5%87%E7%BC%983'>仙侣奇缘3</a>、<a href='http://sh.70yx.com'>水浒传</a>、<a href='https://itunes.apple.com/cn/app/id938688461'>小米运动</a>、<a href='https://itunes.apple.com/cn/app/id1034182617'>米动</a>和<a href='https://www.taptap.com/app/143658'>无限激战</a>">
+	<meta property="og:title" content="收集了一些前期的图像视频芯片的信息" />
+	<meta property="og:type" content="article" />
+	<meta property="og:url" content="https://funcman.me/about_some_oldschool_gpus.html" />
+		<meta property="og:image" content="https://funcman.me/images/avatar.png" />
+
+		<!-- Enable responsiveness on mobile devices-->
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+
+		<title>funcman's blog</title>
+
+		<!-- CSS -->
+		<link href="//fonts.googleapis.com/" rel="dns-prefetch">
+		<link href="//fonts.googleapis.com/css?family=Droid+Serif:400,700,400italic|Abril+Fatface|PT+Sans:400,400italic,700&amp;subset=latin,latin-ext" rel="stylesheet">
+
+		<link rel="stylesheet" href="https://funcman.me/theme/css/poole.css" />
+		<link rel="stylesheet" href="https://funcman.me/theme/css/hyde.css" />
+		<link rel="stylesheet" href="https://funcman.me/theme/css/syntax.css" />
+			<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fork-awesome@1.1.7/css/fork-awesome.min.css" crossorigin="anonymous">
+
+		<!-- Feeds -->
+<link href="https://funcman.me/rss.xml" type="application/atom+xml" rel="alternate" title="funcman's blog Full Atom Feed" />
+
+		<!-- Analytics -->
+	</head>
+
+	<body class="theme-base-0e">
+<div class="sidebar">
+	<div class="container sidebar-sticky">
+		<div class="sidebar-about">
+
+			<h1>
+				<a href="/">
+					<img class="profile-picture" src="https://funcman.me/images/avatar.png">
+					funcman's blog
+				</a>
+			</h1>
+			<p class="lead"></p>
+			<p class="lead">一个游戏程序员。曾经参与开发过<a href='https://www.bing.com/search?q=%E4%BB%99%E4%BE%A3%E5%A5%87%E7%BC%983'>仙侣奇缘3</a>、<a href='http://sh.70yx.com'>水浒传</a>、<a href='https://itunes.apple.com/cn/app/id938688461'>小米运动</a>、<a href='https://itunes.apple.com/cn/app/id1034182617'>米动</a>和<a href='https://www.taptap.com/app/143658'>无限激战</a> </p>
+			<p></p>
+		</div>
+		<nav class="sidebar-social">
+					<a class="sidebar-social-item" href="mailto:hyq1986@gmail.com">
+						<i class="fa fa-envelope"></i>
+					</a>
+					<a class="sidebar-social-item" href="https://twitter.com/funcman" target="_blank">
+						<i class="fa fa-twitter"></i>
+					</a>
+					<a class="sidebar-social-item" href="https://github.com/funcman" target="_blank">
+						<i class="fa fa-github"></i>
+					</a>
+			<a class="sidebar-social-item" href="https://funcman.me/rss.xml">
+				<i class="fa fa-rss"></i>
+			</a>
+		</nav>
+	</div>
+</div>		<div class="content container">
+<div class="post">
+	<h1 class="post-title">收集了一些前期的图像视频芯片的信息</h1>
+	<span class="post-date">周一 16 一月 2023</span>
+	<p>现代的计算机系统，无论是台式电脑、笔记本、手机、游戏机，基本上都有专门的图形芯片，用于图像的输出。今天，我们一般将这种图形芯片，称为GPU（Graphic Processing Unit），即图形处理单元。</p>
+<p>除了一些作为控制器使用MCU系统，一般的通用型计算机系统，都包括了CPU。在PC上，GPU在显卡上存在。而手机等系统，GPU则作为SoC（System on a Chip）的一部分，在主芯片上存在。</p>
+<p>在计算机的发展早期，是没有专门的芯片用于图像输出的，早期的计算机系统甚至没有图像输出。后来计算机越来越为个人所使用，图像输出变得重要起来。于是就有了专门的芯片。</p>
+<p>本篇记录和罗列一些我收集到的前期图像视频芯片的信息，后面会做陆续更新。</p>
+<p>早期图像视频芯片是没有统一的名称的，所以需要罗列一下：</p>
+<table>
+<thead>
+<tr>
+<th>缩写</th>
+<th>全称</th>
+<th>备注</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>CRTC</td>
+<td>Cathode Ray Tube (CRT) Controller</td>
+<td></td>
+</tr>
+<tr>
+<td>GDC</td>
+<td>Graph Display Controller</td>
+<td></td>
+</tr>
+<tr>
+<td>GSP</td>
+<td>Graphics System Processor</td>
+<td>TMS34010</td>
+</tr>
+<tr>
+<td>GDP</td>
+<td>Graphics Display Processor</td>
+<td></td>
+</tr>
+<tr>
+<td>PPU</td>
+<td>Picture Processing Unit</td>
+<td>任天堂<a href="https://en.wikipedia.org/wiki/Nintendo_Entertainment_System" title="任天堂红白机">红白机</a>、<a href="https://en.wikipedia.org/wiki/Super_Nintendo_Entertainment_System" title="超级任天堂">超任</a></td>
+</tr>
+<tr>
+<td>VDC</td>
+<td>Video Display Controller</td>
+<td></td>
+</tr>
+<tr>
+<td>VDG</td>
+<td>Video Display Generator</td>
+<td><code>Generator</code>这个词和<code>Controller</code>差不多的意思</td>
+</tr>
+<tr>
+<td>VDP</td>
+<td>Video Display Processor</td>
+<td>世嘉<a href="https://en.wikipedia.org/wiki/Master_System" title="世嘉Mark3">Mark3</a>、<a href="https://en.wikipedia.org/wiki/Sega_Genesis" title="世嘉MD">MD</a>，<a href="https://en.wikipedia.org/wiki/MSX" title="MSX电脑">MSX</a>电脑</td>
+</tr>
+<tr>
+<td>VIA</td>
+<td>Television Interface Adaptor</td>
+<td>雅达利2600</td>
+</tr>
+<tr>
+<td>VIC</td>
+<td>Video Interface Chip</td>
+<td>MOS公司</td>
+</tr>
+</tbody>
+</table>
+<p>具体的图像视频芯片做一下罗列：</p>
+<table>
+<thead>
+<tr>
+<th>型号</th>
+<th>厂商</th>
+<th>备注                                        MDMD</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>6560</td>
+<td>MOS</td>
+<td>6502同期的视频接口芯片，就是VIC，以及6561</td>
+</tr>
+<tr>
+<td>6567</td>
+<td>MOS</td>
+<td>和6566、8562、8564都属于VIC-II，<a href="https://en.wikipedia.org/wiki/Commodore_64" title="Commdore 64">C64</a>使用</td>
+</tr>
+<tr>
+<td>CDP1861</td>
+<td>美国无线电公司</td>
+<td>七十年代中期产品，常与RCA1802微处理器搭配</td>
+</tr>
+<tr>
+<td>EF9345</td>
+<td>意法半导体</td>
+<td></td>
+</tr>
+<tr>
+<td>SN76489</td>
+<td>德州仪器</td>
+<td>世嘉Mark3中使用了雅马哈生产的SN76489</td>
+</tr>
+<tr>
+<td>TMS34010</td>
+<td>德州仪器</td>
+<td>芯片上还有CPU，主要用于街机</td>
+</tr>
+<tr>
+<td>TMS9918</td>
+<td>德州仪器</td>
+<td><a href="https://en.wikipedia.org/wiki/TI-99/4A" title="TI-99/4A">TI-99/4A</a>，<a href="https://en.wikipedia.org/wiki/MSX" title="MSX电脑">MSX</a>初代</td>
+</tr>
+<tr>
+<td>MC6845</td>
+<td>摩托罗拉</td>
+<td>常与Z80和6502在<a href="https://en.wikipedia.org/wiki/Apple_II" title="苹果2">家用电脑</a>中搭配使用</td>
+</tr>
+<tr>
+<td>MC6847</td>
+<td>摩托罗拉</td>
+<td></td>
+</tr>
+<tr>
+<td>V9938</td>
+<td>雅马哈</td>
+<td>用于<a href="https://en.wikipedia.org/wiki/MSX" title="MSX电脑">MSX</a>2电脑</td>
+</tr>
+<tr>
+<td>V9958</td>
+<td>雅马哈</td>
+<td>用于<a href="https://en.wikipedia.org/wiki/MSX" title="MSX电脑">MSX</a>2+电脑</td>
+</tr>
+<tr>
+<td>µPD7220</td>
+<td>NEC</td>
+<td>NEC的<a href="https://en.wikipedia.org/wiki/PC-98" title="NEC PC-98">PC-98</a></td>
+</tr>
+</tbody>
+</table>
+<p>做这些信息的收集，主要是为了后面自制怀旧风格[家用电脑]做准备。</p>
+</div>
+		</div>
+	</body>
+</html>
