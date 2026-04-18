@@ -66,7 +66,7 @@
 </div>		<div class="content container">
 <div class="post">
 	<h1 class="post-title">一个Win32控制台类</h1>
-	<span class="post-date">周日 06 六月 2010</span>
+	<span class="post-date">2010年06月06日 星期日</span>
 	<p>对于编写Win32程序，尤其是游戏这种实时性高的程序来说，断点调试未必是最合适的调试方法。很多时候，我们更渴望看到实时打印的调试信息。</p>
 <p>一种方法是使用VC的调试函数OutputDebugString()，将信息输出给VC调试控制台。还有一种方法是在Win32控制台工程的基础上创建窗口程序（入口为main而非WinMain）。可以用宏来控制编译，使Debug版本时有控制台，Release版本没有控制台，像这样：</p>
 <div class="highlight"><pre><span></span><code><span class="c1">// 一个简单的方法</span>
@@ -154,7 +154,7 @@
 
 <span class="kt">void</span><span class="w"> </span><span class="n">DbgCon</span><span class="o">::</span><span class="n">NoTop</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
 <span class="w">    </span><span class="c1">// 取消置顶</span>
-<span class="w">    </span><span class="n">SetWindowPos</span><span class="p">(</span><span class="n">HWnd_</span><span class="p">,</span><span class="w"> </span><span class="n">HWND_NOTOPMOST</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="n">SWP_NOMOVE</span><span class="o">||</span><span class="n">SWP_NOSIZE</span><span class="p">);</span><span class="w"> </span>
+<span class="w">    </span><span class="n">SetWindowPos</span><span class="p">(</span><span class="n">HWnd_</span><span class="p">,</span><span class="w"> </span><span class="n">HWND_NOTOPMOST</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="n">SWP_NOMOVE</span><span class="o">||</span><span class="n">SWP_NOSIZE</span><span class="p">);</span>
 <span class="p">}</span>
 </code></pre></div>
 </div>

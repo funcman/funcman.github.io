@@ -66,7 +66,7 @@
 </div>		<div class="content container">
 <div class="post">
 	<h1 class="post-title">如何配置运行在Docker中的GitLab的外部地址</h1>
-	<span class="post-date">周四 09 六月 2022</span>
+	<span class="post-date">2022年06月09日 星期四</span>
 	<p>家里弄了个NAS服务器，在NAS上安装了一个Docker，于是弄了很多内部服务放在Docker上跑。</p>
 <p>但是在设置GitLab时遇到了点问题，经过一番折腾，得到这个很简单的处理方式。</p>
 <p>先说问题。大多数服务都是基于Web的，会要求暴露出80端口。Docker上有很多服务，IP共用主机的没问题，但是端口必须特别指定，然后映射到容器里的80端口上。</p>

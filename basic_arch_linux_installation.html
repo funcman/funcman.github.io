@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="zh_cn" prefix="og: http://ogp.me/ns#">
+	<head>
+		<link href="http://gmpg.org/xfn/11" rel="profile">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta http-equiv="content-type" content="text/html; charset=utf-8">
+
+		<!-- Metadata -->
+	<meta name="description" content="一个游戏程序员。曾经参与开发过<a href='https://www.bing.com/search?q=%E4%BB%99%E4%BE%A3%E5%A5%87%E7%BC%983'>仙侣奇缘3</a>、<a href='http://sh.70yx.com'>水浒传</a>、<a href='https://itunes.apple.com/cn/app/id938688461'>小米运动</a>、<a href='https://itunes.apple.com/cn/app/id1034182617'>米动</a>和<a href='https://www.taptap.com/app/143658'>无限激战</a>">
+	<meta property="og:description" content="一个游戏程序员。曾经参与开发过<a href='https://www.bing.com/search?q=%E4%BB%99%E4%BE%A3%E5%A5%87%E7%BC%983'>仙侣奇缘3</a>、<a href='http://sh.70yx.com'>水浒传</a>、<a href='https://itunes.apple.com/cn/app/id938688461'>小米运动</a>、<a href='https://itunes.apple.com/cn/app/id1034182617'>米动</a>和<a href='https://www.taptap.com/app/143658'>无限激战</a>">
+	<meta property="og:title" content="Arch Linux 的基本安装" />
+	<meta property="og:type" content="article" />
+	<meta property="og:url" content="https://funcman.me/basic_arch_linux_installation.html" />
+		<meta property="og:image" content="https://funcman.me/images/avatar.png" />
+
+		<!-- Enable responsiveness on mobile devices-->
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+
+		<title>funcman's blog</title>
+
+		<!-- CSS -->
+		<link href="//fonts.googleapis.com/" rel="dns-prefetch">
+		<link href="//fonts.googleapis.com/css?family=Droid+Serif:400,700,400italic|Abril+Fatface|PT+Sans:400,400italic,700&amp;subset=latin,latin-ext" rel="stylesheet">
+
+		<link rel="stylesheet" href="https://funcman.me/theme/css/poole.css" />
+		<link rel="stylesheet" href="https://funcman.me/theme/css/hyde.css" />
+		<link rel="stylesheet" href="https://funcman.me/theme/css/syntax.css" />
+			<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fork-awesome@1.1.7/css/fork-awesome.min.css" crossorigin="anonymous">
+
+		<!-- Feeds -->
+<link href="https://funcman.me/rss.xml" type="application/atom+xml" rel="alternate" title="funcman's blog Full Atom Feed" />
+
+		<!-- Analytics -->
+	</head>
+
+	<body class="theme-base-0e">
+<div class="sidebar">
+	<div class="container sidebar-sticky">
+		<div class="sidebar-about">
+
+			<h1>
+				<a href="/">
+					<img class="profile-picture" src="https://funcman.me/images/avatar.png">
+					funcman's blog
+				</a>
+			</h1>
+			<p class="lead"></p>
+			<p class="lead">一个游戏程序员。曾经参与开发过<a href='https://www.bing.com/search?q=%E4%BB%99%E4%BE%A3%E5%A5%87%E7%BC%983'>仙侣奇缘3</a>、<a href='http://sh.70yx.com'>水浒传</a>、<a href='https://itunes.apple.com/cn/app/id938688461'>小米运动</a>、<a href='https://itunes.apple.com/cn/app/id1034182617'>米动</a>和<a href='https://www.taptap.com/app/143658'>无限激战</a> </p>
+			<p></p>
+		</div>
+		<nav class="sidebar-social">
+					<a class="sidebar-social-item" href="mailto:hyq1986@gmail.com">
+						<i class="fa fa-envelope"></i>
+					</a>
+					<a class="sidebar-social-item" href="https://twitter.com/funcman" target="_blank">
+						<i class="fa fa-twitter"></i>
+					</a>
+					<a class="sidebar-social-item" href="https://github.com/funcman" target="_blank">
+						<i class="fa fa-github"></i>
+					</a>
+			<a class="sidebar-social-item" href="https://funcman.me/rss.xml">
+				<i class="fa fa-rss"></i>
+			</a>
+		</nav>
+	</div>
+</div>		<div class="content container">
+<div class="post">
+	<h1 class="post-title">Arch Linux 的基本安装</h1>
+	<span class="post-date">2025年06月12日 星期四</span>
+	<p>好久没写博客，最近AI浪潮，忙疯了，反而做事的效率上来了。于是开了一堆坑，比如继续写博客。</p>
+<h2>为什么是Arch？</h2>
+<p>我一直是Debian/Ubuntu的用户，以前还作为Desktop来用。这几年它们主要作为Server的OS，很好用，也不打算换。</p>
+<p>而Arch，我主要是看中它的高度可折腾性。我希望借由Arch能够回到将Linux作为Desktop方面的生产主力的状态。</p>
+<p>应该有好处。</p>
+<p>这个安装笔记只是一个基本安装的记录，不仅没做到Desktop的程度，连用户都没设置。不着急，慢慢来。后面有进展我还会更新本篇。</p>
+<h2>学习资料</h2>
+<ul>
+<li>
+<p><a href="https://github.com/nakanomikuorg/arch-guide">https://github.com/nakanomikuorg/arch-guide</a> 我主要是照这套来安装的，这篇笔记甚至可以可以说照搬了这套资料。</p>
+</li>
+<li>
+<p><a href="https://github.com/ArchLinuxStudio/ArchLinuxTutorial">https://github.com/ArchLinuxStudio/ArchLinuxTutorial</a> 👆上面那套提及的资料，偏严肃一点。</p>
+</li>
+</ul>
+<h2>机器环境</h2>
+<p>我使用了<strong>VirtualBox</strong>来作为安装机器，给了2核2G，64G硬盘。</p>
+<p>后面我再找实体机器来安装，比如一台2012年的MBA。</p>
+<p>好了，接下来把iso文件塞进vbox，开始安装～</p>
+<h2>确认UEFI模式</h2>
+<div class="highlight"><pre><span></span><code>ls<span class="w"> </span>/sys/firmware/efi/efivars
+</code></pre></div>
+
+<h2>确认网络</h2>
+<div class="highlight"><pre><span></span><code>ping<span class="w"> </span>bilibili.com
+</code></pre></div>
+
+<h2>设置时钟</h2>
+<div class="highlight"><pre><span></span><code>timedetectl set-ntp true
+timedatectl set-timezon Asia/Shanghai
+timedatectl status
+</code></pre></div>
+
+<h2>设置镜像</h2>
+<p>编辑镜像列表文件</p>
+<div class="highlight"><pre><span></span><code>vim<span class="w"> </span>/etc/pacman.d/mirrorlist
+</code></pre></div>
+
+<p>通过正则替换注释掉所有镜像</p>
+<div class="highlight"><pre><span></span><code><span class="p">:</span><span class="k">v</span><span class="sr">/^\(#\|\s*$\)/</span> s<span class="sr">/^/</span>#/
+</code></pre></div>
+
+<p>然后把中科大的镜像放在最前面</p>
+<div class="highlight"><pre><span></span><code>Server = https://mirrors.ustc.edu.cn/archlinux/$repo/os/$arch
+
+## Arch Linux ...
+##
+## ...
+</code></pre></div>
+
+<h2>分区与格式化</h2>
+<h3>分区</h3>
+<p>检查当前分区状况</p>
+<div class="highlight"><pre><span></span><code>lsblk
+</code></pre></div>
+
+<p>然后进行分区操作，一般SATA盘是sda、sdb之类，NVME盘是nvme0n1、nvme1n2之类，后面根据我的实际情况来</p>
+<div class="highlight"><pre><span></span><code>cfdisk<span class="w"> </span>/dev/sda
+</code></pre></div>
+
+<p>可以Delete原本的分区，然后在Free space上New新的分区，可以通过Type设置分区类型</p>
+<ol>
+<li>第一个分区建256M，如果已经存在就别删除继续用，新建记得类型用EFI System</li>
+<li>第二个分区用满几乎全部磁盘，留两倍内存容量给交换分区就行，类型就是默认的Linux filesystem</li>
+<li>第三个分区给虚拟内存交换，用尽剩余的空间即可，类型选Linux swap</li>
+</ol>
+<p>然后Write写入，要敲yes确认，然后Quit退出cfdisk，然后查看一下分区情况</p>
+<div class="highlight"><pre><span></span><code>lsblk
+</code></pre></div>
+
+<h3>格式化</h3>
+<p>sda1是EFI分区，如果分区时就存在，那么不要删除也不要格式化，如果是之前新建的则要格式化</p>
+<div class="highlight"><pre><span></span><code>mkfs.fat<span class="w"> </span>-F32<span class="w"> </span>/dev/sda1
+</code></pre></div>
+
+<p>格式化sda2，用Btrfs</p>
+<div class="highlight"><pre><span></span><code>mkfs.btrfs<span class="w"> </span>-L<span class="w"> </span>Arch<span class="w"> </span>/dev/sda2
+</code></pre></div>
+
+<p>格式化sda3</p>
+<div class="highlight"><pre><span></span><code>mkswap<span class="w"> </span>/dev/sda3
+</code></pre></div>
+
+<p>创建子卷，先挂载sda2到/mnt</p>
+<div class="highlight"><pre><span></span><code>mount<span class="w"> </span>-t<span class="w"> </span>btrfs<span class="w"> </span>-o<span class="w"> </span><span class="nv">compress</span><span class="o">=</span>zstd<span class="w"> </span>/dev/sdxn<span class="w"> </span>/mnt
+</code></pre></div>
+
+<p>可以看一下挂载情况</p>
+<div class="highlight"><pre><span></span><code>df -h
+</code></pre></div>
+
+<p>创建两个子卷</p>
+<div class="highlight"><pre><span></span><code>btrfs<span class="w"> </span>subvolume<span class="w"> </span>create<span class="w"> </span>/mnt/@
+btrfs<span class="w"> </span>subvolume<span class="w"> </span>create<span class="w"> </span>/mnt/@home
+</code></pre></div>
+
+<p>然后看一下子卷情况</p>
+<div class="highlight"><pre><span></span><code>btrfs<span class="w"> </span>subvolume<span class="w"> </span>list<span class="w"> </span>-p<span class="w"> </span>/mnt
+</code></pre></div>
+
+<p>卸载/mnt</p>
+<div class="highlight"><pre><span></span><code>umount<span class="w"> </span>/mnt
+</code></pre></div>
+
+<p>挂载分区目录，要按<strong>顺序</strong>来</p>
+<div class="highlight"><pre><span></span><code>mount<span class="w"> </span>-t<span class="w"> </span>btrfs<span class="w"> </span>-o<span class="w"> </span><span class="nv">subvol</span><span class="o">=</span>/@,compress<span class="o">=</span>zstd<span class="w"> </span>/dev/sda2<span class="w"> </span>/mnt
+mkdir<span class="w"> </span>/mnt/home
+mount<span class="w"> </span>-t<span class="w"> </span>btrfs<span class="w"> </span>-o<span class="w"> </span><span class="nv">subvol</span><span class="o">=</span>/@home,compress<span class="o">=</span>zstd<span class="w"> </span>/dev/sda2<span class="w"> </span>/mnt/home
+mkdir<span class="w"> </span>/mnt/boot
+mount<span class="w"> </span>/dev/sda1<span class="w"> </span>/mnt/boot
+swapon<span class="w"> </span>/dev/sda3
+</code></pre></div>
+
+<p>完了可以用检查下</p>
+<div class="highlight"><pre><span></span><code>df<span class="w"> </span>-h
+free<span class="w"> </span>-h
+</code></pre></div>
+
+<h2>安装系统</h2>
+<h3>安装基础包</h3>
+<div class="highlight"><pre><span></span><code>pacstrap<span class="w"> </span>/mnt<span class="w"> </span>base<span class="w"> </span>base-devel<span class="w"> </span>linux<span class="w"> </span>linux-firmware<span class="w"> </span>btrfs-progs
+</code></pre></div>
+
+<h3>处理虚拟控制台相关报错</h3>
+<p>如果上面的安装过程中有<code>ERROR: file not found: '/etc/vconsole.conf'</code>的错误，就需要自己创建一个<code>/etc/vconsole.conf</code></p>
+<div class="highlight"><pre><span></span><code><span class="nb">echo</span><span class="w"> </span><span class="s1">&#39;KEYMAP=us&#39;</span><span class="w"> </span>&gt;<span class="w"> </span>/mnt/etc/vconsole.conf
+</code></pre></div>
+
+<p>然后重新生成<strong>initramfs 镜像</strong>，这样系统才知道我们加了这个文件</p>
+<div class="highlight"><pre><span></span><code>arch-chroot<span class="w"> </span>/mnt<span class="w"> </span>mkinitcpio<span class="w"> </span>-P
+</code></pre></div>
+
+<p>如果还提示内核模块不存在，就运行</p>
+<div class="highlight"><pre><span></span><code>arch-chroot<span class="w"> </span>/mnt<span class="w"> </span>pacman<span class="w"> </span>-Syu<span class="w"> </span>linux
+</code></pre></div>
+
+<p>重新按照内核，再次执行</p>
+<div class="highlight"><pre><span></span><code>arch-chroot<span class="w"> </span>/mnt<span class="w"> </span>mkinitcpio<span class="w"> </span>-P
+</code></pre></div>
+
+<h3>安装必要功能软件</h3>
+<div class="highlight"><pre><span></span><code>pacstrap<span class="w"> </span>/mnt<span class="w"> </span>networkmanager<span class="w"> </span>vim<span class="w"> </span>sudo<span class="w"> </span>zsh<span class="w"> </span>zsh-completions
+</code></pre></div>
+
+<h3>生成fstab</h3>
+<div class="highlight"><pre><span></span><code>genfstab<span class="w"> </span>-U<span class="w"> </span>/mnt<span class="w"> </span>&gt;<span class="w"> </span>/mnt/etc/fstab
+cat<span class="w"> </span>/mnt/etc/fstab
+</code></pre></div>
+
+<h3>切换到新系统</h3>
+<div class="highlight"><pre><span></span><code>arch-chroot<span class="w"> </span>/mnt
+</code></pre></div>
+
+<h2>设置主机名和HOSTS</h2>
+<p>编辑主机名设置文件</p>
+<div class="highlight"><pre><span></span><code>vim<span class="w"> </span>/etc/hostname
+</code></pre></div>
+
+<p>我设置成 <code>funcman-arch</code></p>
+<p>注意主机名只能包含字母、数字、连字符(-)、点(.)和下划线(_)</p>
+<p>设置hosts</p>
+<div class="highlight"><pre><span></span><code>vim<span class="w"> </span>/etc/hosts
+</code></pre></div>
+
+<p>我的设置</p>
+<div class="highlight"><pre><span></span><code>127.0.0.1   localhost.localdomain localhost
+::1         localhost.localdomain localhost
+127.0.1.1   funcman-arch.localdomain funcman-arch
+</code></pre></div>
+
+<p>加上的<code>127.0.1.1</code>虽然不是必须的，设置了可以避免一些问题</p>
+<h2>设置时区和地域</h2>
+<p>链接上时区文件即可</p>
+<div class="highlight"><pre><span></span><code>ln<span class="w"> </span>-sf<span class="w"> </span>/usr/share/zoneinfo/Asia/Shanghai<span class="w"> </span>/etc/localtime
+</code></pre></div>
+
+<p>再把时间同步到硬件</p>
+<div class="highlight"><pre><span></span><code>hwclock<span class="w"> </span>--systohc
+</code></pre></div>
+
+<p>设置Locale</p>
+<p>打开设置文件</p>
+<div class="highlight"><pre><span></span><code>vim<span class="w"> </span>/etc/locale.gen
+</code></pre></div>
+
+<p>找到<code>en_US.UTF-8 UTF-8</code>和<code>zh_CN.UTF-8 UTF-8</code>，将<code>#</code>注释去掉</p>
+<p>然后执行</p>
+<div class="highlight"><pre><span></span><code>locale-gen
+<span class="nb">echo</span><span class="w"> </span><span class="s1">&#39;LANG=en_US.UTF-8&#39;</span><span class="w"> </span>&gt;<span class="w"> </span>/etc/locale.conf
+</code></pre></div>
+
+<h2>为 root 用户设置密码</h2>
+<div class="highlight"><pre><span></span><code>passwd root
+</code></pre></div>
+
+<p>输入两遍相同的密码</p>
+<h2>安装微码</h2>
+<p>根据你用的CPU制造商安装对应的微码</p>
+<div class="highlight"><pre><span></span><code>pacman -S intel-ucode #Intel
+pacman -S amd-ucode #AMD
+</code></pre></div>
+
+<p>虚拟机就不用装了</p>
+<h2>安装引导程序</h2>
+<div class="highlight"><pre><span></span><code>pacman<span class="w"> </span>-S<span class="w"> </span>grub<span class="w"> </span>efibootmgr<span class="w"> </span>os-prober
+grub-install<span class="w"> </span>--target<span class="o">=</span>x86_64-efi<span class="w"> </span>--efi-directory<span class="o">=</span>/boot<span class="w"> </span>--bootloader-id<span class="o">=</span>ARCHBOOT
+</code></pre></div>
+
+<p>编辑GRUB配置，定制一下</p>
+<div class="highlight"><pre><span></span><code>vim<span class="w"> </span>/etc/default/grub
+</code></pre></div>
+
+<p>找到<code>GRUB_CMDLINE_LINUX_DEFAULT</code>，做以下修改：</p>
+<ul>
+<li>去掉 <code>quiet</code></li>
+<li>把 <code>loglevel</code> 从 <code>3</code> 改成 <code>5</code></li>
+<li>加入 <code>nowatchdog</code> 参数，这可以显著提高开关机速度</li>
+</ul>
+<p>生成配置</p>
+<div class="highlight"><pre><span></span><code>grub-mkconfig<span class="w"> </span>-o<span class="w"> </span>/boot/grub/grub.cfg
+</code></pre></div>
+
+<h2>结束安装</h2>
+<p>执行</p>
+<div class="highlight"><pre><span></span><code><span class="nb">exit</span><span class="w">           </span><span class="c1">#退回安装环境</span>
+umount<span class="w"> </span>-R<span class="w"> </span>/mnt<span class="w"> </span><span class="c1">#卸载新分区</span>
+reboot<span class="w">         </span><span class="c1">#重启</span>
+</code></pre></div>
+
+<p>重启时记得移除安装介质。</p>
+<p>暂时完事～</p>
+</div>
+		</div>
+	</body>
+</html>

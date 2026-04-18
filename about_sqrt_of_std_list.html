@@ -66,7 +66,7 @@
 </div>		<div class="content container">
 <div class="post">
 	<h1 class="post-title">关于std::list的排序</h1>
-	<span class="post-date">周六 04 九月 2010</span>
+	<span class="post-date">2010年09月04日 星期六</span>
 	<p>std::list和std::vector不同，无法使用STL算法库里的sort()，因为std::list不支持随机访问（random access）。</p>
 <div class="highlight"><pre><span></span><code><span class="c1">// std::list排序示例</span>
 
@@ -80,7 +80,7 @@
 <span class="w">    </span><span class="kt">bool</span><span class="w"> </span><span class="nf">operator</span><span class="p">()(</span><span class="kt">int</span><span class="o">*</span><span class="w"> </span><span class="n">a</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="o">*</span><span class="w"> </span><span class="n">b</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="o">*</span><span class="n">a</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="o">*</span><span class="n">b</span><span class="p">;</span>
 <span class="w">    </span><span class="p">}</span>
-<span class="p">};</span><span class="w"> </span>
+<span class="p">};</span>
 
 <span class="kt">int</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
 <span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">list</span><span class="w"> </span><span class="n">il</span><span class="p">;</span>

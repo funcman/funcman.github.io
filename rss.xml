@@ -1,5 +1,235 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>funcman's blog</title><link href="https://funcman.me/" rel="alternate"></link><link href="https://funcman.me/rss.xml" rel="self"></link><id>https://funcman.me/</id><updated>2025-06-12T20:14:11+08:00</updated><entry><title>我还在写博客</title><link href="https://funcman.me/i_am_still_blogging.html" rel="alternate"></link><published>2025-06-12T20:14:11+08:00</published><updated>2025-06-12T20:14:11+08:00</updated><author><name>funcman</name></author><id>tag:funcman.me,2025-06-12:/i_am_still_blogging.html</id><summary type="html">&lt;p&gt;歇了两年多没有写博客，这里说说睡眠~&lt;/p&gt;</summary><content type="html">&lt;p&gt;有两年多没有写博客了，2024年整年这里完全是真空的，我觉得不能就此荒废了。&lt;/p&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>funcman's blog</title><link href="https://funcman.me/" rel="alternate"/><link href="https://funcman.me/rss.xml" rel="self"/><id>https://funcman.me/</id><updated>2025-06-12T20:14:11+08:00</updated><entry><title>Arch Linux 的基本安装</title><link href="https://funcman.me/basic_arch_linux_installation.html" rel="alternate"/><published>2025-06-12T20:14:11+08:00</published><updated>2025-06-12T20:14:11+08:00</updated><author><name>funcman</name></author><id>tag:funcman.me,2025-06-12:/basic_arch_linux_installation.html</id><summary type="html">&lt;p&gt;上班摸鱼时，在虚拟机上安装了一套 Arch Linux...&lt;/p&gt;</summary><content type="html">&lt;p&gt;好久没写博客，最近AI浪潮，忙疯了，反而做事的效率上来了。于是开了一堆坑，比如继续写博客。&lt;/p&gt;
+&lt;h2&gt;为什么是Arch？&lt;/h2&gt;
+&lt;p&gt;我一直是Debian/Ubuntu的用户，以前还作为Desktop来用。这几年它们主要作为Server的OS，很好用，也不打算换。&lt;/p&gt;
+&lt;p&gt;而Arch，我主要是看中它的高度可折腾性。我希望借由Arch能够回到将Linux作为Desktop方面的生产主力的状态。&lt;/p&gt;
+&lt;p&gt;应该有好处。&lt;/p&gt;
+&lt;p&gt;这个安装笔记只是一个基本安装的记录，不仅没做到Desktop的程度，连用户都没设置。不着急，慢慢来。后面有进展我还会更新本篇。&lt;/p&gt;
+&lt;h2&gt;学习资料&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;a href="https://github.com/nakanomikuorg/arch-guide"&gt;https://github.com/nakanomikuorg/arch-guide&lt;/a&gt; 我主要是照这套来安装的，这篇笔记甚至可以可以说照搬了这套资料。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;a href="https://github.com/ArchLinuxStudio/ArchLinuxTutorial"&gt;https://github.com/ArchLinuxStudio/ArchLinuxTutorial&lt;/a&gt; 👆上面那套提及的资料，偏严肃一点。&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2&gt;机器环境&lt;/h2&gt;
+&lt;p&gt;我使用了&lt;strong&gt;VirtualBox&lt;/strong&gt;来作为安装机器，给了2核2G，64G硬盘。&lt;/p&gt;
+&lt;p&gt;后面我再找实体机器来安装，比如一台2012年的MBA。&lt;/p&gt;
+&lt;p&gt;好了，接下来把iso文件塞进vbox，开始安装～&lt;/p&gt;
+&lt;h2&gt;确认UEFI模式&lt;/h2&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;ls&lt;span class="w"&gt; &lt;/span&gt;/sys/firmware/efi/efivars
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;h2&gt;确认网络&lt;/h2&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;ping&lt;span class="w"&gt; &lt;/span&gt;bilibili.com
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;h2&gt;设置时钟&lt;/h2&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;timedetectl set-ntp true
+timedatectl set-timezon Asia/Shanghai
+timedatectl status
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;h2&gt;设置镜像&lt;/h2&gt;
+&lt;p&gt;编辑镜像列表文件&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;vim&lt;span class="w"&gt; &lt;/span&gt;/etc/pacman.d/mirrorlist
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;通过正则替换注释掉所有镜像&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="k"&gt;v&lt;/span&gt;&lt;span class="sr"&gt;/^\(#\|\s*$\)/&lt;/span&gt; s&lt;span class="sr"&gt;/^/&lt;/span&gt;#/
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;然后把中科大的镜像放在最前面&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;Server = https://mirrors.ustc.edu.cn/archlinux/$repo/os/$arch
+
+## Arch Linux ...
+##
+## ...
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;h2&gt;分区与格式化&lt;/h2&gt;
+&lt;h3&gt;分区&lt;/h3&gt;
+&lt;p&gt;检查当前分区状况&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;lsblk
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;然后进行分区操作，一般SATA盘是sda、sdb之类，NVME盘是nvme0n1、nvme1n2之类，后面根据我的实际情况来&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;cfdisk&lt;span class="w"&gt; &lt;/span&gt;/dev/sda
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;可以Delete原本的分区，然后在Free space上New新的分区，可以通过Type设置分区类型&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;第一个分区建256M，如果已经存在就别删除继续用，新建记得类型用EFI System&lt;/li&gt;
+&lt;li&gt;第二个分区用满几乎全部磁盘，留两倍内存容量给交换分区就行，类型就是默认的Linux filesystem&lt;/li&gt;
+&lt;li&gt;第三个分区给虚拟内存交换，用尽剩余的空间即可，类型选Linux swap&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;然后Write写入，要敲yes确认，然后Quit退出cfdisk，然后查看一下分区情况&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;lsblk
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;h3&gt;格式化&lt;/h3&gt;
+&lt;p&gt;sda1是EFI分区，如果分区时就存在，那么不要删除也不要格式化，如果是之前新建的则要格式化&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;mkfs.fat&lt;span class="w"&gt; &lt;/span&gt;-F32&lt;span class="w"&gt; &lt;/span&gt;/dev/sda1
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;格式化sda2，用Btrfs&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;mkfs.btrfs&lt;span class="w"&gt; &lt;/span&gt;-L&lt;span class="w"&gt; &lt;/span&gt;Arch&lt;span class="w"&gt; &lt;/span&gt;/dev/sda2
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;格式化sda3&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;mkswap&lt;span class="w"&gt; &lt;/span&gt;/dev/sda3
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;创建子卷，先挂载sda2到/mnt&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;mount&lt;span class="w"&gt; &lt;/span&gt;-t&lt;span class="w"&gt; &lt;/span&gt;btrfs&lt;span class="w"&gt; &lt;/span&gt;-o&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;compress&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;zstd&lt;span class="w"&gt; &lt;/span&gt;/dev/sdxn&lt;span class="w"&gt; &lt;/span&gt;/mnt
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;可以看一下挂载情况&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;df -h
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;创建两个子卷&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;btrfs&lt;span class="w"&gt; &lt;/span&gt;subvolume&lt;span class="w"&gt; &lt;/span&gt;create&lt;span class="w"&gt; &lt;/span&gt;/mnt/@
+btrfs&lt;span class="w"&gt; &lt;/span&gt;subvolume&lt;span class="w"&gt; &lt;/span&gt;create&lt;span class="w"&gt; &lt;/span&gt;/mnt/@home
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;然后看一下子卷情况&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;btrfs&lt;span class="w"&gt; &lt;/span&gt;subvolume&lt;span class="w"&gt; &lt;/span&gt;list&lt;span class="w"&gt; &lt;/span&gt;-p&lt;span class="w"&gt; &lt;/span&gt;/mnt
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;卸载/mnt&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;umount&lt;span class="w"&gt; &lt;/span&gt;/mnt
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;挂载分区目录，要按&lt;strong&gt;顺序&lt;/strong&gt;来&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;mount&lt;span class="w"&gt; &lt;/span&gt;-t&lt;span class="w"&gt; &lt;/span&gt;btrfs&lt;span class="w"&gt; &lt;/span&gt;-o&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;subvol&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;/@,compress&lt;span class="o"&gt;=&lt;/span&gt;zstd&lt;span class="w"&gt; &lt;/span&gt;/dev/sda2&lt;span class="w"&gt; &lt;/span&gt;/mnt
+mkdir&lt;span class="w"&gt; &lt;/span&gt;/mnt/home
+mount&lt;span class="w"&gt; &lt;/span&gt;-t&lt;span class="w"&gt; &lt;/span&gt;btrfs&lt;span class="w"&gt; &lt;/span&gt;-o&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;subvol&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;/@home,compress&lt;span class="o"&gt;=&lt;/span&gt;zstd&lt;span class="w"&gt; &lt;/span&gt;/dev/sda2&lt;span class="w"&gt; &lt;/span&gt;/mnt/home
+mkdir&lt;span class="w"&gt; &lt;/span&gt;/mnt/boot
+mount&lt;span class="w"&gt; &lt;/span&gt;/dev/sda1&lt;span class="w"&gt; &lt;/span&gt;/mnt/boot
+swapon&lt;span class="w"&gt; &lt;/span&gt;/dev/sda3
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;完了可以用检查下&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;df&lt;span class="w"&gt; &lt;/span&gt;-h
+free&lt;span class="w"&gt; &lt;/span&gt;-h
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;h2&gt;安装系统&lt;/h2&gt;
+&lt;h3&gt;安装基础包&lt;/h3&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;pacstrap&lt;span class="w"&gt; &lt;/span&gt;/mnt&lt;span class="w"&gt; &lt;/span&gt;base&lt;span class="w"&gt; &lt;/span&gt;base-devel&lt;span class="w"&gt; &lt;/span&gt;linux&lt;span class="w"&gt; &lt;/span&gt;linux-firmware&lt;span class="w"&gt; &lt;/span&gt;btrfs-progs
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;h3&gt;处理虚拟控制台相关报错&lt;/h3&gt;
+&lt;p&gt;如果上面的安装过程中有&lt;code&gt;ERROR: file not found: '/etc/vconsole.conf'&lt;/code&gt;的错误，就需要自己创建一个&lt;code&gt;/etc/vconsole.conf&lt;/code&gt;&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="nb"&gt;echo&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;KEYMAP=us&amp;#39;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&amp;gt;&lt;span class="w"&gt; &lt;/span&gt;/mnt/etc/vconsole.conf
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;然后重新生成&lt;strong&gt;initramfs 镜像&lt;/strong&gt;，这样系统才知道我们加了这个文件&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;arch-chroot&lt;span class="w"&gt; &lt;/span&gt;/mnt&lt;span class="w"&gt; &lt;/span&gt;mkinitcpio&lt;span class="w"&gt; &lt;/span&gt;-P
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;如果还提示内核模块不存在，就运行&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;arch-chroot&lt;span class="w"&gt; &lt;/span&gt;/mnt&lt;span class="w"&gt; &lt;/span&gt;pacman&lt;span class="w"&gt; &lt;/span&gt;-Syu&lt;span class="w"&gt; &lt;/span&gt;linux
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;重新按照内核，再次执行&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;arch-chroot&lt;span class="w"&gt; &lt;/span&gt;/mnt&lt;span class="w"&gt; &lt;/span&gt;mkinitcpio&lt;span class="w"&gt; &lt;/span&gt;-P
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;h3&gt;安装必要功能软件&lt;/h3&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;pacstrap&lt;span class="w"&gt; &lt;/span&gt;/mnt&lt;span class="w"&gt; &lt;/span&gt;networkmanager&lt;span class="w"&gt; &lt;/span&gt;vim&lt;span class="w"&gt; &lt;/span&gt;sudo&lt;span class="w"&gt; &lt;/span&gt;zsh&lt;span class="w"&gt; &lt;/span&gt;zsh-completions
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;h3&gt;生成fstab&lt;/h3&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;genfstab&lt;span class="w"&gt; &lt;/span&gt;-U&lt;span class="w"&gt; &lt;/span&gt;/mnt&lt;span class="w"&gt; &lt;/span&gt;&amp;gt;&lt;span class="w"&gt; &lt;/span&gt;/mnt/etc/fstab
+cat&lt;span class="w"&gt; &lt;/span&gt;/mnt/etc/fstab
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;h3&gt;切换到新系统&lt;/h3&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;arch-chroot&lt;span class="w"&gt; &lt;/span&gt;/mnt
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;h2&gt;设置主机名和HOSTS&lt;/h2&gt;
+&lt;p&gt;编辑主机名设置文件&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;vim&lt;span class="w"&gt; &lt;/span&gt;/etc/hostname
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;我设置成 &lt;code&gt;funcman-arch&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;注意主机名只能包含字母、数字、连字符(-)、点(.)和下划线(_)&lt;/p&gt;
+&lt;p&gt;设置hosts&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;vim&lt;span class="w"&gt; &lt;/span&gt;/etc/hosts
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;我的设置&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;127.0.0.1   localhost.localdomain localhost
+::1         localhost.localdomain localhost
+127.0.1.1   funcman-arch.localdomain funcman-arch
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;加上的&lt;code&gt;127.0.1.1&lt;/code&gt;虽然不是必须的，设置了可以避免一些问题&lt;/p&gt;
+&lt;h2&gt;设置时区和地域&lt;/h2&gt;
+&lt;p&gt;链接上时区文件即可&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;ln&lt;span class="w"&gt; &lt;/span&gt;-sf&lt;span class="w"&gt; &lt;/span&gt;/usr/share/zoneinfo/Asia/Shanghai&lt;span class="w"&gt; &lt;/span&gt;/etc/localtime
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;再把时间同步到硬件&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;hwclock&lt;span class="w"&gt; &lt;/span&gt;--systohc
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;设置Locale&lt;/p&gt;
+&lt;p&gt;打开设置文件&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;vim&lt;span class="w"&gt; &lt;/span&gt;/etc/locale.gen
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;找到&lt;code&gt;en_US.UTF-8 UTF-8&lt;/code&gt;和&lt;code&gt;zh_CN.UTF-8 UTF-8&lt;/code&gt;，将&lt;code&gt;#&lt;/code&gt;注释去掉&lt;/p&gt;
+&lt;p&gt;然后执行&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;locale-gen
+&lt;span class="nb"&gt;echo&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;LANG=en_US.UTF-8&amp;#39;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&amp;gt;&lt;span class="w"&gt; &lt;/span&gt;/etc/locale.conf
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;h2&gt;为 root 用户设置密码&lt;/h2&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;passwd root
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;输入两遍相同的密码&lt;/p&gt;
+&lt;h2&gt;安装微码&lt;/h2&gt;
+&lt;p&gt;根据你用的CPU制造商安装对应的微码&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;pacman -S intel-ucode #Intel
+pacman -S amd-ucode #AMD
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;虚拟机就不用装了&lt;/p&gt;
+&lt;h2&gt;安装引导程序&lt;/h2&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;pacman&lt;span class="w"&gt; &lt;/span&gt;-S&lt;span class="w"&gt; &lt;/span&gt;grub&lt;span class="w"&gt; &lt;/span&gt;efibootmgr&lt;span class="w"&gt; &lt;/span&gt;os-prober
+grub-install&lt;span class="w"&gt; &lt;/span&gt;--target&lt;span class="o"&gt;=&lt;/span&gt;x86_64-efi&lt;span class="w"&gt; &lt;/span&gt;--efi-directory&lt;span class="o"&gt;=&lt;/span&gt;/boot&lt;span class="w"&gt; &lt;/span&gt;--bootloader-id&lt;span class="o"&gt;=&lt;/span&gt;ARCHBOOT
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;编辑GRUB配置，定制一下&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;vim&lt;span class="w"&gt; &lt;/span&gt;/etc/default/grub
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;找到&lt;code&gt;GRUB_CMDLINE_LINUX_DEFAULT&lt;/code&gt;，做以下修改：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;去掉 &lt;code&gt;quiet&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;把 &lt;code&gt;loglevel&lt;/code&gt; 从 &lt;code&gt;3&lt;/code&gt; 改成 &lt;code&gt;5&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;加入 &lt;code&gt;nowatchdog&lt;/code&gt; 参数，这可以显著提高开关机速度&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;生成配置&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;grub-mkconfig&lt;span class="w"&gt; &lt;/span&gt;-o&lt;span class="w"&gt; &lt;/span&gt;/boot/grub/grub.cfg
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;h2&gt;结束安装&lt;/h2&gt;
+&lt;p&gt;执行&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="nb"&gt;exit&lt;/span&gt;&lt;span class="w"&gt;           &lt;/span&gt;&lt;span class="c1"&gt;#退回安装环境&lt;/span&gt;
+umount&lt;span class="w"&gt; &lt;/span&gt;-R&lt;span class="w"&gt; &lt;/span&gt;/mnt&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="c1"&gt;#卸载新分区&lt;/span&gt;
+reboot&lt;span class="w"&gt;         &lt;/span&gt;&lt;span class="c1"&gt;#重启&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;重启时记得移除安装介质。&lt;/p&gt;
+&lt;p&gt;暂时完事～&lt;/p&gt;</content><category term="codiing"/><category term="Linux"/><category term="安装"/><category term="笔记"/></entry><entry><title>我还在写博客</title><link href="https://funcman.me/i_am_still_blogging.html" rel="alternate"/><published>2025-06-12T20:14:11+08:00</published><updated>2025-06-12T20:14:11+08:00</updated><author><name>funcman</name></author><id>tag:funcman.me,2025-06-12:/i_am_still_blogging.html</id><summary type="html">&lt;p&gt;歇了两年多没有写博客，这里说说睡眠~&lt;/p&gt;</summary><content type="html">&lt;p&gt;有两年多没有写博客了，2024年整年这里完全是真空的，我觉得不能就此荒废了。&lt;/p&gt;
 &lt;p&gt;实际上，在这个时间里，我又上班了（忘记是否说过前面干什么了）。做的是Unity为底子的家装软件。&lt;/p&gt;
 &lt;p&gt;然后，每天都是上班下班，有的时候会有好几个月天天加班。而今年这种经常加班的状态有所改变。不过，实际上此时此刻我还在办公室。&lt;/p&gt;
 &lt;p&gt;今天早上还迟了个大到，最近在调整生物钟。这很难，我希望是做到每天下班就睡觉，然后凌晨的什么时候起床，开始一天。&lt;/p&gt;
@@ -7,7 +237,7 @@
 &lt;p&gt;我是去年看华尔街日报的一篇文章说华尔街的精英作息就是早上五点起床给老板汇报，然后去上班，下午早早结束工作，然后晚上运动一下到九点就睡。这很有意思，所以我才决定学着做做。&lt;/p&gt;
 &lt;p&gt;然后就断断续续这么做了，有点不容易做到。主要还是事情太多了，尤其工作上。&lt;/p&gt;
 &lt;p&gt;后来我想到，其实我完全没必要在工作上耗费过多的精力。因为实际上我少花一点精力，一样可以给公司带来同样的效益。&lt;/p&gt;
-&lt;p&gt;今年的改变就是基于以上。&lt;/p&gt;</content><category term="others"></category><category term="生活"></category><category term="睡眠"></category></entry><entry><title>收集了一些前期的图像视频芯片的信息</title><link href="https://funcman.me/about_some_oldschool_gpus.html" rel="alternate"></link><published>2023-01-16T11:24:07+08:00</published><updated>2023-01-16T11:24:07+08:00</updated><author><name>funcman</name></author><id>tag:funcman.me,2023-01-16:/about_some_oldschool_gpus.html</id><summary type="html">&lt;p&gt;现代的计算机系统，无论是台式电脑、笔记本、手机、游戏机，基本上都有专门的图形芯片，用于图像的输出。今天，我们一般将这 …&lt;/p&gt;</summary><content type="html">&lt;p&gt;现代的计算机系统，无论是台式电脑、笔记本、手机、游戏机，基本上都有专门的图形芯片，用于图像的输出。今天，我们一般将这种图形芯片，称为GPU（Graphic Processing Unit），即图形处理单元。&lt;/p&gt;
+&lt;p&gt;今年的改变就是基于以上。&lt;/p&gt;</content><category term="others"/><category term="生活"/><category term="睡眠"/></entry><entry><title>收集了一些前期的图像视频芯片的信息</title><link href="https://funcman.me/about_some_oldschool_gpus.html" rel="alternate"/><published>2023-01-16T11:24:07+08:00</published><updated>2023-01-16T11:24:07+08:00</updated><author><name>funcman</name></author><id>tag:funcman.me,2023-01-16:/about_some_oldschool_gpus.html</id><summary type="html">&lt;p&gt;现代的计算机系统，无论是台式电脑、笔记本、手机、游戏机，基本上都有专门的图形芯片，用于图像的输出。今天，我们一般将这 …&lt;/p&gt;</summary><content type="html">&lt;p&gt;现代的计算机系统，无论是台式电脑、笔记本、手机、游戏机，基本上都有专门的图形芯片，用于图像的输出。今天，我们一般将这种图形芯片，称为GPU（Graphic Processing Unit），即图形处理单元。&lt;/p&gt;
 &lt;p&gt;除了一些作为控制器使用MCU系统，一般的通用型计算机系统，都包括了CPU。在PC上，GPU在显卡上存在。而手机等系统，GPU则作为SoC（System on a Chip）的一部分，在主芯片上存在。&lt;/p&gt;
 &lt;p&gt;在计算机的发展早期，是没有专门的芯片用于图像输出的，早期的计算机系统甚至没有图像输出。后来计算机越来越为个人所使用，图像输出变得重要起来。于是就有了专门的芯片。&lt;/p&gt;
 &lt;p&gt;本篇记录和罗列一些我收集到的前期图像视频芯片的信息，后面会做陆续更新。&lt;/p&gt;
@@ -145,7 +375,7 @@
 &lt;/tr&gt;
 &lt;/tbody&gt;
 &lt;/table&gt;
-&lt;p&gt;做这些信息的收集，主要是为了后面自制怀旧风格[家用电脑]做准备。&lt;/p&gt;</content><category term="gamedev"></category><category term="GPU"></category><category term="PPU"></category><category term="VDP"></category><category term="CRTC"></category><category term="芯片"></category></entry><entry><title>这可能是FC游戏《地球冒险》难以汉化的原因</title><link href="https://funcman.me/why_is_it_difficult_to_chineseize_fc_mother.html" rel="alternate"></link><published>2023-01-13T09:36:45+08:00</published><updated>2023-01-13T09:36:45+08:00</updated><author><name>funcman</name></author><id>tag:funcman.me,2023-01-13:/why_is_it_difficult_to_chineseize_fc_mother.html</id><summary type="html">&lt;p&gt;FC游戏《地球冒险》是红白机上的知名作品。作为一个RPG，它有大量的文字。这样的游戏理应出现汉化版，毕竟中文游戏圈已经做了 …&lt;/p&gt;</summary><content type="html">&lt;p&gt;FC游戏《地球冒险》是红白机上的知名作品。作为一个RPG，它有大量的文字。这样的游戏理应出现汉化版，毕竟中文游戏圈已经做了这么多年汉化了。但是事实上就是没有弄出来。我作为一个红白机开发技术上的萌新，尝试一下从技术上分析，这个游戏的汉化难度。&lt;/p&gt;
+&lt;p&gt;做这些信息的收集，主要是为了后面自制怀旧风格[家用电脑]做准备。&lt;/p&gt;</content><category term="gamedev"/><category term="GPU"/><category term="PPU"/><category term="VDP"/><category term="CRTC"/><category term="芯片"/></entry><entry><title>这可能是FC游戏《地球冒险》难以汉化的原因</title><link href="https://funcman.me/why_is_it_difficult_to_chineseize_fc_mother.html" rel="alternate"/><published>2023-01-13T09:36:45+08:00</published><updated>2023-01-13T09:36:45+08:00</updated><author><name>funcman</name></author><id>tag:funcman.me,2023-01-13:/why_is_it_difficult_to_chineseize_fc_mother.html</id><summary type="html">&lt;p&gt;FC游戏《地球冒险》是红白机上的知名作品。作为一个RPG，它有大量的文字。这样的游戏理应出现汉化版，毕竟中文游戏圈已经做了 …&lt;/p&gt;</summary><content type="html">&lt;p&gt;FC游戏《地球冒险》是红白机上的知名作品。作为一个RPG，它有大量的文字。这样的游戏理应出现汉化版，毕竟中文游戏圈已经做了这么多年汉化了。但是事实上就是没有弄出来。我作为一个红白机开发技术上的萌新，尝试一下从技术上分析，这个游戏的汉化难度。&lt;/p&gt;
 &lt;p&gt;&lt;img alt="《地球冒险》标题" src="./images/fc-mother-title.png"&gt; &lt;img alt="《地球冒险》对话" src="./images/fc-mother-talk.png"&gt; &lt;/p&gt;
 &lt;p&gt;《地球冒险》的一些基本信息：它是个日版游戏，标题名称为“Mother”。没有出过官方英文版，但是有爱好者改制的英化版。从Mapper的角度看，它是一个Mapper4游戏，使用了MMC3芯片。&lt;/p&gt;
 &lt;p&gt;&lt;a href="./mmc3_irqs.html"&gt;MMC3支持IRQ中断&lt;/a&gt;，它可以对扫描线进行计数，可以在PPU绘制第N条扫描线时，触发IRQ中断。在IRQ中断执行代码中，我们可以更改PPU绘制时依赖的各种数据。这意味着，我们可以实现屏幕分区域的绘制。比如在第N条扫描线时，改变图样表（Pattern Table）对CHR-ROM的映射。然后在第M条扫描线时，把图样表改回来。这样就能跨段（Bank）绘制更多的CHR（在背景中）。&lt;/p&gt;
@@ -210,7 +440,7 @@
 &lt;p&gt;&lt;img alt="对话框覆盖了场景" src="./images/fc-metal-max-zh2.png"&gt; &lt;img alt="场景全貌" src="./images/fc-metal-max-zh3.png"&gt;&lt;/p&gt;
 &lt;p&gt;好了，说到这里，大致已经讲清了《地球冒险》的汉化难度。应该不是不可能，只是难度极高。游戏扩容时要加入CHR-RAM的支持，要选择合适的Mapper方案。模拟器也不一定能支持得好（看下图）。如果我们想把汉化后的游戏放进&lt;a href="https://krikzz.com/our-products/cartridges/n8-pro-fami.html"&gt;N8烧录卡&lt;/a&gt;，或者做一张MMC3实体卡带，达到运行无误也是有难度的。&lt;/p&gt;
 &lt;p&gt;&lt;img alt="Mesen并不能很好支持对带CHR-RAM的游戏的CHR的查看" src="./images/mesen-donot-support-show-chr-with-ram.png"&gt;&lt;/p&gt;
-&lt;p&gt;作为一个萌新，可能难免有所失误，希望得到指教。&lt;/p&gt;</content><category term="gamedev"></category><category term="红白机"></category><category term="FC"></category><category term="NES"></category><category term="MMC3"></category><category term="汉化"></category><category term="游戏"></category></entry><entry><title>MMC3的IRQ中断</title><link href="https://funcman.me/mmc3_irqs.html" rel="alternate"></link><published>2023-01-11T13:26:34+08:00</published><updated>2023-01-11T13:26:34+08:00</updated><author><name>funcman</name></author><id>tag:funcman.me,2023-01-11:/mmc3_irqs.html</id><summary type="html">&lt;p&gt;&lt;a href="http://bobrost.com/nes/files/mmc3irqs.txt"&gt;原文&lt;/a&gt;作者：Allan Blomquist&lt;/p&gt;
+&lt;p&gt;作为一个萌新，可能难免有所失误，希望得到指教。&lt;/p&gt;</content><category term="gamedev"/><category term="红白机"/><category term="FC"/><category term="NES"/><category term="MMC3"/><category term="汉化"/><category term="游戏"/></entry><entry><title>MMC3的IRQ中断</title><link href="https://funcman.me/mmc3_irqs.html" rel="alternate"/><published>2023-01-11T13:26:34+08:00</published><updated>2023-01-11T13:26:34+08:00</updated><author><name>funcman</name></author><id>tag:funcman.me,2023-01-11:/mmc3_irqs.html</id><summary type="html">&lt;p&gt;&lt;a href="http://bobrost.com/nes/files/mmc3irqs.txt"&gt;原文&lt;/a&gt;作者：Allan Blomquist&lt;/p&gt;
 &lt;p&gt;iNES Mapper #4 (MMC3)提供了一种方便的方法，来对PPU进行帧间改变，以实现NES游戏中的&lt;strong&gt;分屏卷动&lt;/strong&gt;等“特殊效果”。与其使用&lt;code&gt;Sprite-0 Hits&lt;/code&gt;去择机写入PPU硬件，不如 …&lt;/p&gt;</summary><content type="html">&lt;p&gt;&lt;a href="http://bobrost.com/nes/files/mmc3irqs.txt"&gt;原文&lt;/a&gt;作者：Allan Blomquist&lt;/p&gt;
 &lt;p&gt;iNES Mapper #4 (MMC3)提供了一种方便的方法，来对PPU进行帧间改变，以实现NES游戏中的&lt;strong&gt;分屏卷动&lt;/strong&gt;等“特殊效果”。与其使用&lt;code&gt;Sprite-0 Hits&lt;/code&gt;去择机写入PPU硬件，不如使用IRQ。这可以使CPU在一帧内就做完工作，而不是浪费时间去轮询&lt;code&gt;Sprite-0 Hits&lt;/code&gt;标志。 MMC3有4个寄存器，是MMC3为IRQ触发而设的：&lt;/p&gt;
 &lt;p&gt;&lt;code&gt;$C000&lt;/code&gt; - &lt;strong&gt;IRQ计数器&lt;/strong&gt; - Mapper用它来倒计时以触发IRQ。每一条扫描线，该值减一；当它到0时，IRQ就触发。&lt;/p&gt;
@@ -334,7 +564,7 @@
 &lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="na"&gt;.org&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="no"&gt;$fffa&lt;/span&gt;
 &lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="na"&gt;.dw&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="no"&gt;nmi&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="no"&gt;start&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="no"&gt;irq&lt;/span&gt;
 &lt;span class="nf"&gt;endasm&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</content><category term="gamedev"></category><category term="红白机"></category><category term="FC"></category><category term="NES"></category><category term="IRQ"></category><category term="MMC3"></category><category term="芯片"></category></entry><entry><title>如何配置运行在Docker中的GitLab的外部地址</title><link href="https://funcman.me/how_to_configure_gitlab_external_url_in_docker.html" rel="alternate"></link><published>2022-06-09T15:56:42+08:00</published><updated>2022-06-09T15:56:42+08:00</updated><author><name>funcman</name></author><id>tag:funcman.me,2022-06-09:/how_to_configure_gitlab_external_url_in_docker.html</id><summary type="html">&lt;p&gt;家里弄了个NAS服务器，在NAS上安装了一个Docker，于是弄了很多内部服务放在Docker上跑。&lt;/p&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</content><category term="gamedev"/><category term="红白机"/><category term="FC"/><category term="NES"/><category term="IRQ"/><category term="MMC3"/><category term="芯片"/></entry><entry><title>如何配置运行在Docker中的GitLab的外部地址</title><link href="https://funcman.me/how_to_configure_gitlab_external_url_in_docker.html" rel="alternate"/><published>2022-06-09T15:56:42+08:00</published><updated>2022-06-09T15:56:42+08:00</updated><author><name>funcman</name></author><id>tag:funcman.me,2022-06-09:/how_to_configure_gitlab_external_url_in_docker.html</id><summary type="html">&lt;p&gt;家里弄了个NAS服务器，在NAS上安装了一个Docker，于是弄了很多内部服务放在Docker上跑。&lt;/p&gt;
 &lt;p&gt;但是在设置GitLab时遇到了点问题，经过一番折腾，得到这个很简单的处理方式。&lt;/p&gt;
 &lt;p&gt;先说问题。大 …&lt;/p&gt;</summary><content type="html">&lt;p&gt;家里弄了个NAS服务器，在NAS上安装了一个Docker，于是弄了很多内部服务放在Docker上跑。&lt;/p&gt;
 &lt;p&gt;但是在设置GitLab时遇到了点问题，经过一番折腾，得到这个很简单的处理方式。&lt;/p&gt;
@@ -419,7 +649,7 @@ unix&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="m"&gt;2&lt;/span&gt;&lt
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
 &lt;p&gt;因为&lt;code&gt;external_url&lt;/code&gt;的配置，GitLab完全没有用到&lt;code&gt;80&lt;/code&gt;端口，而是&lt;code&gt;11480&lt;/code&gt;。&lt;/p&gt;
-&lt;p&gt;GitLab居然会根据外部地址的端口，指定内部使用的端口，这谁能想到啊。&lt;/p&gt;</content><category term="others"></category><category term="GitLab"></category><category term="Docker"></category><category term="编程环境"></category></entry><entry><title>Unity ShaderLab 个人学习笔记</title><link href="https://funcman.me/unity_shader_lab_note.html" rel="alternate"></link><published>2021-12-21T11:44:12+08:00</published><updated>2021-12-21T11:44:12+08:00</updated><author><name>funcman</name></author><id>tag:funcman.me,2021-12-21:/unity_shader_lab_note.html</id><summary type="html">&lt;p&gt;最近在回顾Unity的着色器知识。&lt;/p&gt;
+&lt;p&gt;GitLab居然会根据外部地址的端口，指定内部使用的端口，这谁能想到啊。&lt;/p&gt;</content><category term="others"/><category term="GitLab"/><category term="Docker"/><category term="编程环境"/></entry><entry><title>Unity ShaderLab 个人学习笔记</title><link href="https://funcman.me/unity_shader_lab_note.html" rel="alternate"/><published>2021-12-21T11:44:12+08:00</published><updated>2021-12-21T11:44:12+08:00</updated><author><name>funcman</name></author><id>tag:funcman.me,2021-12-21:/unity_shader_lab_note.html</id><summary type="html">&lt;p&gt;最近在回顾Unity的着色器知识。&lt;/p&gt;
 &lt;p&gt;这里主要记录个人在ShaderLab中遇到的一些重点内容。&lt;/p&gt;
 &lt;p&gt;这篇会做持续记录，直到完成此遍回顾。&lt;/p&gt;
 &lt;h2&gt;ShaderLab的基本结构&lt;/h2&gt;
@@ -557,7 +787,7 @@ unix&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="m"&gt;2&lt;/span&gt;&lt
 &lt;td&gt;打开并设置混合模式&lt;/td&gt;
 &lt;/tr&gt;
 &lt;/tbody&gt;
-&lt;/table&gt;</content><category term="gamedev"></category><category term="Unity"></category><category term="ShaderLab"></category></entry><entry><title>Orthodox C++</title><link href="https://funcman.me/orthodox_cpp.html" rel="alternate"></link><published>2021-12-17T09:40:38+08:00</published><updated>2021-12-17T09:40:38+08:00</updated><author><name>funcman</name></author><id>tag:funcman.me,2021-12-17:/orthodox_cpp.html</id><summary type="html">&lt;p&gt;本文翻译自&lt;a href="https://gist.github.com/bkaradzic/2e39896bc7d8c34e042b"&gt;https://gist.github.com/bkaradzic/2e39896bc7d8c34e042b&lt;/a&gt;，原作者是&lt;a href="https://twitter.com/bkaradzic"&gt;Бранимир Караџић&lt;/a&gt;。&lt;/p&gt;
+&lt;/table&gt;</content><category term="gamedev"/><category term="Unity"/><category term="ShaderLab"/></entry><entry><title>Orthodox C++</title><link href="https://funcman.me/orthodox_cpp.html" rel="alternate"/><published>2021-12-17T09:40:38+08:00</published><updated>2021-12-17T09:40:38+08:00</updated><author><name>funcman</name></author><id>tag:funcman.me,2021-12-17:/orthodox_cpp.html</id><summary type="html">&lt;p&gt;本文翻译自&lt;a href="https://gist.github.com/bkaradzic/2e39896bc7d8c34e042b"&gt;https://gist.github.com/bkaradzic/2e39896bc7d8c34e042b&lt;/a&gt;，原作者是&lt;a href="https://twitter.com/bkaradzic"&gt;Бранимир Караџић&lt;/a&gt;。&lt;/p&gt;
 &lt;h2&gt;什么是Orthodox C++？&lt;/h2&gt;
 &lt;p&gt;Orthodox C++（有时被称为&lt;strong&gt;C+&lt;/strong&gt;）是C++的最小子集，它改进了C，但避免了所谓的现 …&lt;/p&gt;</summary><content type="html">&lt;p&gt;本文翻译自&lt;a href="https://gist.github.com/bkaradzic/2e39896bc7d8c34e042b"&gt;https://gist.github.com/bkaradzic/2e39896bc7d8c34e042b&lt;/a&gt;，原作者是&lt;a href="https://twitter.com/bkaradzic"&gt;Бранимир Караџић&lt;/a&gt;。&lt;/p&gt;
 &lt;h2&gt;什么是Orthodox C++？&lt;/h2&gt;
@@ -617,7 +847,7 @@ unix&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="m"&gt;2&lt;/span&gt;&lt
 &lt;li&gt;&lt;a href="https://github.com/ConfettiFX/The-Forge"&gt;TheForge&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a href="https://github.com/floooh/oryol"&gt;Oryol&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a href="https://github.com/networknext/sdk"&gt;Network Next SDK&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;</content><category term="programming"></category><category term="C++"></category><category term="编程风格"></category></entry><entry><title>改用Pelican重建这个博客</title><link href="https://funcman.me/replace_jekyll_with_pelican_for_my_blog.html" rel="alternate"></link><published>2021-09-19T03:53:55+08:00</published><updated>2021-09-19T03:53:55+08:00</updated><author><name>funcman</name></author><id>tag:funcman.me,2021-09-19:/replace_jekyll_with_pelican_for_my_blog.html</id><summary type="html">&lt;p&gt;这里简单发一篇博客，讲一下我在使用了Pelican来重建这个博客。至于回归博客的感言什么的，回头再说了。&lt;/p&gt;
+&lt;/ul&gt;</content><category term="codiing"/><category term="C++"/><category term="编程风格"/></entry><entry><title>改用Pelican重建这个博客</title><link href="https://funcman.me/replace_jekyll_with_pelican_for_my_blog.html" rel="alternate"/><published>2021-09-19T03:53:55+08:00</published><updated>2021-09-19T03:53:55+08:00</updated><author><name>funcman</name></author><id>tag:funcman.me,2021-09-19:/replace_jekyll_with_pelican_for_my_blog.html</id><summary type="html">&lt;p&gt;这里简单发一篇博客，讲一下我在使用了Pelican来重建这个博客。至于回归博客的感言什么的，回头再说了。&lt;/p&gt;
 &lt;p&gt;之所以不再使用Jekyll，主要是不想在电 …&lt;/p&gt;</summary><content type="html">&lt;p&gt;这里简单发一篇博客，讲一下我在使用了Pelican来重建这个博客。至于回归博客的感言什么的，回头再说了。&lt;/p&gt;
 &lt;p&gt;之所以不再使用Jekyll，主要是不想在电脑上安装过多的开发环境了。而且Github Pages会是不是升级Jekyll环境，我还得跟着升级，太麻烦了。&lt;/p&gt;
 &lt;p&gt;Pelican的好处是非常简单，很容易生成静态页面，且我会用到Python。&lt;/p&gt;
@@ -648,7 +878,7 @@ unix&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="m"&gt;2&lt;/span&gt;&lt
 &lt;p&gt;显而易见，我的&lt;strong&gt;extra&lt;/strong&gt;目录下还放了&lt;strong&gt;CNAME&lt;/strong&gt;和&lt;strong&gt;rebots.txt&lt;/strong&gt;，Pelican在生成时，会把他们都放到&lt;strong&gt;output&lt;/strong&gt;目录的根部。&lt;/p&gt;
 &lt;p&gt;通过运行&lt;code&gt;pelican content&lt;/code&gt;很容易就在&lt;strong&gt;output&lt;/strong&gt;下生成了全部的静态网页，把这些页面通过git更新到Github Pages上即可完成发布。因为我之前用的是Jekyll，所以我删除了原有的全部文件。另外，这个博客的Pelican的工程需要单独开仓库存储。&lt;/p&gt;
 &lt;p&gt;另外，Pelican可以更换主题，可以通过网站&lt;a href="http://www.pelicanthemes.com"&gt;Pelican Themes&lt;/a&gt;找到你喜欢的主题。等我发完这篇，我就来弄主题。&lt;/p&gt;
-&lt;p&gt;大致就是这样。&lt;/p&gt;</content><category term="others"></category><category term="Pelican"></category></entry><entry><title>另一种在Windows10下使用Jekyll的方法</title><link href="https://funcman.me/another_way_to_use_jekyll_on_windows_10.html" rel="alternate"></link><published>2019-03-31T08:37:45+08:00</published><updated>2019-03-31T08:37:45+08:00</updated><author><name>funcman</name></author><id>tag:funcman.me,2019-03-31:/another_way_to_use_jekyll_on_windows_10.html</id><summary type="html">&lt;p&gt;最近准备继续记博客，需要安装Jekyll环境。&lt;/p&gt;
+&lt;p&gt;大致就是这样。&lt;/p&gt;</content><category term="others"/><category term="Pelican"/></entry><entry><title>另一种在Windows10下使用Jekyll的方法</title><link href="https://funcman.me/another_way_to_use_jekyll_on_windows_10.html" rel="alternate"/><published>2019-03-31T08:37:45+08:00</published><updated>2019-03-31T08:37:45+08:00</updated><author><name>funcman</name></author><id>tag:funcman.me,2019-03-31:/another_way_to_use_jekyll_on_windows_10.html</id><summary type="html">&lt;p&gt;最近准备继续记博客，需要安装Jekyll环境。&lt;/p&gt;
 &lt;p&gt;手头既有Mac也有PC，考虑到上班期间带的是PC，所以还是要在Windows下配置一个Jekyll环境。&lt;/p&gt;
 &lt;p&gt;按照Jekyll官网的方法，是去安装RubyInstaller。但是，RubyInstaller本身是基于MSYS2的，我的 …&lt;/p&gt;</summary><content type="html">&lt;p&gt;最近准备继续记博客，需要安装Jekyll环境。&lt;/p&gt;
 &lt;p&gt;手头既有Mac也有PC，考虑到上班期间带的是PC，所以还是要在Windows下配置一个Jekyll环境。&lt;/p&gt;
@@ -693,7 +923,7 @@ unix&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="m"&gt;2&lt;/span&gt;&lt
 &lt;p&gt;升级完成之后，就可以继续&lt;a href="https://jekyllrb.com/docs/step-by-step/01-setup"&gt;用Jekyll写博客&lt;/a&gt;了。&lt;/p&gt;
 &lt;p&gt;PS：&lt;/p&gt;
 &lt;p&gt;我为了复习怎么用Jekyll，粗略的看了一下&lt;a href="https://jekyllrb.com/docs/step-by-step/01-setup"&gt;Jekyll Step by Step Tutorial&lt;/a&gt;。它在第一步里讲使用jekyll serve来运行Jekyll，这和我们平常使用bundle exec jekyll serve的方式有点不一样。实际上在第十步里有解释&lt;a href="https://jekyllrb.com/docs/step-by-step/10-deployment/#gemfile"&gt;怎么一回事&lt;/a&gt;。我也不是很熟悉Ruby，使用Jekyll的很多人估计也是这样。反正Bundler大概是一个处理相同Gem的不同版本被同时引用的工具，我们记得用它就行了。&lt;/p&gt;
-&lt;p&gt;另外，这一篇虽然标题是Windows10，并不是说不适用于之前的Windows版本，我只是没有试过。&lt;/p&gt;</content><category term="others"></category><category term="Jekyll"></category><category term="Ruby"></category><category term="编程环境"></category></entry><entry><title>“你是如果管理内存的？”</title><link href="https://funcman.me/how_do_you_manage_memory.html" rel="alternate"></link><published>2016-07-22T04:46:07+08:00</published><updated>2016-07-22T04:46:07+08:00</updated><author><name>funcman</name></author><id>tag:funcman.me,2016-07-22:/how_do_you_manage_memory.html</id><summary type="html">&lt;p&gt;还没找到工作，面了几家，都没下文。我脸皮厚，写点总结发博客。&lt;/p&gt;
+&lt;p&gt;另外，这一篇虽然标题是Windows10，并不是说不适用于之前的Windows版本，我只是没有试过。&lt;/p&gt;</content><category term="others"/><category term="Jekyll"/><category term="Ruby"/><category term="编程环境"/></entry><entry><title>“你是如果管理内存的？”</title><link href="https://funcman.me/how_do_you_manage_memory.html" rel="alternate"/><published>2016-07-22T04:46:07+08:00</published><updated>2016-07-22T04:46:07+08:00</updated><author><name>funcman</name></author><id>tag:funcman.me,2016-07-22:/how_do_you_manage_memory.html</id><summary type="html">&lt;p&gt;还没找到工作，面了几家，都没下文。我脸皮厚，写点总结发博客。&lt;/p&gt;
 &lt;p&gt;像标题这样的面试问题，这些天遇到不止一两次。第一次我略 …&lt;/p&gt;</summary><content type="html">&lt;p&gt;还没找到工作，面了几家，都没下文。我脸皮厚，写点总结发博客。&lt;/p&gt;
 &lt;p&gt;像标题这样的面试问题，这些天遇到不止一两次。第一次我略懵，毕竟好久没被面了，没什么准备，所以没做出全面的回答。不过，就算到现在，我也没能在面试时把这个问题回答得很到位。可能这个问题对我来说已经不是什么困扰，平时想得也不多，遇到了我也能解决。这里做一下笔记，这样再遇到这个问题，我可以表现得好一些。&lt;/p&gt;
 &lt;p&gt;首先破题，为什么需要考虑管理内存的事，因为C/C++主要提供的是一种很原始的手工释放内存的方式。人难免出错，如果申请了内存，最后忘记释放，就会造成内存泄漏。此外，对于那些在好几个模块之间共享的内存，怎样才能做到正确且合理地释放，也是个问题。如果其中某个模块做了解引用（dereference）操作，还要专门去通知别的模块，再根据情况的不同决定是否需要真的释放内存，那模块之间必然是紧耦合的。所以，并不是小心谨慎就能解决好内存管理问题，好的内存管理一定要借助合适的方法和工具。&lt;/p&gt;
@@ -706,13 +936,13 @@ unix&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="m"&gt;2&lt;/span&gt;&lt
 &lt;p&gt;对于最简单的引用计数器实现来说，加一、减一操作，往往要我们手工进行。即使将加一、减一隐藏在构造、析构、赋值运算符中，依然需要我们手工写释放操作来进一步触发减一机制。要解决这一问题，我们可以引入智能指针技术：栈对象在出作用域时会自动触发析构，智能指针对象其实就是一种栈对象，它能自动触发减一操作。实际上，新的C++1x的std::shared_ptr，就是一种结合了引用计数的高级智能指针。&lt;/p&gt;
 &lt;p&gt;引用计数技术有个问题，就是一旦对象之间出现循环引用的关系时，就会出问题，无法正常的释放。因为对象的引用计数，由于循环引用的存在，无法降为0。这时需要手工将循环引用关系打断，才能正常的释放。而在真实的编码中，我们会极力避免循环引用的出现，所依赖的手段是好的程序结构。&lt;/p&gt;
 &lt;p&gt;对于C/C++的内存管理，一般不谈论GC垃圾回收。我不把引用计数归为GC，这里说的GC是指使用标记法之类的那种GC。它们普遍比引用计数低效一些，C/C++这种比较偏向执行效率的语言，人们不太将它与GC一起谈。虽然C/C++也是有GC库可用的，但是一旦使用GC库，GC库分配的内存，就必须由GC库管理，且缺乏语言的语法支持。至于细节，不同的GC库使用不同的算法，和那么支持GC的语言并没有太多本质上的区别，其特点可以参考其它语言。GC对比引用计数机制，有一个好处，就是不担心循环引用。&lt;/p&gt;
-&lt;p&gt;对于使用什么手段来解决内存管理问题，不能一概而论，没有方法是最优的。优化程序结构，可以在大的结构节点，使用手工申请、释放的方式控制内存；可以在系统逻辑主干部分，设计结构性强的对象关系，系统地进行对象的释放。不过度设计，减少不必要的机制，比如不滥用Lazy初始化，固化对象生命周期的次序，减少发生循环引用的可能。需要我们编写复杂代码的地方，应该是对性能有严格要求的地方。但即使是游戏编程，也不是所有地方都对性能有强烈的需求。对于那些真正有需求的地方，我们则采取一些特别的手段来管理内存，且要付出的代价不仅仅在编码实现上，还需要有足量的测试，一切根据实际出发。而多数地方，我们要采用现成的、性价比好的方法。&lt;/p&gt;</content><category term="programming"></category><category term="面试"></category><category term="内存管理"></category><category term="内存池"></category></entry><entry><title>✔ JUST DO IT</title><link href="https://funcman.me/just_do_it.html" rel="alternate"></link><published>2016-07-12T17:07:07+08:00</published><updated>2016-07-12T17:07:07+08:00</updated><author><name>funcman</name></author><id>tag:funcman.me,2016-07-12:/just_do_it.html</id><summary type="html">&lt;p&gt;最近辞职了，准备回游戏业，在找工作。&lt;/p&gt;
+&lt;p&gt;对于使用什么手段来解决内存管理问题，不能一概而论，没有方法是最优的。优化程序结构，可以在大的结构节点，使用手工申请、释放的方式控制内存；可以在系统逻辑主干部分，设计结构性强的对象关系，系统地进行对象的释放。不过度设计，减少不必要的机制，比如不滥用Lazy初始化，固化对象生命周期的次序，减少发生循环引用的可能。需要我们编写复杂代码的地方，应该是对性能有严格要求的地方。但即使是游戏编程，也不是所有地方都对性能有强烈的需求。对于那些真正有需求的地方，我们则采取一些特别的手段来管理内存，且要付出的代价不仅仅在编码实现上，还需要有足量的测试，一切根据实际出发。而多数地方，我们要采用现成的、性价比好的方法。&lt;/p&gt;</content><category term="codiing"/><category term="面试"/><category term="内存管理"/><category term="内存池"/></entry><entry><title>✔ JUST DO IT</title><link href="https://funcman.me/just_do_it.html" rel="alternate"/><published>2016-07-12T17:07:07+08:00</published><updated>2016-07-12T17:07:07+08:00</updated><author><name>funcman</name></author><id>tag:funcman.me,2016-07-12:/just_do_it.html</id><summary type="html">&lt;p&gt;最近辞职了，准备回游戏业，在找工作。&lt;/p&gt;
 &lt;p&gt;其实游戏业给我的，是一种失败感，尤其最近。比如斧子的惨状。再如手游审批这事，其实 …&lt;/p&gt;</summary><content type="html">&lt;p&gt;最近辞职了，准备回游戏业，在找工作。&lt;/p&gt;
 &lt;p&gt;其实游戏业给我的，是一种失败感，尤其最近。比如斧子的惨状。再如手游审批这事，其实我对这块不感冒，但也有殃及池鱼的感觉。总结起来，就是一个没劲。主机解禁没带来多少改变，现在又闹这一出，一代又一代的人深陷魔掌无法脱出。&lt;/p&gt;
 &lt;p&gt;特佩服也特感谢一些没心没肺的观点——自己做好了不怕外界环境恶劣。这话是对的，比如放在斧子游戏机这事上，不是大家不挺你，是有些事你自己作死。能这么想的人，都是内心坚毅的人。而且，作为弱者，不干了这碗鸡汤，还能怎样。&lt;/p&gt;
 &lt;p&gt;以前老大批评我想太多，我很认同。业内如何，轮不上我这样的去想，想了也没用。我是程序员，不专注在自己手艺上是不行的。你看老罗，虽然手机做得还行，至少做出来了，但是总给人一种只会耍嘴炮的感觉，间接也耽误了锤子的行情。所以呢，我还是只专注于技术，不然哪一天风云幻变，做出中国巫师、中国神海的人里就没有我了（笑）。&lt;/p&gt;
 &lt;p&gt;十岁想做游戏，二十岁在做游戏，三十岁再回来。觉得对的事，就去做吧。&lt;/p&gt;
-&lt;p&gt;&lt;img alt="JUSE FUCKING DO IT" src="https://funcman.me/images/just_fucking_do_it.png"&gt;&lt;/p&gt;</content><category term="gamedev"></category><category term="职业"></category><category term="事业"></category><category term="工作"></category></entry><entry><title>如何在OSX El Capitan下使用基于CH34x芯片的USB串口适配线</title><link href="https://funcman.me/how_to_use_ch34x_usb_to_serial_adapter_on_osx_el_capitan.html" rel="alternate"></link><published>2015-12-10T07:47:23+08:00</published><updated>2015-12-10T07:47:23+08:00</updated><author><name>funcman</name></author><id>tag:funcman.me,2015-12-10:/how_to_use_ch34x_usb_to_serial_adapter_on_osx_el_capitan.html</id><summary type="html">&lt;p&gt;淘宝上有很多廉价的USB转串口的适配线，这其中不少使用的是南京的沁恒公司的CH34x芯片。&lt;/p&gt;
+&lt;p&gt;&lt;img alt="JUSE FUCKING DO IT" src="https://funcman.me/images/just_fucking_do_it.png"&gt;&lt;/p&gt;</content><category term="gamedev"/><category term="职业"/><category term="事业"/><category term="工作"/></entry><entry><title>如何在OSX El Capitan下使用基于CH34x芯片的USB串口适配线</title><link href="https://funcman.me/how_to_use_ch34x_usb_to_serial_adapter_on_osx_el_capitan.html" rel="alternate"/><published>2015-12-10T07:47:23+08:00</published><updated>2015-12-10T07:47:23+08:00</updated><author><name>funcman</name></author><id>tag:funcman.me,2015-12-10:/how_to_use_ch34x_usb_to_serial_adapter_on_osx_el_capitan.html</id><summary type="html">&lt;p&gt;淘宝上有很多廉价的USB转串口的适配线，这其中不少使用的是南京的沁恒公司的CH34x芯片。&lt;/p&gt;
 &lt;p&gt;我们可以在“关于本机”-“系统报告”-“硬件”-“USB”里查看适配线 …&lt;/p&gt;</summary><content type="html">&lt;p&gt;淘宝上有很多廉价的USB转串口的适配线，这其中不少使用的是南京的沁恒公司的CH34x芯片。&lt;/p&gt;
 &lt;p&gt;我们可以在“关于本机”-“系统报告”-“硬件”-“USB”里查看适配线的VID（厂商ID），来确定适配线是否基于CH34x芯片。CH34x的VID是0x1a86，我这根的PID（产品ID）是0x7523，你的PID可能不同，0x5523也是一个可用的PID。&lt;/p&gt;
 &lt;p&gt;确定芯片后，就可以去找驱动程序了。沁恒的网址是&lt;a href="http://www.wch.cn"&gt;http://www.wch.cn&lt;/a&gt;，我们可以从上面找到我们需要的驱动。&lt;a href="http://www.wch.cn/download/CH341SER_MAC_ZIP.html"&gt;Mac的驱动也是有的&lt;/a&gt;，不过太老了，未经签名，所以通过不了苹果在OSX 10.11上加入的SIP&lt;sup id="fnref:1"&gt;&lt;a class="footnote-ref" href="#fn:1"&gt;1&lt;/a&gt;&lt;/sup&gt;保护技术。如果直接安装这个驱动，肯定是用不了的。必须屏蔽SIP对kext&lt;sup id="fnref:2"&gt;&lt;a class="footnote-ref" href="#fn:2"&gt;2&lt;/a&gt;&lt;/sup&gt;的保护。&lt;/p&gt;
@@ -732,7 +962,7 @@ unix&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="m"&gt;2&lt;/span&gt;&lt
 &lt;p&gt;OSX的内核扩展，驱动一般是以这种形式存在的&amp;#160;&lt;a class="footnote-backref" href="#fnref:2" title="Jump back to footnote 2 in the text"&gt;&amp;#8617;&lt;/a&gt;&lt;/p&gt;
 &lt;/li&gt;
 &lt;/ol&gt;
-&lt;/div&gt;</content><category term="programming"></category><category term="OSX El Capitan"></category><category term="CH34x"></category><category term="串口"></category></entry><entry><title>如何背单词</title><link href="https://funcman.me/how_to_remember_english_words.html" rel="alternate"></link><published>2015-11-25T06:44:07+08:00</published><updated>2015-11-25T06:44:07+08:00</updated><author><name>funcman</name></author><id>tag:funcman.me,2015-11-25:/how_to_remember_english_words.html</id><summary type="html">&lt;p&gt;我是个英语很烂的人，所有关于英语的能力，都来自于技术工作中对英文的不得不进行的接触。因为英语太烂，也失去了一 …&lt;/p&gt;</summary><content type="html">&lt;p&gt;我是个英语很烂的人，所有关于英语的能力，都来自于技术工作中对英文的不得不进行的接触。因为英语太烂，也失去了一些不错的机会。怎么学英语，我是不懂的。至于背单词，大多数英语好的人，应该都去尝试过。我也尝试过，但一直不得其法。&lt;/p&gt;
+&lt;/div&gt;</content><category term="codiing"/><category term="OSX El Capitan"/><category term="CH34x"/><category term="串口"/></entry><entry><title>如何背单词</title><link href="https://funcman.me/how_to_remember_english_words.html" rel="alternate"/><published>2015-11-25T06:44:07+08:00</published><updated>2015-11-25T06:44:07+08:00</updated><author><name>funcman</name></author><id>tag:funcman.me,2015-11-25:/how_to_remember_english_words.html</id><summary type="html">&lt;p&gt;我是个英语很烂的人，所有关于英语的能力，都来自于技术工作中对英文的不得不进行的接触。因为英语太烂，也失去了一 …&lt;/p&gt;</summary><content type="html">&lt;p&gt;我是个英语很烂的人，所有关于英语的能力，都来自于技术工作中对英文的不得不进行的接触。因为英语太烂，也失去了一些不错的机会。怎么学英语，我是不懂的。至于背单词，大多数英语好的人，应该都去尝试过。我也尝试过，但一直不得其法。&lt;/p&gt;
 &lt;p&gt;现在，为了完成学业，我又准备拿起单词书，再次尝试一下。在开始做这件事时，我想了一下，到底是什么阻碍了我之前在背单词上的持续努力？&lt;/p&gt;
 &lt;p&gt;我不是没有目的的去学习一个东西，相反，学好了英语对我来说有很多积极的意义。在我内心里，是有学习的冲动的。所以，之前的不顺利，应该是方法上出了问题。&lt;/p&gt;
 &lt;p&gt;背单词是一种记忆活动，在记忆领域，人们有一个普遍的共识，就是人脑记忆新事物遵循着“艾宾浩斯记忆曲线”。我之前也采用了遵循这种规律的记忆复习方法，相信在这类方法的应用上，没有什么问题。&lt;/p&gt;
@@ -740,23 +970,23 @@ unix&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="m"&gt;2&lt;/span&gt;&lt
 &lt;p&gt;人有一种既贪婪又懦弱的通性。人做一件事情，是由欲望驱使的，欲望总是使人在得到的同时还想得到更多。人的能力有限，无法驾驭所有，当欲望发展成贪婪，无法得到完全的满足时，人的懦弱的本性就开始产生作用：放弃掉全部追求。&lt;/p&gt;
 &lt;p&gt;这就是贪婪导致毁灭的道理。在之前的背单词过程中，我渴望着把每一个单词记住记牢，用法、特例、近义词、反义词等等通通收入脑子里。实际上我做不到，也没有产生什么益处。这样背完一百个单词后，我感觉不到任何提高。我觉得自己在做没有意义的事，于是放弃就成了轻易且自然的事情。&lt;/p&gt;
 &lt;p&gt;所有智慧都在说一件事，克制住欲望。背单词也一样，我不需要记住那么多，甚至不需要记住每一个单词的拼写。我只需要对这些单词有种“我接触过”的印象，就能在英文阅读中有&lt;strong&gt;能力提升的感觉&lt;/strong&gt;。然后，当我发现某些单词需要经常书写时，再去记住它们的拼写。如此循序渐进，总能获取到学习的正面反馈，也就有了不断坚持下去的&lt;strong&gt;动力&lt;/strong&gt;。&lt;/p&gt;
-&lt;p&gt;在&lt;a href="https://itunes.apple.com/app/id888483369/"&gt;墨墨背单词&lt;/a&gt;这个应用中，“记住一个单词”的定义是&lt;strong&gt;由用户决定&lt;/strong&gt;的。用户只需要告诉应用，对于某个单词，在一次测试过程中，是记住了还是忘记了，或是模模糊糊记不清。然后应用根据用户的记忆反馈，为用户提供这个单词在下次出现的时机和频率。至于用户怎么定义“记住了”，完全由用户根据自己追求的目标进行判断。对于我来说，看到一个英文单词，能想到它的中文意思，那就是记住了。就这么简单。&lt;/p&gt;</content><category term="others"></category><category term="英语"></category><category term="背单词"></category></entry><entry><title>如何正确编写苹果健康程序</title><link href="https://funcman.me/how_to_save_data_to_apple_health_correctly.html" rel="alternate"></link><published>2015-10-27T10:45:00+08:00</published><updated>2015-10-27T10:45:00+08:00</updated><author><name>funcman</name></author><id>tag:funcman.me,2015-10-27:/how_to_save_data_to_apple_health_correctly.html</id><summary type="html">&lt;p&gt;苹果健康使用HealthKit接收数据的提交和读取，很多时候，我们从程序编写的角度，把两者看做同一个东西，下文简称HK。&lt;/p&gt;
+&lt;p&gt;在&lt;a href="https://itunes.apple.com/app/id888483369/"&gt;墨墨背单词&lt;/a&gt;这个应用中，“记住一个单词”的定义是&lt;strong&gt;由用户决定&lt;/strong&gt;的。用户只需要告诉应用，对于某个单词，在一次测试过程中，是记住了还是忘记了，或是模模糊糊记不清。然后应用根据用户的记忆反馈，为用户提供这个单词在下次出现的时机和频率。至于用户怎么定义“记住了”，完全由用户根据自己追求的目标进行判断。对于我来说，看到一个英文单词，能想到它的中文意思，那就是记住了。就这么简单。&lt;/p&gt;</content><category term="others"/><category term="英语"/><category term="背单词"/></entry><entry><title>如何正确编写苹果健康程序</title><link href="https://funcman.me/how_to_save_data_to_apple_health_correctly.html" rel="alternate"/><published>2015-10-27T10:45:00+08:00</published><updated>2015-10-27T10:45:00+08:00</updated><author><name>funcman</name></author><id>tag:funcman.me,2015-10-27:/how_to_save_data_to_apple_health_correctly.html</id><summary type="html">&lt;p&gt;苹果健康使用HealthKit接收数据的提交和读取，很多时候，我们从程序编写的角度，把两者看做同一个东西，下文简称HK。&lt;/p&gt;
 &lt;p&gt;HK在权限管理方面，有个很特（guai）别（yi）的地方，也是一 …&lt;/p&gt;</summary><content type="html">&lt;p&gt;苹果健康使用HealthKit接收数据的提交和读取，很多时候，我们从程序编写的角度，把两者看做同一个东西，下文简称HK。&lt;/p&gt;
 &lt;p&gt;HK在权限管理方面，有个很特（guai）别（yi）的地方，也是一个坑，即：读权限和写权限是完全分离的，存在可写但不可读的情况。由于权限控制权完全在用户手中，即使程序同时请求读写权限，也可能只是获得到写权限，而无读权限。这就造成一个问题：程序无法直接知道HK里已经存有哪些数据，如果不想办法规避这个坑，同一条数据有可能被重复写入HK。&lt;/p&gt;
 &lt;p&gt;为了避免重复写入数据，我们需要在APP端甚至云端的数据存储中，对每条需要同步到HK的数据，进行标记。这样，才能将HK的数据同步做到最佳。&lt;/p&gt;
-&lt;p&gt;我个人对HK本身的设计有个想法：HK应该自动把同一个数据源提交来的相同数据进行合并。如果几个数据，它们的起止时间，数值等，都是相同的，把它们看做同一个数据，是完全合理的。其实HK对于重复数据，是有一个融合算法的，并不会把数据进行累加。但是，用户点开“显示所有数据”时，看到有数据重复的情况，多多少少心里会有些膈应，会怪罪APP端。苹果对HK的数据隐私，看得格外重要，才设计出如此怪异的权限机制，牺牲了不少的可用性。&lt;/p&gt;</content><category term="programming"></category><category term="苹果健康"></category><category term="HealthKit"></category></entry><entry><title>谈一谈个人在接下来几年的游戏技术方向</title><link href="https://funcman.me/talk_about_my_next_interests_in_game_technologys.html" rel="alternate"></link><published>2015-01-08T14:46:00+08:00</published><updated>2015-01-08T14:46:00+08:00</updated><author><name>funcman</name></author><id>tag:funcman.me,2015-01-08:/talk_about_my_next_interests_in_game_technologys.html</id><summary type="html">&lt;p&gt;我对目前火爆的手游和之前火爆的端游、页游通通不感兴趣。除非项目非常nice，或者团队的人非常有趣，否则我不太会积极 …&lt;/p&gt;</summary><content type="html">&lt;p&gt;我对目前火爆的手游和之前火爆的端游、页游通通不感兴趣。除非项目非常nice，或者团队的人非常有趣，否则我不太会积极地回到游戏行业中。理想的状态是，我是一群酷爱游戏且专业的人的之一，做着一款看着就好玩的电视、电脑游戏。虽然Xbox ONE已经来中国了，PS4也要上市了，但是中国电视游戏的春天恐怕还要等上几年。所以，我考虑在这几年积攒一下技术。&lt;/p&gt;
+&lt;p&gt;我个人对HK本身的设计有个想法：HK应该自动把同一个数据源提交来的相同数据进行合并。如果几个数据，它们的起止时间，数值等，都是相同的，把它们看做同一个数据，是完全合理的。其实HK对于重复数据，是有一个融合算法的，并不会把数据进行累加。但是，用户点开“显示所有数据”时，看到有数据重复的情况，多多少少心里会有些膈应，会怪罪APP端。苹果对HK的数据隐私，看得格外重要，才设计出如此怪异的权限机制，牺牲了不少的可用性。&lt;/p&gt;</content><category term="codiing"/><category term="苹果健康"/><category term="HealthKit"/></entry><entry><title>谈一谈个人在接下来几年的游戏技术方向</title><link href="https://funcman.me/talk_about_my_next_interests_in_game_technologys.html" rel="alternate"/><published>2015-01-08T14:46:00+08:00</published><updated>2015-01-08T14:46:00+08:00</updated><author><name>funcman</name></author><id>tag:funcman.me,2015-01-08:/talk_about_my_next_interests_in_game_technologys.html</id><summary type="html">&lt;p&gt;我对目前火爆的手游和之前火爆的端游、页游通通不感兴趣。除非项目非常nice，或者团队的人非常有趣，否则我不太会积极 …&lt;/p&gt;</summary><content type="html">&lt;p&gt;我对目前火爆的手游和之前火爆的端游、页游通通不感兴趣。除非项目非常nice，或者团队的人非常有趣，否则我不太会积极地回到游戏行业中。理想的状态是，我是一群酷爱游戏且专业的人的之一，做着一款看着就好玩的电视、电脑游戏。虽然Xbox ONE已经来中国了，PS4也要上市了，但是中国电视游戏的春天恐怕还要等上几年。所以，我考虑在这几年积攒一下技术。&lt;/p&gt;
 &lt;p&gt;所谓的积攒技术，就是做一个2D引擎，其实也就是造轮子。如果是即刻投身商业开发，那么造轮子，一定是件可耻的事情。Unity或者cocos2d-x已经足够好了。而这对于我来说，只是个人私事。理由不具体直接解释了，反正我就是爱折腾。&lt;/p&gt;
 &lt;p&gt;我个人很喜欢Unity的快捷和强大，但也感到如果Unity和cocos2d-x一样开源，很多事会好办很多。而对于后者，我不太喜欢它的设计。cocos2d吸收了很多Cocoa的特点，但对于一个游戏引擎来说，有些地方还是简洁点好。&lt;/p&gt;
 &lt;p&gt;对于一个2D引擎来说，图形底层并不复杂，只要把Sprite做出来，这个引擎就能用来做游戏了。一个成熟的2D引擎，必不可少要有一套动画系统。以前的2D游戏多采用序列帧，现在基本上是实时演算的关键帧插值动画。动画编辑器的开发量是不小的，我考虑使用Flash作为动画编辑器，用JSFL做数据导出。Flash可做的事情非常多，比如还可以作为UI布局器使用，甚至粒子特效编辑器也省了。使用通用编辑器来取代内部编辑器，是节省成本的一个好方法。&lt;/p&gt;
 &lt;p&gt;我个人是很喜欢Unity的，尤其是它的Editor，和Component系统。UnityEditor级别的开发，不是几个人能完成的，所以就不是我要借鉴的对象。我要学习的是Component系统。游戏是OO设计最经典的应用场景之一（另一个是GUI），Component系统是我见过的最好理解的游戏OOD。好理解意味着好用，开发快捷方便。&lt;/p&gt;
 &lt;p&gt;我考虑在这个引擎中深度应用Lua语言，而不是像我以前的项目那样，只是把Lua作为写回调功能的工具。我偏向C/C++只为Lua提供回调功能，单纯去解决真正的性能问题。引擎应用程序员是面向Lua工作的，C/C++只需要做好核心的即可。&lt;/p&gt;
-&lt;p&gt;以上说的是2D引擎技术，此外，我还对服务端技术感兴趣，这是我没有真正做过的，需要去常识的。我曾经了解过一段时间node.js，并且网易的一群人还弄出了一个Pomelo，但我不考虑node。JavaScript的爱好者很喜欢摆弄异步回调，node上也充满了这种风格的东西。但异步毕竟是个烧脑的东西，我更喜欢简单直接的。我对go和云风的skynet很感兴趣，尤其后者是我喜欢的“C+Lua”。&lt;/p&gt;</content><category term="gamedev"></category><category term="技术选型"></category></entry><entry><title>关于有理数、无理数中的“理”字</title><link href="https://funcman.me/about_logos_of_the_rational_number_and_irrational_number.html" rel="alternate"></link><published>2014-12-17T15:00:00+08:00</published><updated>2014-12-17T15:00:00+08:00</updated><author><name>funcman</name></author><id>tag:funcman.me,2014-12-17:/about_logos_of_the_rational_number_and_irrational_number.html</id><summary type="html">&lt;p&gt;我们知道有理数就是可以用整数比值表示的数字。但对于无理数，我们就不好下定义，只好说不能用整数比值表示的数字 …&lt;/p&gt;</summary><content type="html">&lt;p&gt;我们知道有理数就是可以用整数比值表示的数字。但对于无理数，我们就不好下定义，只好说不能用整数比值表示的数字就是无理数。&lt;/p&gt;
+&lt;p&gt;以上说的是2D引擎技术，此外，我还对服务端技术感兴趣，这是我没有真正做过的，需要去常识的。我曾经了解过一段时间node.js，并且网易的一群人还弄出了一个Pomelo，但我不考虑node。JavaScript的爱好者很喜欢摆弄异步回调，node上也充满了这种风格的东西。但异步毕竟是个烧脑的东西，我更喜欢简单直接的。我对go和云风的skynet很感兴趣，尤其后者是我喜欢的“C+Lua”。&lt;/p&gt;</content><category term="gamedev"/><category term="技术选型"/></entry><entry><title>关于有理数、无理数中的“理”字</title><link href="https://funcman.me/about_logos_of_the_rational_number_and_irrational_number.html" rel="alternate"/><published>2014-12-17T15:00:00+08:00</published><updated>2014-12-17T15:00:00+08:00</updated><author><name>funcman</name></author><id>tag:funcman.me,2014-12-17:/about_logos_of_the_rational_number_and_irrational_number.html</id><summary type="html">&lt;p&gt;我们知道有理数就是可以用整数比值表示的数字。但对于无理数，我们就不好下定义，只好说不能用整数比值表示的数字 …&lt;/p&gt;</summary><content type="html">&lt;p&gt;我们知道有理数就是可以用整数比值表示的数字。但对于无理数，我们就不好下定义，只好说不能用整数比值表示的数字就是无理数。&lt;/p&gt;
 &lt;p&gt;对于有理数、无理数中间这个“理”字，我们也不太容易理解，数字不具备位格，怎么还能讲道理。其实这两个名词，来自日文。我们知道，很多汉语里采用的日式外来词，和汉语字词意思多少有些出入，理解起来就会有点“无厘头”。&lt;/p&gt;
 &lt;p&gt;我在网上随便搜索了一下，据说这个日式外来词，在翻译时也受到了徐光启和利玛窦翻译的《几何原本》的影响。根据网上的说法，在徐、利版本的《几何原本》中，将比值作为“理”字翻译出来。但是我不太确信这样的解释，我不清楚文言文中的“理”字可作比值的意思。&lt;/p&gt;
 &lt;p&gt;我所知道的，这个“理”字，在最早希腊文中，是用logos表示。logos大概就是事物本质规律的意思，也有话语、可被语言表达的事物的意思。圣经里，面向希腊语地区读者的《约翰福音》，用logos来关联上帝的话语，中文版本圣经里翻作“道”字。而拉丁文，logos被转译为ratio，也就是英文中的比值和rational（可理解的）的词根。我不知道logos有没有比值的意思，retio既有比值的意思，也有可被理解的意思。&lt;/p&gt;
 &lt;p&gt;所以，至少我们可以把有理数和无理数，在字面上理解为可以理解的数和不可理解的数，这样多少可以说得通。&lt;/p&gt;
 &lt;p&gt;无论在圣经中，还是在发现有理数的古希腊毕达哥拉斯学派的眼里，logos都是一个高大上的词。所以，发现无理数这样不logos的数的希伯索斯，被认为亵渎了神圣，最后被狂热的毕门学者投入了地中海。当然，这和基督教没有关系，基督教是在其后几百年才有的。很多科学史上的迫害，问题不在于信仰什么，而是拜宗教狂热所赐，不管是基督教下的，还是这种拜科学教背景的。&lt;/p&gt;
-&lt;p&gt;乱七八糟讲了这么多，回过头来，我们还是很难通过字面和简单的语言，来提供一种本文第一段第二句之外的对无理数的定义或解释。摊手~&lt;/p&gt;</content><category term="mathematics"></category><category term="有理数"></category><category term="数学"></category></entry><entry><title>关于std::list的排序</title><link href="https://funcman.me/about_sqrt_of_std_list.html" rel="alternate"></link><published>2010-09-04T12:58:00+08:00</published><updated>2010-09-04T12:58:00+08:00</updated><author><name>funcman</name></author><id>tag:funcman.me,2010-09-04:/about_sqrt_of_std_list.html</id><summary type="html">&lt;p&gt;std::list和std::vector不同，无法使用STL算法库里的sort()，因为std::list不支持随机访问（random access）。&lt;/p&gt;
+&lt;p&gt;乱七八糟讲了这么多，回过头来，我们还是很难通过字面和简单的语言，来提供一种本文第一段第二句之外的对无理数的定义或解释。摊手~&lt;/p&gt;</content><category term="mathematics"/><category term="有理数"/><category term="数学"/></entry><entry><title>关于std::list的排序</title><link href="https://funcman.me/about_sqrt_of_std_list.html" rel="alternate"/><published>2010-09-04T12:58:00+08:00</published><updated>2010-09-04T12:58:00+08:00</updated><author><name>funcman</name></author><id>tag:funcman.me,2010-09-04:/about_sqrt_of_std_list.html</id><summary type="html">&lt;p&gt;std::list和std::vector不同，无法使用STL算法库里的sort()，因为std::list不支持随机访问（random access）。&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="c1"&gt;// std::list排序示例&lt;/span&gt;
 
 &lt;span class="cp"&gt;#include&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="cpf"&gt;&amp;lt;stdio.h&amp;gt;&lt;/span&gt;
@@ -769,7 +999,7 @@ unix&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="m"&gt;2&lt;/span&gt;&lt
 &lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="kt"&gt;bool&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nf"&gt;operator&lt;/span&gt;&lt;span class="p"&gt;()(&lt;/span&gt;&lt;span class="kt"&gt;int&lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;a&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kt"&gt;int&lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;b&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;
 &lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="k"&gt;return&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;a&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;b&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
 &lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;
-&lt;span class="p"&gt;};&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;
+&lt;span class="p"&gt;};&lt;/span&gt;
 
 &lt;span class="kt"&gt;int&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nf"&gt;main&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;
 &lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="n"&gt;std&lt;/span&gt;&lt;span class="o"&gt;::&lt;/span&gt;&lt;span class="n"&gt;list&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;il&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
@@ -786,7 +1016,7 @@ unix&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="m"&gt;2&lt;/span&gt;&lt
 &lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="kt"&gt;bool&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nf"&gt;operator&lt;/span&gt;&lt;span class="p"&gt;()(&lt;/span&gt;&lt;span class="kt"&gt;int&lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;a&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kt"&gt;int&lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;b&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;
 &lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="k"&gt;return&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;a&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;b&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
 &lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;
-&lt;span class="p"&gt;};&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;
+&lt;span class="p"&gt;};&lt;/span&gt;
 
 &lt;span class="kt"&gt;int&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nf"&gt;main&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;
 &lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="n"&gt;std&lt;/span&gt;&lt;span class="o"&gt;::&lt;/span&gt;&lt;span class="n"&gt;list&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;il&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
@@ -815,7 +1045,7 @@ unix&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="m"&gt;2&lt;/span&gt;&lt
 
 &lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="k"&gt;return&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
 &lt;span class="p"&gt;}&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</content><category term="programming"></category><category term="STL"></category><category term="list"></category><category term="容器"></category></entry><entry><title>一个Win32控制台类</title><link href="https://funcman.me/win32_console_class.html" rel="alternate"></link><published>2010-06-06T10:54:00+08:00</published><updated>2010-06-06T10:54:00+08:00</updated><author><name>funcman</name></author><id>tag:funcman.me,2010-06-06:/win32_console_class.html</id><summary type="html">&lt;p&gt;对于编写Win32程序，尤其是游戏这种实时性高的程序来说，断点调试未必是最合适的调试方法。很多时候，我们更渴望看到实时打 …&lt;/p&gt;</summary><content type="html">&lt;p&gt;对于编写Win32程序，尤其是游戏这种实时性高的程序来说，断点调试未必是最合适的调试方法。很多时候，我们更渴望看到实时打印的调试信息。&lt;/p&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</content><category term="codiing"/><category term="STL"/><category term="list"/><category term="容器"/></entry><entry><title>一个Win32控制台类</title><link href="https://funcman.me/win32_console_class.html" rel="alternate"/><published>2010-06-06T10:54:00+08:00</published><updated>2010-06-06T10:54:00+08:00</updated><author><name>funcman</name></author><id>tag:funcman.me,2010-06-06:/win32_console_class.html</id><summary type="html">&lt;p&gt;对于编写Win32程序，尤其是游戏这种实时性高的程序来说，断点调试未必是最合适的调试方法。很多时候，我们更渴望看到实时打 …&lt;/p&gt;</summary><content type="html">&lt;p&gt;对于编写Win32程序，尤其是游戏这种实时性高的程序来说，断点调试未必是最合适的调试方法。很多时候，我们更渴望看到实时打印的调试信息。&lt;/p&gt;
 &lt;p&gt;一种方法是使用VC的调试函数OutputDebugString()，将信息输出给VC调试控制台。还有一种方法是在Win32控制台工程的基础上创建窗口程序（入口为main而非WinMain）。可以用宏来控制编译，使Debug版本时有控制台，Release版本没有控制台，像这样：&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="c1"&gt;// 一个简单的方法&lt;/span&gt;
 &lt;span class="cp"&gt;#ifndef _DEBUG&lt;/span&gt;
@@ -902,9 +1132,9 @@ unix&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="m"&gt;2&lt;/span&gt;&lt
 
 &lt;span class="kt"&gt;void&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;DbgCon&lt;/span&gt;&lt;span class="o"&gt;::&lt;/span&gt;&lt;span class="n"&gt;NoTop&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;
 &lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="c1"&gt;// 取消置顶&lt;/span&gt;
-&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="n"&gt;SetWindowPos&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;HWnd_&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;HWND_NOTOPMOST&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;SWP_NOMOVE&lt;/span&gt;&lt;span class="o"&gt;||&lt;/span&gt;&lt;span class="n"&gt;SWP_NOSIZE&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="n"&gt;SetWindowPos&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;HWnd_&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;HWND_NOTOPMOST&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;SWP_NOMOVE&lt;/span&gt;&lt;span class="o"&gt;||&lt;/span&gt;&lt;span class="n"&gt;SWP_NOSIZE&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
 &lt;span class="p"&gt;}&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</content><category term="programming"></category><category term="C++"></category><category term="Win32"></category><category term="控制台"></category></entry><entry><title>C语言对数据的隐藏封装</title><link href="https://funcman.me/data_hiding_in_c.html" rel="alternate"></link><published>2010-05-16T19:48:00+08:00</published><updated>2010-05-16T19:48:00+08:00</updated><author><name>funcman</name></author><id>tag:funcman.me,2010-05-16:/data_hiding_in_c.html</id><summary type="html">&lt;p&gt;在C++中，如果我们想把数据结构隐藏起来，只为用户提供接口，可以通过实现继承接口类的方式到达目的。那C中，可以采用什 …&lt;/p&gt;</summary><content type="html">&lt;p&gt;在C++中，如果我们想把数据结构隐藏起来，只为用户提供接口，可以通过实现继承接口类的方式到达目的。那C中，可以采用什么方式呢。下面有一例：&lt;/p&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</content><category term="codiing"/><category term="C++"/><category term="Win32"/><category term="控制台"/></entry><entry><title>C语言对数据的隐藏封装</title><link href="https://funcman.me/data_hiding_in_c.html" rel="alternate"/><published>2010-05-16T19:48:00+08:00</published><updated>2010-05-16T19:48:00+08:00</updated><author><name>funcman</name></author><id>tag:funcman.me,2010-05-16:/data_hiding_in_c.html</id><summary type="html">&lt;p&gt;在C++中，如果我们想把数据结构隐藏起来，只为用户提供接口，可以通过实现继承接口类的方式到达目的。那C中，可以采用什 …&lt;/p&gt;</summary><content type="html">&lt;p&gt;在C++中，如果我们想把数据结构隐藏起来，只为用户提供接口，可以通过实现继承接口类的方式到达目的。那C中，可以采用什么方式呢。下面有一例：&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="c1"&gt;// demo.h&lt;/span&gt;
 
 &lt;span class="cp"&gt;#ifndef DEMO_H&lt;/span&gt;
@@ -954,20 +1184,20 @@ unix&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="m"&gt;2&lt;/span&gt;&lt
 &lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="n"&gt;DemoDestory&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;demo&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
 &lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="k"&gt;return&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
 &lt;span class="p"&gt;}&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</content><category term="programming"></category><category term="C语言"></category><category term="接口"></category><category term="封装"></category></entry><entry><title>艾未未作品《4851》观后感</title><link href="https://funcman.me/review_of_4851_by_ai_weiwei.html" rel="alternate"></link><published>2010-01-10T02:44:00+08:00</published><updated>2010-01-10T02:44:00+08:00</updated><author><name>funcman</name></author><id>tag:funcman.me,2010-01-10:/review_of_4851_by_ai_weiwei.html</id><summary type="html">&lt;p&gt;艾未未先生的《4851》是我看到的最深刻的艺术作品。&lt;/p&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</content><category term="codiing"/><category term="C语言"/><category term="接口"/><category term="封装"/></entry><entry><title>艾未未作品《4851》观后感</title><link href="https://funcman.me/review_of_4851_by_ai_weiwei.html" rel="alternate"/><published>2010-01-10T02:44:00+08:00</published><updated>2010-01-10T02:44:00+08:00</updated><author><name>funcman</name></author><id>tag:funcman.me,2010-01-10:/review_of_4851_by_ai_weiwei.html</id><summary type="html">&lt;p&gt;艾未未先生的《4851》是我看到的最深刻的艺术作品。&lt;/p&gt;
 &lt;p&gt;87分钟的片长，可能没几个人会真的花87分钟完整地看完这部片子。&lt;/p&gt;
 &lt;p&gt;没关系，你的观看方式已经是这部艺术作品 …&lt;/p&gt;</summary><content type="html">&lt;p&gt;艾未未先生的《4851》是我看到的最深刻的艺术作品。&lt;/p&gt;
 &lt;p&gt;87分钟的片长，可能没几个人会真的花87分钟完整地看完这部片子。&lt;/p&gt;
 &lt;p&gt;没关系，你的观看方式已经是这部艺术作品的一部分。&lt;/p&gt;
 &lt;p&gt;这是部完美的艺术作品，像一味催化剂。&lt;/p&gt;
 &lt;p&gt;只要你对5·12的任何一点有所思考，它都会从理性和感性两方面触发你。&lt;/p&gt;
-&lt;p&gt;你可以通过YouTube观看：&lt;a href="https://www.youtube.com/watch?v=4IZpRHDOJpg"&gt;《4851》&lt;/a&gt;（中国用户访问YouTube需要跨越GFW）&lt;/p&gt;</content><category term="others"></category><category term="艺术"></category><category term="艾未未"></category></entry><entry><title>动物保护的逻辑──小论《海豚湾》的政治正确性</title><link href="https://funcman.me/logic_of_animal_protectionism.html" rel="alternate"></link><published>2009-12-21T19:34:00+08:00</published><updated>2009-12-21T19:34:00+08:00</updated><author><name>funcman</name></author><id>tag:funcman.me,2009-12-21:/logic_of_animal_protectionism.html</id><summary type="html">&lt;p&gt;一、某些动物性情趋向于人，人们能从这些动物身上获得人道情感，保护这些动物是在维护人道主义。之所有争取一些动物 …&lt;/p&gt;</summary><content type="html">&lt;p&gt;一、某些动物性情趋向于人，人们能从这些动物身上获得人道情感，保护这些动物是在维护人道主义。之所有争取一些动物不作为牲畜屠宰，争取一些牲口在屠宰时更快死亡以减少受虐程度，是基于这样一个泛功利的动机。&lt;/p&gt;
+&lt;p&gt;你可以通过YouTube观看：&lt;a href="https://www.youtube.com/watch?v=4IZpRHDOJpg"&gt;《4851》&lt;/a&gt;（中国用户访问YouTube需要跨越GFW）&lt;/p&gt;</content><category term="others"/><category term="艺术"/><category term="艾未未"/></entry><entry><title>动物保护的逻辑──小论《海豚湾》的政治正确性</title><link href="https://funcman.me/logic_of_animal_protectionism.html" rel="alternate"/><published>2009-12-21T19:34:00+08:00</published><updated>2009-12-21T19:34:00+08:00</updated><author><name>funcman</name></author><id>tag:funcman.me,2009-12-21:/logic_of_animal_protectionism.html</id><summary type="html">&lt;p&gt;一、某些动物性情趋向于人，人们能从这些动物身上获得人道情感，保护这些动物是在维护人道主义。之所有争取一些动物 …&lt;/p&gt;</summary><content type="html">&lt;p&gt;一、某些动物性情趋向于人，人们能从这些动物身上获得人道情感，保护这些动物是在维护人道主义。之所有争取一些动物不作为牲畜屠宰，争取一些牲口在屠宰时更快死亡以减少受虐程度，是基于这样一个泛功利的动机。&lt;/p&gt;
 &lt;p&gt;二、野生动物是地球生态的重要组成部分，保护野生动物，是为了地球生态能够正常运行下去。地球生态的正常运作，才能让人们和他们的后台得以更好地生存。这也是一个功利的理由。&lt;/p&gt;
 &lt;p&gt;所以即使抛弃崇高的理念，以现实利益为名，动物保护主义也是完全站得住脚的。&lt;/p&gt;
-&lt;p&gt;《海豚湾》作为一部动物保护主义题材的环保纪录片，它的拍摄，是在遵从上面两个重要逻辑的前提下展开的。海豚保护组织最终在国际规则制定会议（法的层面）上，展出血淋淋的证据，给日本滥杀海豚的恶行以有力一击。这种行事方式十分成熟。&lt;/p&gt;</content><category term="others"></category><category term="电影"></category><category term="纪录片"></category><category term="动物保护"></category><category term="政治正确"></category></entry><entry><title>应该在何时判断一个指针是否为NULL</title><link href="https://funcman.me/when_should_determine_whether_a-pointer_is_null.html" rel="alternate"></link><published>2007-10-12T11:20:00+08:00</published><updated>2007-10-12T11:20:00+08:00</updated><author><name>funcman</name></author><id>tag:funcman.me,2007-10-12:/when_should_determine_whether_a-pointer_is_null.html</id><summary type="html">&lt;p&gt;今天看到一篇Blog：&lt;a href="http://fsfoundry.org/codefreak/2007/09/16/a-couple-of-things-about-pointer-to-null/"&gt;《NULL指标两三事》&lt;/a&gt;，文中谈的主题即是我这篇Blog的题目，我这里也只是对原文的做些简单的记录。&lt;/p&gt;
+&lt;p&gt;《海豚湾》作为一部动物保护主义题材的环保纪录片，它的拍摄，是在遵从上面两个重要逻辑的前提下展开的。海豚保护组织最终在国际规则制定会议（法的层面）上，展出血淋淋的证据，给日本滥杀海豚的恶行以有力一击。这种行事方式十分成熟。&lt;/p&gt;</content><category term="others"/><category term="电影"/><category term="纪录片"/><category term="动物保护"/><category term="政治正确"/></entry><entry><title>应该在何时判断一个指针是否为NULL</title><link href="https://funcman.me/when_should_determine_whether_a-pointer_is_null.html" rel="alternate"/><published>2007-10-12T11:20:00+08:00</published><updated>2007-10-12T11:20:00+08:00</updated><author><name>funcman</name></author><id>tag:funcman.me,2007-10-12:/when_should_determine_whether_a-pointer_is_null.html</id><summary type="html">&lt;p&gt;今天看到一篇Blog：&lt;a href="http://fsfoundry.org/codefreak/2007/09/16/a-couple-of-things-about-pointer-to-null/"&gt;《NULL指标两三事》&lt;/a&gt;，文中谈的主题即是我这篇Blog的题目，我这里也只是对原文的做些简单的记录。&lt;/p&gt;
 &lt;p&gt;文中谈到的问题，也是我们平常 …&lt;/p&gt;</summary><content type="html">&lt;p&gt;今天看到一篇Blog：&lt;a href="http://fsfoundry.org/codefreak/2007/09/16/a-couple-of-things-about-pointer-to-null/"&gt;《NULL指标两三事》&lt;/a&gt;，文中谈的主题即是我这篇Blog的题目，我这里也只是对原文的做些简单的记录。&lt;/p&gt;
 &lt;p&gt;文中谈到的问题，也是我们平常出现的问题，即在操作一个指针前，我们常常在不需要判断指针是否为NULL时做了判断，而在需要判断时却想当然地把它漏掉了。&lt;/p&gt;
 &lt;p&gt;例如：delete时，完全可以对一个NULL指针进行操作，而我们却要多余地加上一个&lt;code&gt;if(ptr!=NULL)&lt;/code&gt;判断；
 又如：strlen时，如果参数给了一个NULL指针，就可能造成整个程序崩掉，我们却以为strlen自己会做NULL指针判读，并在获得一个NULL参数时return。&lt;/p&gt;
 &lt;p&gt;另外，在原文的评论栏中有一问一答，合理地解释了为什么strlen这样的接受指针参数的函数，会不做&lt;code&gt;if(NULL==ptr)return;&lt;/code&gt;这样的操作。嗯，为了效率，这么做充分体验了C的精神。想像一下，对于一个错误的参数，检测函数的返回难道比在调用前就检测参数更省事么；何况如果同一个参数穿过层层的函数调用，一个个检测函数返回是多么可怕的事，不如在调用函数事先来个参数检测。实际上，像strlen这样的函数，也不是没有在函数内部做参数检测，只不过它用的是非常合理的assert断言机制，即满足了功能，又满足了效率。&lt;/p&gt;
-&lt;p&gt;以后再操作指针时，要记得有这么回事~&lt;/p&gt;</content><category term="programming"></category><category term="C"></category><category term="C++"></category><category term="指针"></category><category term="pointer"></category></entry></feed>
+&lt;p&gt;以后再操作指针时，要记得有这么回事~&lt;/p&gt;</content><category term="codiing"/><category term="C"/><category term="C++"/><category term="指针"/><category term="pointer"/></entry></feed>
