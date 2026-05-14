@@ -1,5 +1,82 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>funcman's blog</title><link href="https://funcman.me/" rel="alternate"/><link href="https://funcman.me/rss.xml" rel="self"/><id>https://funcman.me/</id><updated>2026-04-18T23:47:37+08:00</updated><entry><title>Arch Linux 的基本安装</title><link href="https://funcman.me/basic_arch_linux_installation.html" rel="alternate"/><published>2026-04-18T23:47:37+08:00</published><updated>2026-04-18T23:47:37+08:00</updated><author><name>funcman</name></author><id>tag:funcman.me,2026-04-18:/basic_arch_linux_installation.html</id><summary type="html">&lt;p&gt;上班摸鱼时，在虚拟机上安装了一套 Arch Linux...&lt;/p&gt;</summary><content type="html">&lt;p&gt;好久没写博客，最近AI浪潮，忙疯了，反而做事的效率上来了。于是开了一堆坑，比如继续写博客。&lt;/p&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>funcman's blog</title><link href="https://funcman.me/" rel="alternate"/><link href="https://funcman.me/rss.xml" rel="self"/><id>https://funcman.me/</id><updated>2026-05-14T21:33:24+08:00</updated><entry><title>一个严谨的.gitattributes文件</title><link href="https://funcman.me/a_rigorous_dot_gitattributes_file.html" rel="alternate"/><published>2026-05-14T21:33:24+08:00</published><updated>2026-05-14T21:33:24+08:00</updated><author><name>funcman</name></author><id>tag:funcman.me,2026-05-14:/a_rigorous_dot_gitattributes_file.html</id><summary type="html">&lt;p&gt;一个严谨的.gitattributes文件要怎么写？&lt;/p&gt;</summary><content type="html">&lt;p&gt;一个严谨的git项目库应该有&lt;code&gt;.gitattributes&lt;/code&gt;文件，来让git在不同操作系统和场景环境下，根据设定的规则处理文件。&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;.gitattributes&lt;/code&gt;文件的常见用途有：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;统一行尾符（CRLF / LF）&lt;/strong&gt;
+   防止 Windows 和 Mac/Linux 协作时因换行符不一致产生大量假改动。
+   例如：&lt;code&gt;* text=auto&lt;/code&gt; 让 Git 自动处理，或 &lt;code&gt;*.js text eol=lf&lt;/code&gt; 强制 JS 文件用 LF。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;指定二进制文件&lt;/strong&gt;
+   避免 Git 对图片、压缩包等二进制文件尝试合并或输出乱码 diff。
+   例如：&lt;code&gt;*.png binary&lt;/code&gt;。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;定义 diff 策略&lt;/strong&gt;
+   某些生成文件（如锁文件、压缩后的代码）不想看普通 diff，可以标记为 &lt;code&gt;-diff&lt;/code&gt; 或指定自定义 diff 工具。
+   例如：&lt;code&gt;*.lock binary&lt;/code&gt; 或 &lt;code&gt;*.ipynb diff=jupyternotebook&lt;/code&gt;。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;控制合并行为&lt;/strong&gt;
+   指定某个文件在合并时始终使用某一版本（如 &lt;code&gt;ours&lt;/code&gt; 或 &lt;code&gt;theirs&lt;/code&gt;）。
+   例如：&lt;code&gt;config.xml merge=ours&lt;/code&gt;。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;过滤内容（配合 smudge / clean）&lt;/strong&gt;
+   在检出/提交时自动执行脚本，比如对模板文件自动替换变量、对密钥文件做简单加解密。
+   例如：&lt;code&gt;*.secret filter=crypt&lt;/code&gt;。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;影响 GitHub 的语言统计&lt;/strong&gt;
+   让 GitHub 不把某些文件（如生成的代码、测试数据）算入项目的语言比例。
+   例如：&lt;code&gt;generated.js linguist-generated=true&lt;/code&gt;。&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;以我做的项目为例，一个严谨的&lt;code&gt;.gitattributes&lt;/code&gt;文件是这样的：&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;# 1. 设置默认安全策略（放在最前面）
+* text=auto
+
+# 2. 对所有文本文件强制执行LF标准（覆盖全局）
+#    这样能确保跨平台的基线统一
+* text eol=lf
+
+# 3. 为Windows专属文件，单独打破规则，强制使用CRLF（放在后面）
+#    这行规则的优先级高于上面的 &amp;#39;* text eol=lf&amp;#39;
+*.bat    text eol=crlf
+*.cmd    text eol=crlf
+*.ps1    text eol=crlf
+
+# 4. 明确标记所有二进制文件（放在最后，作为终极保障）
+#    这些规则会覆盖前面的所有文本处理规则，确保安全
+*.png    binary
+*.jpg    binary
+*.jpeg   binary
+*.gif    binary
+*.ico    binary
+*.pdf    binary
+*.zip    binary
+*.mp3    binary
+*.mp4    binary
+*.mov    binary
+*.webp   binary
+*.bytes  binary
+
+# 5. LFS文件，对于大尺寸文件，要纳入LFS管理，“-text”表示这个文件非文本文件
+Assets/Resources/Data/Data.bytes filter=lfs diff=lfs merge=lfs -text
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;不写好&lt;code&gt;.gitattributes&lt;/code&gt;会出现潜在的问题。&lt;/p&gt;
+&lt;p&gt;比如今天，我发现我司的Web后台重新部署之后，LOGO居然裂了，显示不出来。仔细一番研究比较之后，发现本地的png文件，和git库中的，在文件头上有&lt;strong&gt;大差异&lt;/strong&gt;：&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;本地版本
+89 50 4E 47 0D 0A 1A 0A
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;git库内版本
+89 50 4E 47 0A 1A 0A
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;显然是git在提交时，把&lt;code&gt;CRLF&lt;/code&gt;改成了&lt;code&gt;LF&lt;/code&gt;。&lt;/p&gt;</content><category term="codiing"/><category term="Git"/><category term="笔记"/></entry><entry><title>Arch Linux 的基本安装</title><link href="https://funcman.me/basic_arch_linux_installation.html" rel="alternate"/><published>2026-04-18T23:47:37+08:00</published><updated>2026-04-18T23:47:37+08:00</updated><author><name>funcman</name></author><id>tag:funcman.me,2026-04-18:/basic_arch_linux_installation.html</id><summary type="html">&lt;p&gt;上班摸鱼时，在虚拟机上安装了一套 Arch Linux...&lt;/p&gt;</summary><content type="html">&lt;p&gt;好久没写博客，最近AI浪潮，忙疯了，反而做事的效率上来了。于是开了一堆坑，比如继续写博客。&lt;/p&gt;
 &lt;h2&gt;为什么是Arch？&lt;/h2&gt;
 &lt;p&gt;我一直是Debian/Ubuntu的用户，以前还作为Desktop来用。这几年它们主要作为Server的OS，很好用，也不打算换。&lt;/p&gt;
 &lt;p&gt;而Arch，我主要是看中它的高度可折腾性。我希望借由Arch能够回到将Linux作为Desktop方面的生产主力的状态。&lt;/p&gt;

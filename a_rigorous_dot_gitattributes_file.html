@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="zh_cn" prefix="og: http://ogp.me/ns#">
+	<head>
+		<link href="http://gmpg.org/xfn/11" rel="profile">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta http-equiv="content-type" content="text/html; charset=utf-8">
+
+		<!-- Metadata -->
+	<meta name="description" content="一个游戏程序员。曾经参与开发过<a href='https://www.bing.com/search?q=%E4%BB%99%E4%BE%A3%E5%A5%87%E7%BC%983'>仙侣奇缘3</a>、<a href='http://sh.70yx.com'>水浒传</a>、<a href='https://itunes.apple.com/cn/app/id938688461'>小米运动</a>、<a href='https://itunes.apple.com/cn/app/id1034182617'>米动</a>和<a href='https://www.taptap.com/app/143658'>无限激战</a>">
+	<meta property="og:description" content="一个游戏程序员。曾经参与开发过<a href='https://www.bing.com/search?q=%E4%BB%99%E4%BE%A3%E5%A5%87%E7%BC%983'>仙侣奇缘3</a>、<a href='http://sh.70yx.com'>水浒传</a>、<a href='https://itunes.apple.com/cn/app/id938688461'>小米运动</a>、<a href='https://itunes.apple.com/cn/app/id1034182617'>米动</a>和<a href='https://www.taptap.com/app/143658'>无限激战</a>">
+	<meta property="og:title" content="一个严谨的.gitattributes文件" />
+	<meta property="og:type" content="article" />
+	<meta property="og:url" content="https://funcman.me/a_rigorous_dot_gitattributes_file.html" />
+		<meta property="og:image" content="https://funcman.me/images/avatar.png" />
+
+		<!-- Enable responsiveness on mobile devices-->
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+
+		<title>funcman's blog</title>
+
+		<!-- CSS -->
+		<link href="//fonts.googleapis.com/" rel="dns-prefetch">
+		<link href="//fonts.googleapis.com/css?family=Droid+Serif:400,700,400italic|Abril+Fatface|PT+Sans:400,400italic,700&amp;subset=latin,latin-ext" rel="stylesheet">
+
+		<link rel="stylesheet" href="https://funcman.me/theme/css/poole.css" />
+		<link rel="stylesheet" href="https://funcman.me/theme/css/hyde.css" />
+		<link rel="stylesheet" href="https://funcman.me/theme/css/syntax.css" />
+			<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fork-awesome@1.1.7/css/fork-awesome.min.css" crossorigin="anonymous">
+
+		<!-- Feeds -->
+<link href="https://funcman.me/rss.xml" type="application/atom+xml" rel="alternate" title="funcman's blog Full Atom Feed" />
+
+		<!-- Analytics -->
+	</head>
+
+	<body class="theme-base-0e">
+<div class="sidebar">
+	<div class="container sidebar-sticky">
+		<div class="sidebar-about">
+
+			<h1>
+				<a href="/">
+					<img class="profile-picture" src="https://funcman.me/images/avatar.png">
+					funcman's blog
+				</a>
+			</h1>
+			<p class="lead"></p>
+			<p class="lead">一个游戏程序员。曾经参与开发过<a href='https://www.bing.com/search?q=%E4%BB%99%E4%BE%A3%E5%A5%87%E7%BC%983'>仙侣奇缘3</a>、<a href='http://sh.70yx.com'>水浒传</a>、<a href='https://itunes.apple.com/cn/app/id938688461'>小米运动</a>、<a href='https://itunes.apple.com/cn/app/id1034182617'>米动</a>和<a href='https://www.taptap.com/app/143658'>无限激战</a> </p>
+			<p></p>
+		</div>
+		<nav class="sidebar-social">
+					<a class="sidebar-social-item" href="mailto:hyq1986@gmail.com">
+						<i class="fa fa-envelope"></i>
+					</a>
+					<a class="sidebar-social-item" href="https://twitter.com/funcman" target="_blank">
+						<i class="fa fa-twitter"></i>
+					</a>
+					<a class="sidebar-social-item" href="https://github.com/funcman" target="_blank">
+						<i class="fa fa-github"></i>
+					</a>
+			<a class="sidebar-social-item" href="https://funcman.me/rss.xml">
+				<i class="fa fa-rss"></i>
+			</a>
+		</nav>
+	</div>
+</div>		<div class="content container">
+<div class="post">
+	<h1 class="post-title">一个严谨的.gitattributes文件</h1>
+	<span class="post-date">2026年05月14日 星期四</span>
+	<p>一个严谨的git项目库应该有<code>.gitattributes</code>文件，来让git在不同操作系统和场景环境下，根据设定的规则处理文件。</p>
+<p><code>.gitattributes</code>文件的常见用途有：</p>
+<ol>
+<li>
+<p><strong>统一行尾符（CRLF / LF）</strong>
+   防止 Windows 和 Mac/Linux 协作时因换行符不一致产生大量假改动。
+   例如：<code>* text=auto</code> 让 Git 自动处理，或 <code>*.js text eol=lf</code> 强制 JS 文件用 LF。</p>
+</li>
+<li>
+<p><strong>指定二进制文件</strong>
+   避免 Git 对图片、压缩包等二进制文件尝试合并或输出乱码 diff。
+   例如：<code>*.png binary</code>。</p>
+</li>
+<li>
+<p><strong>定义 diff 策略</strong>
+   某些生成文件（如锁文件、压缩后的代码）不想看普通 diff，可以标记为 <code>-diff</code> 或指定自定义 diff 工具。
+   例如：<code>*.lock binary</code> 或 <code>*.ipynb diff=jupyternotebook</code>。</p>
+</li>
+<li>
+<p><strong>控制合并行为</strong>
+   指定某个文件在合并时始终使用某一版本（如 <code>ours</code> 或 <code>theirs</code>）。
+   例如：<code>config.xml merge=ours</code>。</p>
+</li>
+<li>
+<p><strong>过滤内容（配合 smudge / clean）</strong>
+   在检出/提交时自动执行脚本，比如对模板文件自动替换变量、对密钥文件做简单加解密。
+   例如：<code>*.secret filter=crypt</code>。</p>
+</li>
+<li>
+<p><strong>影响 GitHub 的语言统计</strong>
+   让 GitHub 不把某些文件（如生成的代码、测试数据）算入项目的语言比例。
+   例如：<code>generated.js linguist-generated=true</code>。</p>
+</li>
+</ol>
+<p>以我做的项目为例，一个严谨的<code>.gitattributes</code>文件是这样的：</p>
+<div class="highlight"><pre><span></span><code># 1. 设置默认安全策略（放在最前面）
+* text=auto
+
+# 2. 对所有文本文件强制执行LF标准（覆盖全局）
+#    这样能确保跨平台的基线统一
+* text eol=lf
+
+# 3. 为Windows专属文件，单独打破规则，强制使用CRLF（放在后面）
+#    这行规则的优先级高于上面的 &#39;* text eol=lf&#39;
+*.bat    text eol=crlf
+*.cmd    text eol=crlf
+*.ps1    text eol=crlf
+
+# 4. 明确标记所有二进制文件（放在最后，作为终极保障）
+#    这些规则会覆盖前面的所有文本处理规则，确保安全
+*.png    binary
+*.jpg    binary
+*.jpeg   binary
+*.gif    binary
+*.ico    binary
+*.pdf    binary
+*.zip    binary
+*.mp3    binary
+*.mp4    binary
+*.mov    binary
+*.webp   binary
+*.bytes  binary
+
+# 5. LFS文件，对于大尺寸文件，要纳入LFS管理，“-text”表示这个文件非文本文件
+Assets/Resources/Data/Data.bytes filter=lfs diff=lfs merge=lfs -text
+</code></pre></div>
+
+<p>不写好<code>.gitattributes</code>会出现潜在的问题。</p>
+<p>比如今天，我发现我司的Web后台重新部署之后，LOGO居然裂了，显示不出来。仔细一番研究比较之后，发现本地的png文件，和git库中的，在文件头上有<strong>大差异</strong>：</p>
+<div class="highlight"><pre><span></span><code>本地版本
+89 50 4E 47 0D 0A 1A 0A
+</code></pre></div>
+
+<div class="highlight"><pre><span></span><code>git库内版本
+89 50 4E 47 0A 1A 0A
+</code></pre></div>
+
+<p>显然是git在提交时，把<code>CRLF</code>改成了<code>LF</code>。</p>
+</div>
+		</div>
+	</body>
+</html>
