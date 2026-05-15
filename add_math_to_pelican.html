@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="zh_cn" prefix="og: http://ogp.me/ns#">
+	<head>
+		<link href="http://gmpg.org/xfn/11" rel="profile">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta http-equiv="content-type" content="text/html; charset=utf-8">
+
+		<!-- Metadata -->
+	<meta name="description" content="一个游戏程序员。曾经参与开发过<a href='https://www.bing.com/search?q=%E4%BB%99%E4%BE%A3%E5%A5%87%E7%BC%983'>仙侣奇缘3</a>、<a href='http://sh.70yx.com'>水浒传</a>、<a href='https://itunes.apple.com/cn/app/id938688461'>小米运动</a>、<a href='https://itunes.apple.com/cn/app/id1034182617'>米动</a>和<a href='https://www.taptap.com/app/143658'>无限激战</a>">
+	<meta property="og:description" content="一个游戏程序员。曾经参与开发过<a href='https://www.bing.com/search?q=%E4%BB%99%E4%BE%A3%E5%A5%87%E7%BC%983'>仙侣奇缘3</a>、<a href='http://sh.70yx.com'>水浒传</a>、<a href='https://itunes.apple.com/cn/app/id938688461'>小米运动</a>、<a href='https://itunes.apple.com/cn/app/id1034182617'>米动</a>和<a href='https://www.taptap.com/app/143658'>无限激战</a>">
+	<meta property="og:title" content="给Pelican增加数学式的显示" />
+	<meta property="og:type" content="article" />
+	<meta property="og:url" content="https://funcman.me/add_math_to_pelican.html" />
+		<meta property="og:image" content="https://funcman.me/images/avatar.png" />
+
+		<!-- Enable responsiveness on mobile devices-->
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+
+		<title>funcman's blog</title>
+
+		<!-- CSS -->
+		<link href="//fonts.googleapis.com/" rel="dns-prefetch">
+		<link href="//fonts.googleapis.com/css?family=Droid+Serif:400,700,400italic|Abril+Fatface|PT+Sans:400,400italic,700&amp;subset=latin,latin-ext" rel="stylesheet">
+
+		<link rel="stylesheet" href="https://funcman.me/theme/css/poole.css" />
+		<link rel="stylesheet" href="https://funcman.me/theme/css/hyde.css" />
+		<link rel="stylesheet" href="https://funcman.me/theme/css/syntax.css" />
+			<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fork-awesome@1.1.7/css/fork-awesome.min.css" crossorigin="anonymous">
+
+		<!-- Feeds -->
+<link href="https://funcman.me/rss.xml" type="application/atom+xml" rel="alternate" title="funcman's blog Full Atom Feed" />
+
+		<!-- Analytics -->
+	</head>
+
+	<body class="theme-base-0e">
+<div class="sidebar">
+	<div class="container sidebar-sticky">
+		<div class="sidebar-about">
+
+			<h1>
+				<a href="/">
+					<img class="profile-picture" src="https://funcman.me/images/avatar.png">
+					funcman's blog
+				</a>
+			</h1>
+			<p class="lead"></p>
+			<p class="lead">一个游戏程序员。曾经参与开发过<a href='https://www.bing.com/search?q=%E4%BB%99%E4%BE%A3%E5%A5%87%E7%BC%983'>仙侣奇缘3</a>、<a href='http://sh.70yx.com'>水浒传</a>、<a href='https://itunes.apple.com/cn/app/id938688461'>小米运动</a>、<a href='https://itunes.apple.com/cn/app/id1034182617'>米动</a>和<a href='https://www.taptap.com/app/143658'>无限激战</a> </p>
+			<p></p>
+		</div>
+		<nav class="sidebar-social">
+					<a class="sidebar-social-item" href="mailto:hyq1986@gmail.com">
+						<i class="fa fa-envelope"></i>
+					</a>
+					<a class="sidebar-social-item" href="https://twitter.com/funcman" target="_blank">
+						<i class="fa fa-twitter"></i>
+					</a>
+					<a class="sidebar-social-item" href="https://github.com/funcman" target="_blank">
+						<i class="fa fa-github"></i>
+					</a>
+			<a class="sidebar-social-item" href="https://funcman.me/rss.xml">
+				<i class="fa fa-rss"></i>
+			</a>
+		</nav>
+	</div>
+</div>		<div class="content container">
+<div class="post">
+	<h1 class="post-title">给Pelican增加数学式的显示</h1>
+	<span class="post-date">2026年05月15日 星期五</span>
+	<p>AI时代，我觉得数学在我接下来的学习和工作中太重要了，所以我决定给Pelican加上显示数学表达式的功能。</p>
+<p>大概有三种实现方式：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">方案</th>
+<th style="text-align: left;">插件</th>
+<th style="text-align: left;">方式</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">KaTeX预渲染</td>
+<td style="text-align: left;">pelican-katex</td>
+<td style="text-align: left;">生成时将公式转为HTML/MathML</td>
+</tr>
+<tr>
+<td style="text-align: left;">MathJax浏览器渲染</td>
+<td style="text-align: left;">pelican-render-math</td>
+<td style="text-align: left;">浏览器加载MathJax.js动态渲染</td>
+</tr>
+<tr>
+<td style="text-align: left;">LaTeX转SVG</td>
+<td style="text-align: left;">pelican-math-svg</td>
+<td style="text-align: left;">调用LaTeX将公式编译为SVG图片嵌入页面</td>
+</tr>
+</tbody>
+</table>
+<p>我比较了一下，第二个<code>pelican-render-math</code>的实现起来比较简单，利用Pelican原有的运行环境就能跑。</p>
+<p>使用<code>pip</code>安装：</p>
+<div class="highlight"><pre><span></span><code>pip<span class="w"> </span>install<span class="w"> </span>pelican-render-math
+</code></pre></div>
+
+<p>如果是用了<code>uv</code>就用：</p>
+<div class="highlight"><pre><span></span><code>uv<span class="w"> </span>add<span class="w"> </span>pelican-render-math
+</code></pre></div>
+
+<p>然后在<code>pelicanconf.py</code>中添加：</p>
+<div class="highlight"><pre><span></span><code><span class="n">PLUGINS</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;render_math&quot;</span><span class="p">]</span>
+<span class="n">MATH_JAX</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;align&quot;</span><span class="p">:</span> <span class="s2">&quot;center&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;auto_insert&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="s2">&quot;process_escapes&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="s2">&quot;latex_preview&quot;</span><span class="p">:</span> <span class="s2">&quot;TeX&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;color&quot;</span><span class="p">:</span> <span class="s2">&quot;inherit&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;linebreak_automatic&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="s2">&quot;responsive&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="s2">&quot;responsive_break&quot;</span><span class="p">:</span> <span class="mi">768</span><span class="p">,</span>
+    <span class="s2">&quot;process_summary&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>各参数注解：</p>
+<ul>
+<li>
+<p><code>"align": "center"</code></p>
+<ul>
+<li>对应 MathJax 的 <code>displayAlign</code> 设置。</li>
+<li>作用：控制块级公式（<code>$$...$$</code>）的水平对齐方式。</li>
+<li>可选值：<code>"left"</code>, <code>"center"</code>, <code>"right"</code>。这里设置为居中显示。</li>
+</ul>
+</li>
+<li>
+<p><code>"auto_insert": True</code></p>
+<ul>
+<li>作用：是否由插件自动在需要渲染数学公式的页面 <code>&lt;head&gt;</code> 中插入 MathJax 的 JavaScript 引用和配置。</li>
+<li>效果：<ul>
+<li>设为 <code>True</code>：你无需手动修改主题模板，插件会智能判断文章是否包含公式，只在有公式的页面加载 MathJax。</li>
+<li>设为 <code>False</code>：你需要自行在模板中添加 MathJax 的加载代码，适合希望完全手动控制资源加载的场景。</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p><code>"process_escapes": True</code></p>
+<ul>
+<li>作用：开启后，MathJax 会先处理 HTML 中由 Markdown 产生的转义字符。例如，Markdown 将 <code>\$</code> 转义为 <code>$</code> 字面量，但实际你可能是想写 LaTeX 命令。</li>
+<li>典型影响：<ul>
+<li>当在 Markdown 中写 <code>\$x$</code> 时，开启该选项会先将 <code>\$</code> 还原成 <code>$</code>，从而正确解析行内公式。</li>
+<li>关闭时，<code>$</code> 可能被 Markdown 转义而失效，导致公式无法渲染。</li>
+</ul>
+</li>
+<li>建议：保持 <code>True</code>，尤其当你需要在文章里使用美元符号本身而不表示公式时，可以用 <code>\$</code> 来区分。</li>
+</ul>
+</li>
+<li>
+<p><code>"latex_preview": "TeX"</code></p>
+<ul>
+<li>作用：在 MathJax 完全渲染出精美公式之前，页面上临时显示的占位内容样式。</li>
+<li>可选值：<ul>
+<li><code>"TeX"</code>：显示原始的 LaTeX 源码（如 <code>\frac{a}{b}</code>），直到渲染完成才替换为漂亮公式。这能避免页面布局跳动，且让读者知道这里有公式正在处理。</li>
+<li><code>"none"</code>：不显示任何预览，公式区域可能短暂留白或显示占位符。</li>
+<li>其他值可能无效，插件通常只处理这两个选项。</li>
+</ul>
+</li>
+<li>效果：设置为 <code>"TeX"</code> 能提供更好的视觉体验。</li>
+</ul>
+</li>
+<li>
+<p><code>"color": "inherit"</code></p>
+<ul>
+<li>作用：设置渲染后数学公式的整体颜色。</li>
+<li>解释：<code>"inherit"</code> 表示公式颜色继承其所在 HTML 元素的前景色。这意味着公式会自动适配网页的字体颜色，比如正文为深灰色时公式也是深灰色，暗色模式下也能自动变色。</li>
+<li>如果设为具体颜色：如 <code>"black"</code> 或 <code>"#333"</code>，则公式颜色固定，不再跟随文本颜色。</li>
+</ul>
+</li>
+<li>
+<p><code>"linebreak_automatic": False</code></p>
+<ul>
+<li>对应 MathJax 的自动换行功能。</li>
+<li>作用：控制过长的块级公式是否允许在行内自动换行。</li>
+<li>效果：<ul>
+<li><code>False</code>：长公式超出容器宽度时会出现水平滚动条，公式保持单行。</li>
+<li><code>True</code>：数学公式会在合适的运算符（如 <code>+</code>, <code>=</code>）处自动换行，避免破坏页面布局，但可能影响公式语义的直观性。这里你选择禁用，通常是希望公式完整展示。</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p><code>"responsive": True</code></p>
+<ul>
+<li>作用：启用 MathJax 的响应式渲染。开启后，公式会根据屏幕或容器宽度动态调整显示策略（例如缩放、重排），在小屏幕移动设备上避免公式被截断。</li>
+<li>依赖：通常与 <code>responsive_break</code> 配合使用，当视口宽度小于某个值时触发特殊处理。</li>
+</ul>
+</li>
+<li>
+<p><code>"responsive_break": 768</code></p>
+<ul>
+<li>作用：设置响应式触发的断点宽度（单位：像素）。</li>
+<li>效果：当浏览器视口宽度 ≤ 768px 时，MathJax 会尝试让公式适应窄屏幕（比如采用缩放或允许公式内部换行等策略）。数值可根据你的主题移动端适配方案调整。</li>
+<li>注意：该参数仅在 <code>"responsive": True</code> 时生效。</li>
+</ul>
+</li>
+<li>
+<p><code>"process_summary": True</code></p>
+<ul>
+<li>作用：是否在文章的摘要（文章列表页显示的前几行内容）中也处理数学公式。</li>
+<li>效果：<ul>
+<li>设为 <code>True</code>：插件会解析摘要中的 <code>$...$</code> 或 <code>$$...$$</code>，并在列表页同样插入 MathJax 渲染它们。这可以保证首页或分类页的摘要不会显示原始 LaTeX 代码。</li>
+<li>设为 <code>False</code>：摘要中的公式不会被处理，可能直接显示未渲染的代码，影响阅读体验。推荐保持 <code>True</code>。</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p>现在我们试试效果：</p>
+<p>同一行数学式：<span class="math">\(\dfrac{1}{1+x^2}\)</span></p>
+<p>代码是：</p>
+<div class="highlight"><pre><span></span><code>同一行数学式：$\dfrac{1}{1+x^2}$
+</code></pre></div>
+
+<p>独立行复杂数学式：</p>
+<div class="math">$$
+\begin{pmatrix}
+a_{11} &amp; a_{12} &amp; \cdots &amp; a_{1n} \\
+a_{21} &amp; a_{22} &amp; \cdots &amp; a_{2n} \\
+\vdots &amp; \vdots &amp; \ddots &amp; \vdots \\
+a_{n1} &amp; a_{n2} &amp; \cdots &amp; a_{nn}
+\end{pmatrix}
+\begin{pmatrix}
+x_1 \\ x_2 \\ \vdots \\ x_n
+\end{pmatrix}
+=
+\lambda
+\begin{pmatrix}
+x_1 \\ x_2 \\ \vdots \\ x_n
+\end{pmatrix}
+$$</div>
+<p>代码是：</p>
+<div class="highlight"><pre><span></span><code>独立行复杂数学式：
+
+$$
+\begin{pmatrix}
+a<span class="ge">_{11} &amp; a_</span>{12} &amp; \cdots &amp; a_{1n} \\
+a<span class="ge">_{21} &amp; a_</span>{22} &amp; \cdots &amp; a_{2n} \\
+\vdots &amp; \vdots &amp; \ddots &amp; \vdots \\
+a<span class="ge">_{n1} &amp; a_</span>{n2} &amp; \cdots &amp; a_{nn}
+\end{pmatrix}
+\begin{pmatrix}
+x<span class="ge">_1 \\ x_</span>2 \\ \vdots \\ x_n
+<span class="gh">\end{pmatrix}</span>
+<span class="gh">=</span>
+\lambda
+\begin{pmatrix}
+x<span class="ge">_1 \\ x_</span>2 \\ \vdots \\ x_n
+\end{pmatrix}
+$$
+</code></pre></div>
+
+<p>以上，应该够用了。</p>
+<script type="text/javascript">if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+    var align = "center",
+        indent = "0em",
+        linebreak = "false";
+
+    if (true) {
+        align = (screen.width < 768) ? "left" : align;
+        indent = (screen.width < 768) ? "0em" : indent;
+        linebreak = (screen.width < 768) ? 'true' : linebreak;
+    }
+
+    var mathjaxscript = document.createElement('script');
+    mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
+    mathjaxscript.type = 'text/javascript';
+    mathjaxscript.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.3/latest.js?config=TeX-AMS-MML_HTMLorMML';
+
+    var configscript = document.createElement('script');
+    configscript.type = 'text/x-mathjax-config';
+    configscript[(window.opera ? "innerHTML" : "text")] =
+        "MathJax.Hub.Config({" +
+        "    config: ['MMLorHTML.js']," +
+        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'none' } }," +
+        "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
+        "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
+        "    displayAlign: '"+ align +"'," +
+        "    displayIndent: '"+ indent +"'," +
+        "    showMathMenu: true," +
+        "    messageStyle: 'normal'," +
+        "    tex2jax: { " +
+        "        inlineMath: [ ['\\\\(','\\\\)'] ], " +
+        "        displayMath: [ ['$$','$$'] ]," +
+        "        processEscapes: true," +
+        "        preview: 'TeX'," +
+        "    }, " +
+        "    'HTML-CSS': { " +
+        "        availableFonts: ['STIX', 'TeX']," +
+        "        preferredFont: 'STIX'," +
+        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'inherit ! important'} }," +
+        "        linebreaks: { automatic: "+ linebreak +", width: '90% container' }," +
+        "    }, " +
+        "}); " +
+        "if ('default' !== 'default') {" +
+            "MathJax.Hub.Register.StartupHook('HTML-CSS Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax['HTML-CSS'].FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+            "MathJax.Hub.Register.StartupHook('SVG Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax.SVG.FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+        "}";
+
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(configscript);
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
+}
+</script>
+</div>
+		</div>
+	</body>
+</html>

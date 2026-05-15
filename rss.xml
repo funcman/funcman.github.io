@@ -1,5 +1,256 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>funcman's blog</title><link href="https://funcman.me/" rel="alternate"/><link href="https://funcman.me/rss.xml" rel="self"/><id>https://funcman.me/</id><updated>2026-05-14T21:33:24+08:00</updated><entry><title>一个严谨的.gitattributes文件</title><link href="https://funcman.me/a_rigorous_dot_gitattributes_file.html" rel="alternate"/><published>2026-05-14T21:33:24+08:00</published><updated>2026-05-14T21:33:24+08:00</updated><author><name>funcman</name></author><id>tag:funcman.me,2026-05-14:/a_rigorous_dot_gitattributes_file.html</id><summary type="html">&lt;p&gt;一个严谨的.gitattributes文件要怎么写？&lt;/p&gt;</summary><content type="html">&lt;p&gt;一个严谨的Git项目库应该有&lt;code&gt;.gitattributes&lt;/code&gt;文件，来让Git在不同操作系统和场景环境下，根据设定的规则处理文件。&lt;/p&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>funcman's blog</title><link href="https://funcman.me/" rel="alternate"/><link href="https://funcman.me/rss.xml" rel="self"/><id>https://funcman.me/</id><updated>2026-05-15T11:02:12+08:00</updated><entry><title>给Pelican增加数学式的显示</title><link href="https://funcman.me/add_math_to_pelican.html" rel="alternate"/><published>2026-05-15T11:02:12+08:00</published><updated>2026-05-15T11:02:12+08:00</updated><author><name>funcman</name></author><id>tag:funcman.me,2026-05-15:/add_math_to_pelican.html</id><summary type="html">&lt;p&gt;AI时代，数学太重要了，所以给Pelican增加了数学表达式的显示...&lt;/p&gt;</summary><content type="html">&lt;p&gt;AI时代，我觉得数学在我接下来的学习和工作中太重要了，所以我决定给Pelican加上显示数学表达式的功能。&lt;/p&gt;
+&lt;p&gt;大概有三种实现方式：&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th style="text-align: left;"&gt;方案&lt;/th&gt;
+&lt;th style="text-align: left;"&gt;插件&lt;/th&gt;
+&lt;th style="text-align: left;"&gt;方式&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td style="text-align: left;"&gt;KaTeX预渲染&lt;/td&gt;
+&lt;td style="text-align: left;"&gt;pelican-katex&lt;/td&gt;
+&lt;td style="text-align: left;"&gt;生成时将公式转为HTML/MathML&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="text-align: left;"&gt;MathJax浏览器渲染&lt;/td&gt;
+&lt;td style="text-align: left;"&gt;pelican-render-math&lt;/td&gt;
+&lt;td style="text-align: left;"&gt;浏览器加载MathJax.js动态渲染&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="text-align: left;"&gt;LaTeX转SVG&lt;/td&gt;
+&lt;td style="text-align: left;"&gt;pelican-math-svg&lt;/td&gt;
+&lt;td style="text-align: left;"&gt;调用LaTeX将公式编译为SVG图片嵌入页面&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;我比较了一下，第二个&lt;code&gt;pelican-render-math&lt;/code&gt;的实现起来比较简单，利用Pelican原有的运行环境就能跑。&lt;/p&gt;
+&lt;p&gt;使用&lt;code&gt;pip&lt;/code&gt;安装：&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;pip&lt;span class="w"&gt; &lt;/span&gt;install&lt;span class="w"&gt; &lt;/span&gt;pelican-render-math
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;如果是用了&lt;code&gt;uv&lt;/code&gt;就用：&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;uv&lt;span class="w"&gt; &lt;/span&gt;add&lt;span class="w"&gt; &lt;/span&gt;pelican-render-math
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;然后在&lt;code&gt;pelicanconf.py&lt;/code&gt;中添加：&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="n"&gt;PLUGINS&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;render_math&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;
+&lt;span class="n"&gt;MATH_JAX&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="s2"&gt;&amp;quot;align&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;center&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="s2"&gt;&amp;quot;auto_insert&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="kc"&gt;True&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="s2"&gt;&amp;quot;process_escapes&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="kc"&gt;True&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="s2"&gt;&amp;quot;latex_preview&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;TeX&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="s2"&gt;&amp;quot;color&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;inherit&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="s2"&gt;&amp;quot;linebreak_automatic&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="kc"&gt;False&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="s2"&gt;&amp;quot;responsive&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="kc"&gt;True&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="s2"&gt;&amp;quot;responsive_break&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="mi"&gt;768&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="s2"&gt;&amp;quot;process_summary&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="kc"&gt;True&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;各参数注解：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;code&gt;"align": "center"&lt;/code&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;对应 MathJax 的 &lt;code&gt;displayAlign&lt;/code&gt; 设置。&lt;/li&gt;
+&lt;li&gt;作用：控制块级公式（&lt;code&gt;$$...$$&lt;/code&gt;）的水平对齐方式。&lt;/li&gt;
+&lt;li&gt;可选值：&lt;code&gt;"left"&lt;/code&gt;, &lt;code&gt;"center"&lt;/code&gt;, &lt;code&gt;"right"&lt;/code&gt;。这里设置为居中显示。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;code&gt;"auto_insert": True&lt;/code&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;作用：是否由插件自动在需要渲染数学公式的页面 &lt;code&gt;&amp;lt;head&amp;gt;&lt;/code&gt; 中插入 MathJax 的 JavaScript 引用和配置。&lt;/li&gt;
+&lt;li&gt;效果：&lt;ul&gt;
+&lt;li&gt;设为 &lt;code&gt;True&lt;/code&gt;：你无需手动修改主题模板，插件会智能判断文章是否包含公式，只在有公式的页面加载 MathJax。&lt;/li&gt;
+&lt;li&gt;设为 &lt;code&gt;False&lt;/code&gt;：你需要自行在模板中添加 MathJax 的加载代码，适合希望完全手动控制资源加载的场景。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;code&gt;"process_escapes": True&lt;/code&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;作用：开启后，MathJax 会先处理 HTML 中由 Markdown 产生的转义字符。例如，Markdown 将 &lt;code&gt;\$&lt;/code&gt; 转义为 &lt;code&gt;$&lt;/code&gt; 字面量，但实际你可能是想写 LaTeX 命令。&lt;/li&gt;
+&lt;li&gt;典型影响：&lt;ul&gt;
+&lt;li&gt;当在 Markdown 中写 &lt;code&gt;\$x$&lt;/code&gt; 时，开启该选项会先将 &lt;code&gt;\$&lt;/code&gt; 还原成 &lt;code&gt;$&lt;/code&gt;，从而正确解析行内公式。&lt;/li&gt;
+&lt;li&gt;关闭时，&lt;code&gt;$&lt;/code&gt; 可能被 Markdown 转义而失效，导致公式无法渲染。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;建议：保持 &lt;code&gt;True&lt;/code&gt;，尤其当你需要在文章里使用美元符号本身而不表示公式时，可以用 &lt;code&gt;\$&lt;/code&gt; 来区分。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;code&gt;"latex_preview": "TeX"&lt;/code&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;作用：在 MathJax 完全渲染出精美公式之前，页面上临时显示的占位内容样式。&lt;/li&gt;
+&lt;li&gt;可选值：&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;"TeX"&lt;/code&gt;：显示原始的 LaTeX 源码（如 &lt;code&gt;\frac{a}{b}&lt;/code&gt;），直到渲染完成才替换为漂亮公式。这能避免页面布局跳动，且让读者知道这里有公式正在处理。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;"none"&lt;/code&gt;：不显示任何预览，公式区域可能短暂留白或显示占位符。&lt;/li&gt;
+&lt;li&gt;其他值可能无效，插件通常只处理这两个选项。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;效果：设置为 &lt;code&gt;"TeX"&lt;/code&gt; 能提供更好的视觉体验。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;code&gt;"color": "inherit"&lt;/code&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;作用：设置渲染后数学公式的整体颜色。&lt;/li&gt;
+&lt;li&gt;解释：&lt;code&gt;"inherit"&lt;/code&gt; 表示公式颜色继承其所在 HTML 元素的前景色。这意味着公式会自动适配网页的字体颜色，比如正文为深灰色时公式也是深灰色，暗色模式下也能自动变色。&lt;/li&gt;
+&lt;li&gt;如果设为具体颜色：如 &lt;code&gt;"black"&lt;/code&gt; 或 &lt;code&gt;"#333"&lt;/code&gt;，则公式颜色固定，不再跟随文本颜色。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;code&gt;"linebreak_automatic": False&lt;/code&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;对应 MathJax 的自动换行功能。&lt;/li&gt;
+&lt;li&gt;作用：控制过长的块级公式是否允许在行内自动换行。&lt;/li&gt;
+&lt;li&gt;效果：&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;False&lt;/code&gt;：长公式超出容器宽度时会出现水平滚动条，公式保持单行。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;True&lt;/code&gt;：数学公式会在合适的运算符（如 &lt;code&gt;+&lt;/code&gt;, &lt;code&gt;=&lt;/code&gt;）处自动换行，避免破坏页面布局，但可能影响公式语义的直观性。这里你选择禁用，通常是希望公式完整展示。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;code&gt;"responsive": True&lt;/code&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;作用：启用 MathJax 的响应式渲染。开启后，公式会根据屏幕或容器宽度动态调整显示策略（例如缩放、重排），在小屏幕移动设备上避免公式被截断。&lt;/li&gt;
+&lt;li&gt;依赖：通常与 &lt;code&gt;responsive_break&lt;/code&gt; 配合使用，当视口宽度小于某个值时触发特殊处理。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;code&gt;"responsive_break": 768&lt;/code&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;作用：设置响应式触发的断点宽度（单位：像素）。&lt;/li&gt;
+&lt;li&gt;效果：当浏览器视口宽度 ≤ 768px 时，MathJax 会尝试让公式适应窄屏幕（比如采用缩放或允许公式内部换行等策略）。数值可根据你的主题移动端适配方案调整。&lt;/li&gt;
+&lt;li&gt;注意：该参数仅在 &lt;code&gt;"responsive": True&lt;/code&gt; 时生效。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;code&gt;"process_summary": True&lt;/code&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;作用：是否在文章的摘要（文章列表页显示的前几行内容）中也处理数学公式。&lt;/li&gt;
+&lt;li&gt;效果：&lt;ul&gt;
+&lt;li&gt;设为 &lt;code&gt;True&lt;/code&gt;：插件会解析摘要中的 &lt;code&gt;$...$&lt;/code&gt; 或 &lt;code&gt;$$...$$&lt;/code&gt;，并在列表页同样插入 MathJax 渲染它们。这可以保证首页或分类页的摘要不会显示原始 LaTeX 代码。&lt;/li&gt;
+&lt;li&gt;设为 &lt;code&gt;False&lt;/code&gt;：摘要中的公式不会被处理，可能直接显示未渲染的代码，影响阅读体验。推荐保持 &lt;code&gt;True&lt;/code&gt;。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;现在我们试试效果：&lt;/p&gt;
+&lt;p&gt;同一行数学式：&lt;span class="math"&gt;\(\dfrac{1}{1+x^2}\)&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;代码是：&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;同一行数学式：$\dfrac{1}{1+x^2}$
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;独立行复杂数学式：&lt;/p&gt;
+&lt;div class="math"&gt;$$
+\begin{pmatrix}
+a_{11} &amp;amp; a_{12} &amp;amp; \cdots &amp;amp; a_{1n} \\
+a_{21} &amp;amp; a_{22} &amp;amp; \cdots &amp;amp; a_{2n} \\
+\vdots &amp;amp; \vdots &amp;amp; \ddots &amp;amp; \vdots \\
+a_{n1} &amp;amp; a_{n2} &amp;amp; \cdots &amp;amp; a_{nn}
+\end{pmatrix}
+\begin{pmatrix}
+x_1 \\ x_2 \\ \vdots \\ x_n
+\end{pmatrix}
+=
+\lambda
+\begin{pmatrix}
+x_1 \\ x_2 \\ \vdots \\ x_n
+\end{pmatrix}
+$$&lt;/div&gt;
+&lt;p&gt;代码是：&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;独立行复杂数学式：
+
+$$
+\begin{pmatrix}
+a&lt;span class="ge"&gt;_{11} &amp;amp; a_&lt;/span&gt;{12} &amp;amp; \cdots &amp;amp; a_{1n} \\
+a&lt;span class="ge"&gt;_{21} &amp;amp; a_&lt;/span&gt;{22} &amp;amp; \cdots &amp;amp; a_{2n} \\
+\vdots &amp;amp; \vdots &amp;amp; \ddots &amp;amp; \vdots \\
+a&lt;span class="ge"&gt;_{n1} &amp;amp; a_&lt;/span&gt;{n2} &amp;amp; \cdots &amp;amp; a_{nn}
+\end{pmatrix}
+\begin{pmatrix}
+x&lt;span class="ge"&gt;_1 \\ x_&lt;/span&gt;2 \\ \vdots \\ x_n
+&lt;span class="gh"&gt;\end{pmatrix}&lt;/span&gt;
+&lt;span class="gh"&gt;=&lt;/span&gt;
+\lambda
+\begin{pmatrix}
+x&lt;span class="ge"&gt;_1 \\ x_&lt;/span&gt;2 \\ \vdots \\ x_n
+\end{pmatrix}
+$$
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;以上，应该够用了。&lt;/p&gt;
+&lt;script type="text/javascript"&gt;if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+    var align = "center",
+        indent = "0em",
+        linebreak = "false";
+
+    if (true) {
+        align = (screen.width &lt; 768) ? "left" : align;
+        indent = (screen.width &lt; 768) ? "0em" : indent;
+        linebreak = (screen.width &lt; 768) ? 'true' : linebreak;
+    }
+
+    var mathjaxscript = document.createElement('script');
+    mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
+    mathjaxscript.type = 'text/javascript';
+    mathjaxscript.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.3/latest.js?config=TeX-AMS-MML_HTMLorMML';
+
+    var configscript = document.createElement('script');
+    configscript.type = 'text/x-mathjax-config';
+    configscript[(window.opera ? "innerHTML" : "text")] =
+        "MathJax.Hub.Config({" +
+        "    config: ['MMLorHTML.js']," +
+        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'none' } }," +
+        "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
+        "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
+        "    displayAlign: '"+ align +"'," +
+        "    displayIndent: '"+ indent +"'," +
+        "    showMathMenu: true," +
+        "    messageStyle: 'normal'," +
+        "    tex2jax: { " +
+        "        inlineMath: [ ['\\\\(','\\\\)'] ], " +
+        "        displayMath: [ ['$$','$$'] ]," +
+        "        processEscapes: true," +
+        "        preview: 'TeX'," +
+        "    }, " +
+        "    'HTML-CSS': { " +
+        "        availableFonts: ['STIX', 'TeX']," +
+        "        preferredFont: 'STIX'," +
+        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'inherit ! important'} }," +
+        "        linebreaks: { automatic: "+ linebreak +", width: '90% container' }," +
+        "    }, " +
+        "}); " +
+        "if ('default' !== 'default') {" +
+            "MathJax.Hub.Register.StartupHook('HTML-CSS Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax['HTML-CSS'].FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+            "MathJax.Hub.Register.StartupHook('SVG Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax.SVG.FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+        "}";
+
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(configscript);
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
+}
+&lt;/script&gt;</content><category term="others"/><category term="Pelican"/><category term="数学"/></entry><entry><title>一个严谨的.gitattributes文件</title><link href="https://funcman.me/a_rigorous_dot_gitattributes_file.html" rel="alternate"/><published>2026-05-14T21:33:24+08:00</published><updated>2026-05-14T21:33:24+08:00</updated><author><name>funcman</name></author><id>tag:funcman.me,2026-05-14:/a_rigorous_dot_gitattributes_file.html</id><summary type="html">&lt;p&gt;一个严谨的.gitattributes文件要怎么写？&lt;/p&gt;</summary><content type="html">&lt;p&gt;一个严谨的Git项目库应该有&lt;code&gt;.gitattributes&lt;/code&gt;文件，来让Git在不同操作系统和场景环境下，根据设定的规则处理文件。&lt;/p&gt;
 &lt;p&gt;&lt;code&gt;.gitattributes&lt;/code&gt;文件的常见用途有：&lt;/p&gt;
 &lt;ol&gt;
 &lt;li&gt;
@@ -77,7 +328,7 @@ Assets/Resources/Data/Data.bytes filter=lfs diff=lfs merge=lfs -text
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
 &lt;p&gt;&lt;img alt="Good and Bad PNG" src="images/good_and_bad_png.png"&gt;&lt;/p&gt;
-&lt;p&gt;显然是Git在提交时，把&lt;code&gt;CRLF&lt;/code&gt;改成了&lt;code&gt;LF&lt;/code&gt;。&lt;/p&gt;</content><category term="codiing"/><category term="Git"/><category term="笔记"/></entry><entry><title>Arch Linux 的基本安装</title><link href="https://funcman.me/basic_arch_linux_installation.html" rel="alternate"/><published>2026-04-18T23:47:37+08:00</published><updated>2026-04-18T23:47:37+08:00</updated><author><name>funcman</name></author><id>tag:funcman.me,2026-04-18:/basic_arch_linux_installation.html</id><summary type="html">&lt;p&gt;上班摸鱼时，在虚拟机上安装了一套 Arch Linux...&lt;/p&gt;</summary><content type="html">&lt;p&gt;好久没写博客，最近AI浪潮，忙疯了，反而做事的效率上来了。于是开了一堆坑，比如继续写博客。&lt;/p&gt;
+&lt;p&gt;显然是Git在提交时，把&lt;code&gt;CRLF&lt;/code&gt;改成了&lt;code&gt;LF&lt;/code&gt;。&lt;/p&gt;</content><category term="codiing"/><category term="Git"/><category term="Debug"/></entry><entry><title>Arch Linux 的基本安装</title><link href="https://funcman.me/basic_arch_linux_installation.html" rel="alternate"/><published>2026-04-18T23:47:37+08:00</published><updated>2026-04-18T23:47:37+08:00</updated><author><name>funcman</name></author><id>tag:funcman.me,2026-04-18:/basic_arch_linux_installation.html</id><summary type="html">&lt;p&gt;上班摸鱼时，在虚拟机上安装了一套 Arch Linux...&lt;/p&gt;</summary><content type="html">&lt;p&gt;好久没写博客，最近AI浪潮，忙疯了，反而做事的效率上来了。于是开了一堆坑，比如继续写博客。&lt;/p&gt;
 &lt;h2&gt;为什么是Arch？&lt;/h2&gt;
 &lt;p&gt;我一直是Debian/Ubuntu的用户，以前还作为Desktop来用。这几年它们主要作为Server的OS，很好用，也不打算换。&lt;/p&gt;
 &lt;p&gt;而Arch，我主要是看中它的高度可折腾性。我希望借由Arch能够回到将Linux作为Desktop方面的生产主力的状态。&lt;/p&gt;
@@ -540,7 +791,7 @@ reboot&lt;span class="w"&gt;         &lt;/span&gt;&lt;span class="c1"&gt;#重启
 &lt;ol&gt;
 &lt;li&gt;写&lt;code&gt;$E000&lt;/code&gt;以确认IRQ并禁用&lt;code&gt;IRQ计数器&lt;/code&gt;&lt;/li&gt;
 &lt;/ol&gt;
-&lt;p&gt;你在游戏使用MMC3的IRQ之前，有几件事情你必须设置好。&lt;strong&gt;首先&lt;/strong&gt;，你要设置好ROM结尾中断向量表里的IRQ向量，指向IRQ发生时你想被调用的代码。IRQ向量的位置在$FFFE，在NMI向量和RESET向量的右边。当一个IRQ中断触发时，CPU会跳到的16位地址$FFFE上，并且CPU标志被自动存下来，在IRQ程序返回时自动恢复。但是CPU的寄存器不会被保存，所以你必须确保在IRQ程序结束时，它们会被恢复原样（开始时应该入栈AXY寄存器，结束时出栈YXA，注意顺序）。&lt;/p&gt;
+&lt;p&gt;你在游戏使用MMC3的IRQ之前，有几件事情你必须设置好。&lt;strong&gt;首先&lt;/strong&gt;，你要设置好ROM结尾中断向量表里的IRQ向量，指向IRQ发生时你想被调用的代码。IRQ向量的位置在&lt;span class="math"&gt;\(FFFE，在NMI向量和RESET向量的右边。当一个IRQ中断触发时，CPU会跳到的16位地址\)&lt;/span&gt;FFFE上，并且CPU标志被自动存下来，在IRQ程序返回时自动恢复。但是CPU的寄存器不会被保存，所以你必须确保在IRQ程序结束时，它们会被恢复原样（开始时应该入栈AXY寄存器，结束时出栈YXA，注意顺序）。&lt;/p&gt;
 &lt;p&gt;&lt;strong&gt;第二&lt;/strong&gt;件你必须做的事情，使用MMC3的IRQ，就要阻止其他的在NES上产生的IRQ中断。NES有一个“帧计数器”，默认会在每帧结束时产生IRQ中断，非常像NMI。如果不禁用这个，你的IRQ代码次数，会比你要的更多，从而搞砸你的游戏。禁用帧计数器的IRQ中断，只需要在你的程序开始时，把&lt;code&gt;$40&lt;/code&gt;写入到&lt;code&gt;$4017&lt;/code&gt;。&lt;/p&gt;
 &lt;p&gt;&lt;strong&gt;最后&lt;/strong&gt;，为了能够使用IRQ，你一定要告诉NES的CPU，你有实际确认它们，而不是忽略了它们，因为它在默认情况下（这也是为什么你不必担心在简单的游戏里，帧计数器的IRQ的发生 - CPU实际上忽略了它们）会启用的IRQ。你必须用“CLI”指令清除CPU中的中断禁用标志。在某些时刻，如果你想重新禁用它们，要用“SEI”。&lt;/p&gt;
 &lt;p&gt;下面是一个在nbasic中使用MMC3 IRQ中断的最小例子。 它使用一个IRQ中断来改变屏幕上一半的背景颜色，而不需要使用&lt;code&gt;Sprite-0-Hits&lt;/code&gt;来确定你的位置。&lt;/p&gt;
@@ -642,7 +893,70 @@ reboot&lt;span class="w"&gt;         &lt;/span&gt;&lt;span class="c1"&gt;#重启
 &lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="na"&gt;.org&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="no"&gt;$fffa&lt;/span&gt;
 &lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="na"&gt;.dw&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="no"&gt;nmi&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="no"&gt;start&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="no"&gt;irq&lt;/span&gt;
 &lt;span class="nf"&gt;endasm&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</content><category term="gamedev"/><category term="红白机"/><category term="FC"/><category term="NES"/><category term="IRQ"/><category term="MMC3"/><category term="芯片"/></entry><entry><title>如何配置运行在Docker中的GitLab的外部地址</title><link href="https://funcman.me/how_to_configure_gitlab_external_url_in_docker.html" rel="alternate"/><published>2022-06-09T15:56:42+08:00</published><updated>2022-06-09T15:56:42+08:00</updated><author><name>funcman</name></author><id>tag:funcman.me,2022-06-09:/how_to_configure_gitlab_external_url_in_docker.html</id><summary type="html">&lt;p&gt;家里弄了个NAS服务器，在NAS上安装了一个Docker，于是弄了很多内部服务放在Docker上跑。&lt;/p&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;script type="text/javascript"&gt;if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+    var align = "center",
+        indent = "0em",
+        linebreak = "false";
+
+    if (true) {
+        align = (screen.width &lt; 768) ? "left" : align;
+        indent = (screen.width &lt; 768) ? "0em" : indent;
+        linebreak = (screen.width &lt; 768) ? 'true' : linebreak;
+    }
+
+    var mathjaxscript = document.createElement('script');
+    mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
+    mathjaxscript.type = 'text/javascript';
+    mathjaxscript.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.3/latest.js?config=TeX-AMS-MML_HTMLorMML';
+
+    var configscript = document.createElement('script');
+    configscript.type = 'text/x-mathjax-config';
+    configscript[(window.opera ? "innerHTML" : "text")] =
+        "MathJax.Hub.Config({" +
+        "    config: ['MMLorHTML.js']," +
+        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'none' } }," +
+        "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
+        "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
+        "    displayAlign: '"+ align +"'," +
+        "    displayIndent: '"+ indent +"'," +
+        "    showMathMenu: true," +
+        "    messageStyle: 'normal'," +
+        "    tex2jax: { " +
+        "        inlineMath: [ ['\\\\(','\\\\)'] ], " +
+        "        displayMath: [ ['$$','$$'] ]," +
+        "        processEscapes: true," +
+        "        preview: 'TeX'," +
+        "    }, " +
+        "    'HTML-CSS': { " +
+        "        availableFonts: ['STIX', 'TeX']," +
+        "        preferredFont: 'STIX'," +
+        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'inherit ! important'} }," +
+        "        linebreaks: { automatic: "+ linebreak +", width: '90% container' }," +
+        "    }, " +
+        "}); " +
+        "if ('default' !== 'default') {" +
+            "MathJax.Hub.Register.StartupHook('HTML-CSS Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax['HTML-CSS'].FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+            "MathJax.Hub.Register.StartupHook('SVG Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax.SVG.FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+        "}";
+
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(configscript);
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
+}
+&lt;/script&gt;</content><category term="gamedev"/><category term="红白机"/><category term="FC"/><category term="NES"/><category term="IRQ"/><category term="MMC3"/><category term="芯片"/></entry><entry><title>如何配置运行在Docker中的GitLab的外部地址</title><link href="https://funcman.me/how_to_configure_gitlab_external_url_in_docker.html" rel="alternate"/><published>2022-06-09T15:56:42+08:00</published><updated>2022-06-09T15:56:42+08:00</updated><author><name>funcman</name></author><id>tag:funcman.me,2022-06-09:/how_to_configure_gitlab_external_url_in_docker.html</id><summary type="html">&lt;p&gt;家里弄了个NAS服务器，在NAS上安装了一个Docker，于是弄了很多内部服务放在Docker上跑。&lt;/p&gt;
 &lt;p&gt;但是在设置GitLab时遇到了点问题，经过一番折腾，得到这个很简单的处理方式。&lt;/p&gt;
 &lt;p&gt;先说问题。大 …&lt;/p&gt;</summary><content type="html">&lt;p&gt;家里弄了个NAS服务器，在NAS上安装了一个Docker，于是弄了很多内部服务放在Docker上跑。&lt;/p&gt;
 &lt;p&gt;但是在设置GitLab时遇到了点问题，经过一番折腾，得到这个很简单的处理方式。&lt;/p&gt;
