@@ -95,9 +95,9 @@
 </code></pre></div>
 
 <h2>设置时钟</h2>
-<div class="highlight"><pre><span></span><code>timedetectl set-ntp true
-timedatectl set-timezon Asia/Shanghai
-timedatectl status
+<div class="highlight"><pre><span></span><code>timedetectl<span class="w"> </span>set-ntp<span class="w"> </span><span class="nb">true</span>
+timedatectl<span class="w"> </span>set-timezon<span class="w"> </span>Asia/Shanghai
+timedatectl<span class="w"> </span>status
 </code></pre></div>
 
 <h2>设置镜像</h2>
@@ -155,7 +155,7 @@ timedatectl status
 </code></pre></div>
 
 <p>可以看一下挂载情况</p>
-<div class="highlight"><pre><span></span><code>df -h
+<div class="highlight"><pre><span></span><code>df<span class="w"> </span>-h
 </code></pre></div>
 
 <p>创建两个子卷</p>
@@ -259,14 +259,14 @@ cat<span class="w"> </span>/mnt/etc/fstab
 </code></pre></div>
 
 <h2>为 root 用户设置密码</h2>
-<div class="highlight"><pre><span></span><code>passwd root
+<div class="highlight"><pre><span></span><code>passwd<span class="w"> </span>root
 </code></pre></div>
 
 <p>输入两遍相同的密码</p>
 <h2>安装微码</h2>
 <p>根据你用的CPU制造商安装对应的微码</p>
-<div class="highlight"><pre><span></span><code>pacman -S intel-ucode #Intel
-pacman -S amd-ucode #AMD
+<div class="highlight"><pre><span></span><code>pacman<span class="w"> </span>-S<span class="w"> </span>intel-ucode<span class="w"> </span><span class="c1">#Intel</span>
+pacman<span class="w"> </span>-S<span class="w"> </span>amd-ucode<span class="w"> </span><span class="c1">#AMD</span>
 </code></pre></div>
 
 <p>虚拟机就不用装了</p>

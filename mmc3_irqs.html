@@ -97,10 +97,10 @@
 </blockquote>
 <div class="highlight"><pre><span></span><code><span class="c1">;//nesasm文件头</span>
 <span class="nf">asm</span>
-<span class="w">    </span><span class="na">.inesprg</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="c1">;//1个PRG段</span>
-<span class="w">    </span><span class="na">.ineschr</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="c1">;//0个CHR段</span>
-<span class="w">    </span><span class="na">.inesmir</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="c1">;//镜像类型0</span>
-<span class="w">    </span><span class="na">.inesmap</span><span class="w"> </span><span class="mi">4</span><span class="w"> </span><span class="c1">;//内存使用mapper 4 (MMC3)</span>
+<span class="w">    </span><span class="na">.inesprg</span><span class="w"> </span><span class="mi">1</span><span class="w">              </span><span class="c1">;//1个PRG段</span>
+<span class="w">    </span><span class="na">.ineschr</span><span class="w"> </span><span class="mi">0</span><span class="w">              </span><span class="c1">;//0个CHR段</span>
+<span class="w">    </span><span class="na">.inesmir</span><span class="w"> </span><span class="mi">0</span><span class="w">              </span><span class="c1">;//镜像类型0</span>
+<span class="w">    </span><span class="na">.inesmap</span><span class="w"> </span><span class="mi">4</span><span class="w">              </span><span class="c1">;//内存使用mapper 4 (MMC3)</span>
 <span class="w">    </span><span class="na">.org</span><span class="w"> </span><span class="no">$C000</span>
 <span class="w">    </span><span class="na">.bank</span><span class="w"> </span><span class="mi">0</span>
 <span class="nf">endasm</span>
@@ -148,9 +148,9 @@
 <span class="w">    </span><span class="nf">tya</span><span class="w">                     </span><span class="c1">;// IRQ中断了你的主线程代码。改变你的</span>
 <span class="w">    </span><span class="nf">pha</span><span class="w">                     </span><span class="c1">;// 寄存器值，对主线程来说，这是可是</span>
 <span class="w">                            </span><span class="c1">;// 不太好的...</span>
-<span class="nf">endasm</span><span class="w">                      </span>
+<span class="nf">endasm</span>
 
-<span class="w">    </span><span class="no">set</span><span class="w"> </span><span class="no">$2001</span><span class="w"> </span><span class="no">$00</span><span class="w">           </span><span class="c1">;// 强制关闭背景，迫使愚蠢的模拟器意识到我在改变背景色</span>
+<span class="w">    </span><span class="nf">set</span><span class="w"> </span><span class="no">$2001</span><span class="w"> </span><span class="no">$00</span><span class="w">           </span><span class="c1">;// 强制关闭背景，迫使愚蠢的模拟器意识到我在改变背景色</span>
 
 <span class="w">    </span><span class="nf">set</span><span class="w"> </span><span class="no">$2006</span><span class="w"> </span><span class="no">$3F</span>
 <span class="w">    </span><span class="nf">set</span><span class="w"> </span><span class="no">$2006</span><span class="w"> </span><span class="no">$00</span><span class="w">           </span><span class="c1">;// 设置背景色为绿色</span>
@@ -176,10 +176,10 @@
 <span class="nl">vwait:</span>
 <span class="w">    </span><span class="nf">asm</span>
 <span class="w">        </span><span class="nf">lda</span><span class="w"> </span><span class="no">$2002</span>
-<span class="w">        </span><span class="nf">bpl</span><span class="w"> </span><span class="no">vwait</span><span class="w">   </span><span class="c1">;//等待回溯开始</span>
+<span class="w">        </span><span class="nf">bpl</span><span class="w"> </span><span class="no">vwait</span><span class="w">           </span><span class="c1">;//等待回溯开始</span>
 <span class="w">    </span><span class="nl">vwait_1:</span>
 <span class="w">        </span><span class="nf">lda</span><span class="w"> </span><span class="no">$2002</span>
-<span class="w">        </span><span class="nf">bmi</span><span class="w"> </span><span class="no">vwait_1</span><span class="w"> </span><span class="c1">;//等待回溯结束</span>
+<span class="w">        </span><span class="nf">bmi</span><span class="w"> </span><span class="no">vwait_1</span><span class="w">         </span><span class="c1">;//等待回溯结束</span>
 <span class="w">    </span><span class="nf">endasm</span>
 <span class="w">    </span><span class="nf">return</span>
 

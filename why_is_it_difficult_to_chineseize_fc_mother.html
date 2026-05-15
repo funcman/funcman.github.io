@@ -68,7 +68,7 @@
 	<h1 class="post-title">这可能是FC游戏《地球冒险》难以汉化的原因</h1>
 	<span class="post-date">2023年01月13日 星期五</span>
 	<p>FC游戏《地球冒险》是红白机上的知名作品。作为一个RPG，它有大量的文字。这样的游戏理应出现汉化版，毕竟中文游戏圈已经做了这么多年汉化了。但是事实上就是没有弄出来。我作为一个红白机开发技术上的萌新，尝试一下从技术上分析，这个游戏的汉化难度。</p>
-<p><img alt="《地球冒险》标题" src="./images/fc-mother-title.png"> <img alt="《地球冒险》对话" src="./images/fc-mother-talk.png"> </p>
+<p><img alt="《地球冒险》标题" src="./images/fc-mother-title.png"> <img alt="《地球冒险》对话" src="./images/fc-mother-talk.png"></p>
 <p>《地球冒险》的一些基本信息：它是个日版游戏，标题名称为“Mother”。没有出过官方英文版，但是有爱好者改制的英化版。从Mapper的角度看，它是一个Mapper4游戏，使用了MMC3芯片。</p>
 <p><a href="./mmc3_irqs.html">MMC3支持IRQ中断</a>，它可以对扫描线进行计数，可以在PPU绘制第N条扫描线时，触发IRQ中断。在IRQ中断执行代码中，我们可以更改PPU绘制时依赖的各种数据。这意味着，我们可以实现屏幕分区域的绘制。比如在第N条扫描线时，改变图样表（Pattern Table）对CHR-ROM的映射。然后在第M条扫描线时，把图样表改回来。这样就能跨段（Bank）绘制更多的CHR（在背景中）。</p>
 <p>下面我们来看《地球冒险》中战斗画面的一帧：</p>

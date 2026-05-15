@@ -130,7 +130,8 @@
 *.webp   binary
 *.bytes  binary
 
-# 5. LFS文件，对于大尺寸文件，要纳入LFS管理，“-text”表示这个文件非文本文件
+# 5. LFS文件，对于大尺寸文件，要纳入LFS管理
+#    “-text”表示这个文件非文本文件
 Assets/Resources/Data/Data.bytes filter=lfs diff=lfs merge=lfs -text
 </code></pre></div>
 

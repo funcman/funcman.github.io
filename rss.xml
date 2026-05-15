@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>funcman's blog</title><link href="https://funcman.me/" rel="alternate"/><link href="https://funcman.me/rss.xml" rel="self"/><id>https://funcman.me/</id><updated>2026-05-15T11:02:12+08:00</updated><entry><title>给Pelican增加数学式和图表的显示</title><link href="https://funcman.me/add_math_and_graphviz_to_pelican.html" rel="alternate"/><published>2026-05-15T11:02:12+08:00</published><updated>2026-05-15T11:02:12+08:00</updated><author><name>funcman</name></author><id>tag:funcman.me,2026-05-15:/add_math_and_graphviz_to_pelican.html</id><summary type="html">&lt;p&gt;AI时代，数学太重要了，所以给Pelican增加了数学表达式的显示。额外的还加了Graphviz图表的功能，因为我感觉也很重要...&lt;/p&gt;</summary><content type="html">&lt;p&gt;AI时代，我觉得数学在我接下来的学习和工作中太重要了，所以我决定给Pelican加上显示数学表达式的功能。&lt;/p&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>funcman's blog</title><link href="https://funcman.me/" rel="alternate"/><link href="https://funcman.me/rss.xml" rel="self"/><id>https://funcman.me/</id><updated>2026-05-15T11:02:12+08:00</updated><entry><title>给Pelican增加数学公式和图表的显示</title><link href="https://funcman.me/add_math_and_graphviz_to_pelican.html" rel="alternate"/><published>2026-05-15T11:02:12+08:00</published><updated>2026-05-15T11:02:12+08:00</updated><author><name>funcman</name></author><id>tag:funcman.me,2026-05-15:/add_math_and_graphviz_to_pelican.html</id><summary type="html">&lt;p&gt;AI时代，数学太重要了，所以给Pelican增加了数学表达式的显示。额外的还加了Graphviz图表的功能，因为我感觉也很重要...&lt;/p&gt;</summary><content type="html">&lt;p&gt;AI时代，我觉得数学在我接下来的学习和工作中太重要了，所以我决定给Pelican加上显示数学表达式的功能。&lt;/p&gt;
 &lt;h2&gt;MathJax 数学公式&lt;/h2&gt;
 &lt;h3&gt;方案选择&lt;/h3&gt;
-&lt;p&gt;大概有三种实现方式：&lt;/p&gt;
+&lt;p&gt;Pelican显示数学公式，大概有三种实现方式：&lt;/p&gt;
 &lt;table&gt;
 &lt;thead&gt;
 &lt;tr&gt;
@@ -149,12 +149,12 @@
 &lt;/ul&gt;
 &lt;h3&gt;效果示例&lt;/h3&gt;
 &lt;p&gt;现在我们试试效果：&lt;/p&gt;
-&lt;p&gt;同一行数学式：&lt;span class="math"&gt;\(\dfrac{1}{1+x^2}\)&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;同一行数学公式：&lt;span class="math"&gt;\(\dfrac{1}{1+x^2}\)&lt;/span&gt;&lt;/p&gt;
 &lt;p&gt;代码是：&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;同一行数学式：$\dfrac{1}{1+x^2}$
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;同一行数学公式：$\dfrac{1}{1+x^2}$
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
-&lt;p&gt;独立行复杂数学式：&lt;/p&gt;
+&lt;p&gt;独立行复杂数学公式：&lt;/p&gt;
 &lt;div class="math"&gt;$$
 \begin{pmatrix}
 a_{11} &amp;amp; a_{12} &amp;amp; \cdots &amp;amp; a_{1n} \\
@@ -172,7 +172,7 @@ x_1 \\ x_2 \\ \vdots \\ x_n
 \end{pmatrix}
 $$&lt;/div&gt;
 &lt;p&gt;代码是：&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;独立行复杂数学式：
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;独立行复杂数学公式：
 
 $$
 \begin{pmatrix}
@@ -388,7 +388,8 @@ digraph finite_state_machine {
 *.webp   binary
 *.bytes  binary
 
-# 5. LFS文件，对于大尺寸文件，要纳入LFS管理，“-text”表示这个文件非文本文件
+# 5. LFS文件，对于大尺寸文件，要纳入LFS管理
+#    “-text”表示这个文件非文本文件
 Assets/Resources/Data/Data.bytes filter=lfs diff=lfs merge=lfs -text
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
@@ -431,9 +432,9 @@ Assets/Resources/Data/Data.bytes filter=lfs diff=lfs merge=lfs -text
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
 &lt;h2&gt;设置时钟&lt;/h2&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;timedetectl set-ntp true
-timedatectl set-timezon Asia/Shanghai
-timedatectl status
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;timedetectl&lt;span class="w"&gt; &lt;/span&gt;set-ntp&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nb"&gt;true&lt;/span&gt;
+timedatectl&lt;span class="w"&gt; &lt;/span&gt;set-timezon&lt;span class="w"&gt; &lt;/span&gt;Asia/Shanghai
+timedatectl&lt;span class="w"&gt; &lt;/span&gt;status
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
 &lt;h2&gt;设置镜像&lt;/h2&gt;
@@ -491,7 +492,7 @@ timedatectl status
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
 &lt;p&gt;可以看一下挂载情况&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;df -h
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;df&lt;span class="w"&gt; &lt;/span&gt;-h
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
 &lt;p&gt;创建两个子卷&lt;/p&gt;
@@ -595,14 +596,14 @@ cat&lt;span class="w"&gt; &lt;/span&gt;/mnt/etc/fstab
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
 &lt;h2&gt;为 root 用户设置密码&lt;/h2&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;passwd root
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;passwd&lt;span class="w"&gt; &lt;/span&gt;root
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
 &lt;p&gt;输入两遍相同的密码&lt;/p&gt;
 &lt;h2&gt;安装微码&lt;/h2&gt;
 &lt;p&gt;根据你用的CPU制造商安装对应的微码&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;pacman -S intel-ucode #Intel
-pacman -S amd-ucode #AMD
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;pacman&lt;span class="w"&gt; &lt;/span&gt;-S&lt;span class="w"&gt; &lt;/span&gt;intel-ucode&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="c1"&gt;#Intel&lt;/span&gt;
+pacman&lt;span class="w"&gt; &lt;/span&gt;-S&lt;span class="w"&gt; &lt;/span&gt;amd-ucode&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="c1"&gt;#AMD&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
 &lt;p&gt;虚拟机就不用装了&lt;/p&gt;
@@ -713,7 +714,7 @@ reboot&lt;span class="w"&gt;         &lt;/span&gt;&lt;span class="c1"&gt;#重启
 &lt;tr&gt;
 &lt;th&gt;型号&lt;/th&gt;
 &lt;th&gt;厂商&lt;/th&gt;
-&lt;th&gt;备注                                        MDMD&lt;/th&gt;
+&lt;th&gt;备注&lt;/th&gt;
 &lt;/tr&gt;
 &lt;/thead&gt;
 &lt;tbody&gt;
@@ -755,7 +756,7 @@ reboot&lt;span class="w"&gt;         &lt;/span&gt;&lt;span class="c1"&gt;#重启
 &lt;tr&gt;
 &lt;td&gt;MC6845&lt;/td&gt;
 &lt;td&gt;摩托罗拉&lt;/td&gt;
-&lt;td&gt;常与Z80和6502在&lt;a href="https://en.wikipedia.org/wiki/Apple_II" title="苹果2"&gt;家用电脑&lt;/a&gt;中搭配使用&lt;/td&gt;
+&lt;td&gt;常与Z80和6502在&lt;a href="https://en.wikipedia.org/wiki/Home_computer" title="这里的“家用电脑”，英文是“Home Computer”。特指七十年代末期出现，八十年代大行其道的个人计算机。它们往往用八位微处理器，键盘和主机集成在一起，用电视作为显示器。中国与之对应的概念是“电脑学习机”。著名的有苹果2、C64、TRS-80等。"&gt;家用电脑&lt;/a&gt;中搭配使用，比如&lt;a href="https://en.wikipedia.org/wiki/Apple_II" title="苹果2"&gt;Apple II&lt;/a&gt;、&lt;a href="https://en.wikipedia.org/wiki/BBC_Micro" title="BBC Micro"&gt;BBC Micro&lt;/a&gt;&lt;/td&gt;
 &lt;/tr&gt;
 &lt;tr&gt;
 &lt;td&gt;MC6847&lt;/td&gt;
@@ -779,8 +780,8 @@ reboot&lt;span class="w"&gt;         &lt;/span&gt;&lt;span class="c1"&gt;#重启
 &lt;/tr&gt;
 &lt;/tbody&gt;
 &lt;/table&gt;
-&lt;p&gt;做这些信息的收集，主要是为了后面自制怀旧风格[家用电脑]做准备。&lt;/p&gt;</content><category term="gamedev"/><category term="GPU"/><category term="PPU"/><category term="VDP"/><category term="CRTC"/><category term="芯片"/></entry><entry><title>这可能是FC游戏《地球冒险》难以汉化的原因</title><link href="https://funcman.me/why_is_it_difficult_to_chineseize_fc_mother.html" rel="alternate"/><published>2023-01-13T09:36:45+08:00</published><updated>2023-01-13T09:36:45+08:00</updated><author><name>funcman</name></author><id>tag:funcman.me,2023-01-13:/why_is_it_difficult_to_chineseize_fc_mother.html</id><summary type="html">&lt;p&gt;FC游戏《地球冒险》是红白机上的知名作品。作为一个RPG，它有大量的文字。这样的游戏理应出现汉化版，毕竟中文游戏圈已经做了 …&lt;/p&gt;</summary><content type="html">&lt;p&gt;FC游戏《地球冒险》是红白机上的知名作品。作为一个RPG，它有大量的文字。这样的游戏理应出现汉化版，毕竟中文游戏圈已经做了这么多年汉化了。但是事实上就是没有弄出来。我作为一个红白机开发技术上的萌新，尝试一下从技术上分析，这个游戏的汉化难度。&lt;/p&gt;
-&lt;p&gt;&lt;img alt="《地球冒险》标题" src="./images/fc-mother-title.png"&gt; &lt;img alt="《地球冒险》对话" src="./images/fc-mother-talk.png"&gt; &lt;/p&gt;
+&lt;p&gt;做这些信息的收集，主要是为了后面自制怀旧风格&lt;a href="https://en.wikipedia.org/wiki/Home_computer" title="这里的“家用电脑”，英文是“Home Computer”。特指七十年代末期出现，八十年代大行其道的个人计算机。它们往往用八位微处理器，键盘和主机集成在一起，用电视作为显示器。中国与之对应的概念是“电脑学习机”。著名的有苹果2、C64、TRS-80等。"&gt;家用电脑&lt;/a&gt;做准备。&lt;/p&gt;</content><category term="gamedev"/><category term="GPU"/><category term="PPU"/><category term="VDP"/><category term="CRTC"/><category term="芯片"/></entry><entry><title>这可能是FC游戏《地球冒险》难以汉化的原因</title><link href="https://funcman.me/why_is_it_difficult_to_chineseize_fc_mother.html" rel="alternate"/><published>2023-01-13T09:36:45+08:00</published><updated>2023-01-13T09:36:45+08:00</updated><author><name>funcman</name></author><id>tag:funcman.me,2023-01-13:/why_is_it_difficult_to_chineseize_fc_mother.html</id><summary type="html">&lt;p&gt;FC游戏《地球冒险》是红白机上的知名作品。作为一个RPG，它有大量的文字。这样的游戏理应出现汉化版，毕竟中文游戏圈已经做了 …&lt;/p&gt;</summary><content type="html">&lt;p&gt;FC游戏《地球冒险》是红白机上的知名作品。作为一个RPG，它有大量的文字。这样的游戏理应出现汉化版，毕竟中文游戏圈已经做了这么多年汉化了。但是事实上就是没有弄出来。我作为一个红白机开发技术上的萌新，尝试一下从技术上分析，这个游戏的汉化难度。&lt;/p&gt;
+&lt;p&gt;&lt;img alt="《地球冒险》标题" src="./images/fc-mother-title.png"&gt; &lt;img alt="《地球冒险》对话" src="./images/fc-mother-talk.png"&gt;&lt;/p&gt;
 &lt;p&gt;《地球冒险》的一些基本信息：它是个日版游戏，标题名称为“Mother”。没有出过官方英文版，但是有爱好者改制的英化版。从Mapper的角度看，它是一个Mapper4游戏，使用了MMC3芯片。&lt;/p&gt;
 &lt;p&gt;&lt;a href="./mmc3_irqs.html"&gt;MMC3支持IRQ中断&lt;/a&gt;，它可以对扫描线进行计数，可以在PPU绘制第N条扫描线时，触发IRQ中断。在IRQ中断执行代码中，我们可以更改PPU绘制时依赖的各种数据。这意味着，我们可以实现屏幕分区域的绘制。比如在第N条扫描线时，改变图样表（Pattern Table）对CHR-ROM的映射。然后在第M条扫描线时，把图样表改回来。这样就能跨段（Bank）绘制更多的CHR（在背景中）。&lt;/p&gt;
 &lt;p&gt;下面我们来看《地球冒险》中战斗画面的一帧：&lt;/p&gt;
@@ -875,10 +876,10 @@ reboot&lt;span class="w"&gt;         &lt;/span&gt;&lt;span class="c1"&gt;#重启
 &lt;/blockquote&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="c1"&gt;;//nesasm文件头&lt;/span&gt;
 &lt;span class="nf"&gt;asm&lt;/span&gt;
-&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="na"&gt;.inesprg&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="c1"&gt;;//1个PRG段&lt;/span&gt;
-&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="na"&gt;.ineschr&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="c1"&gt;;//0个CHR段&lt;/span&gt;
-&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="na"&gt;.inesmir&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="c1"&gt;;//镜像类型0&lt;/span&gt;
-&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="na"&gt;.inesmap&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;4&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="c1"&gt;;//内存使用mapper 4 (MMC3)&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="na"&gt;.inesprg&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="w"&gt;              &lt;/span&gt;&lt;span class="c1"&gt;;//1个PRG段&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="na"&gt;.ineschr&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="w"&gt;              &lt;/span&gt;&lt;span class="c1"&gt;;//0个CHR段&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="na"&gt;.inesmir&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="w"&gt;              &lt;/span&gt;&lt;span class="c1"&gt;;//镜像类型0&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="na"&gt;.inesmap&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;4&lt;/span&gt;&lt;span class="w"&gt;              &lt;/span&gt;&lt;span class="c1"&gt;;//内存使用mapper 4 (MMC3)&lt;/span&gt;
 &lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="na"&gt;.org&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="no"&gt;$C000&lt;/span&gt;
 &lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="na"&gt;.bank&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;
 &lt;span class="nf"&gt;endasm&lt;/span&gt;
@@ -926,9 +927,9 @@ reboot&lt;span class="w"&gt;         &lt;/span&gt;&lt;span class="c1"&gt;#重启
 &lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="nf"&gt;tya&lt;/span&gt;&lt;span class="w"&gt;                     &lt;/span&gt;&lt;span class="c1"&gt;;// IRQ中断了你的主线程代码。改变你的&lt;/span&gt;
 &lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="nf"&gt;pha&lt;/span&gt;&lt;span class="w"&gt;                     &lt;/span&gt;&lt;span class="c1"&gt;;// 寄存器值，对主线程来说，这是可是&lt;/span&gt;
 &lt;span class="w"&gt;                            &lt;/span&gt;&lt;span class="c1"&gt;;// 不太好的...&lt;/span&gt;
-&lt;span class="nf"&gt;endasm&lt;/span&gt;&lt;span class="w"&gt;                      &lt;/span&gt;
+&lt;span class="nf"&gt;endasm&lt;/span&gt;
 
-&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="no"&gt;set&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="no"&gt;$2001&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="no"&gt;$00&lt;/span&gt;&lt;span class="w"&gt;           &lt;/span&gt;&lt;span class="c1"&gt;;// 强制关闭背景，迫使愚蠢的模拟器意识到我在改变背景色&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="nf"&gt;set&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="no"&gt;$2001&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="no"&gt;$00&lt;/span&gt;&lt;span class="w"&gt;           &lt;/span&gt;&lt;span class="c1"&gt;;// 强制关闭背景，迫使愚蠢的模拟器意识到我在改变背景色&lt;/span&gt;
 
 &lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="nf"&gt;set&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="no"&gt;$2006&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="no"&gt;$3F&lt;/span&gt;
 &lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="nf"&gt;set&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="no"&gt;$2006&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="no"&gt;$00&lt;/span&gt;&lt;span class="w"&gt;           &lt;/span&gt;&lt;span class="c1"&gt;;// 设置背景色为绿色&lt;/span&gt;
@@ -954,10 +955,10 @@ reboot&lt;span class="w"&gt;         &lt;/span&gt;&lt;span class="c1"&gt;#重启
 &lt;span class="nl"&gt;vwait:&lt;/span&gt;
 &lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="nf"&gt;asm&lt;/span&gt;
 &lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="nf"&gt;lda&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="no"&gt;$2002&lt;/span&gt;
-&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="nf"&gt;bpl&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="no"&gt;vwait&lt;/span&gt;&lt;span class="w"&gt;   &lt;/span&gt;&lt;span class="c1"&gt;;//等待回溯开始&lt;/span&gt;
+&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="nf"&gt;bpl&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="no"&gt;vwait&lt;/span&gt;&lt;span class="w"&gt;           &lt;/span&gt;&lt;span class="c1"&gt;;//等待回溯开始&lt;/span&gt;
 &lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="nl"&gt;vwait_1:&lt;/span&gt;
 &lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="nf"&gt;lda&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="no"&gt;$2002&lt;/span&gt;
-&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="nf"&gt;bmi&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="no"&gt;vwait_1&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="c1"&gt;;//等待回溯结束&lt;/span&gt;
+&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="nf"&gt;bmi&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="no"&gt;vwait_1&lt;/span&gt;&lt;span class="w"&gt;         &lt;/span&gt;&lt;span class="c1"&gt;;//等待回溯结束&lt;/span&gt;
 &lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="nf"&gt;endasm&lt;/span&gt;
 &lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="nf"&gt;return&lt;/span&gt;
 
@@ -1265,13 +1266,13 @@ unix&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="m"&gt;2&lt;/span&gt;&lt
 &lt;h2&gt;为什么要用Orthodox C++？&lt;/h2&gt;
 &lt;p&gt;基于Orthodox C++限制所编写的代码，将更容易理解，更简单，并且可以用更老的编译器构建。用Orthodox C++子集编写的项目，将更容易被其他C++项目接受，因为Orthodox C++用到的子集，不太会与采用者的C++子集偏好相冲突。&lt;/p&gt;
 &lt;h2&gt;使用Orthodox C++编写的Hello World&lt;/h2&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="cp"&gt;#include&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="cpf"&gt;&amp;lt;stdio.h&amp;gt;&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="cp"&gt;#include&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="cpf"&gt;&amp;lt;stdio.h&amp;gt;&lt;/span&gt;
 
-&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="kt"&gt;int&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nf"&gt;main&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
-&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;
-&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="n"&gt;printf&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;hello, world&lt;/span&gt;&lt;span class="se"&gt;\n&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
-&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="k"&gt;return&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
-&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;span class="kt"&gt;int&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nf"&gt;main&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+&lt;span class="p"&gt;{&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="n"&gt;printf&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;hello, world&lt;/span&gt;&lt;span class="se"&gt;\n&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="k"&gt;return&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
 &lt;h2&gt;我该使用什么？&lt;/h2&gt;
@@ -1365,25 +1366,25 @@ unix&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="m"&gt;2&lt;/span&gt;&lt
 &lt;p&gt;MSYS2集成了Pacman和MinGW-w64。&lt;/p&gt;
 &lt;p&gt;我们在中国使用MSYS2，最好设置一下国内的镜像，网上的文章基本都是让用&lt;a href="https://lug.ustc.edu.cn/wiki/mirrors/help/msys2"&gt;中科大的镜像&lt;/a&gt;，但目前他们的东西有点问题，只好改用&lt;a href="https://mirrors.tuna.tsinghua.edu.cn/help/msys2"&gt;清华的镜像&lt;/a&gt;。可惜了，实际上中科大离我很近。&lt;/p&gt;
 &lt;p&gt;按照页面上的说明设置好镜像，并执行：&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;pacman -Syu
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;pacman&lt;span class="w"&gt; &lt;/span&gt;-Syu
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
 &lt;p&gt;在最后提示关闭MSYS2时，点窗口的X进行关闭，再去MSYS2安装目录里运行一下autorebase.bat。然后打开MSYS2，执行一下更新：&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;pacman -Su
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;pacman&lt;span class="w"&gt; &lt;/span&gt;-Su
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
 &lt;p&gt;之后就安装一系列软件，我这里是：&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="n"&gt;pacman&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;S&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;vim&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;git&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;base&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;devel&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;mingw&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;w64&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;x86_64&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;toolchain&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;mingw&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;w64&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;x86_64&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;ruby&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;mingw&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;w64&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;x86_64&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;ruby&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;native&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;package&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;installer&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;pacman&lt;span class="w"&gt; &lt;/span&gt;-S&lt;span class="w"&gt; &lt;/span&gt;vim&lt;span class="w"&gt; &lt;/span&gt;git&lt;span class="w"&gt; &lt;/span&gt;base-devel&lt;span class="w"&gt; &lt;/span&gt;mingw-w64-x86_64-toolchain&lt;span class="w"&gt; &lt;/span&gt;mingw-w64-x86_64-ruby&lt;span class="w"&gt; &lt;/span&gt;mingw-w64-x86_64-ruby-native-package-installer
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
 &lt;p&gt;之所以是使用mingw64/mingw-w64-x86_64-ruby，而不是msys/ruby，是因为我先用它试了一番，在Gem安装Jekyll时总是有个库编不过去。我没有深究下去，先这么着吧，以后有空再找找解决方法。&lt;/p&gt;
 &lt;p&gt;安装了这个版本的Ruby之后，需要将&lt;a href="https://github.com/msys2/msys2/wiki/MSYS2-introduction#subsystems"&gt;shell type&lt;/a&gt;设为mingw64进入MSYS2环境，也就是从“MSYS2 MinGW 64-bit”而不是“MSYS2 MSYS”进。前者会把/mingw64/bin加入到PATH里，而此版本Ruby安装在/mingw64/bin中。&lt;/p&gt;
 &lt;p&gt;然后，我用Gem安装Bundler和Jekyll：&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;gem install bundler jekyll
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;gem&lt;span class="w"&gt; &lt;/span&gt;install&lt;span class="w"&gt; &lt;/span&gt;bundler&lt;span class="w"&gt; &lt;/span&gt;jekyll
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
 &lt;p&gt;我已经有个很久没写过的旧博客，需要升级一下，所以进入博客的目录，执行了一下：&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;bundle update
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;bundle&lt;span class="w"&gt; &lt;/span&gt;update
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
 &lt;p&gt;据说升级Gem是一件很折腾人的事情，Ruby程序员往往一次升级单个Gem，一次性bundle update，容易出问题。我也是反复在bundle install和bundle update之间折腾，才搞定了这件事。具体可以查一下&lt;a href="https://bing.com/search?q=bundle%20install%20bundle%20update%20%E5%8C%BA%E5%88%AB"&gt;bundle install和bundle update之间的区别&lt;/a&gt;。&lt;/p&gt;
@@ -1414,7 +1415,7 @@ unix&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="m"&gt;2&lt;/span&gt;&lt
 &lt;p&gt;我们可以在“关于本机”-“系统报告”-“硬件”-“USB”里查看适配线的VID（厂商ID），来确定适配线是否基于CH34x芯片。CH34x的VID是0x1a86，我这根的PID（产品ID）是0x7523，你的PID可能不同，0x5523也是一个可用的PID。&lt;/p&gt;
 &lt;p&gt;确定芯片后，就可以去找驱动程序了。沁恒的网址是&lt;a href="http://www.wch.cn"&gt;http://www.wch.cn&lt;/a&gt;，我们可以从上面找到我们需要的驱动。&lt;a href="http://www.wch.cn/download/CH341SER_MAC_ZIP.html"&gt;Mac的驱动也是有的&lt;/a&gt;，不过太老了，未经签名，所以通过不了苹果在OSX 10.11上加入的SIP&lt;sup id="fnref:1"&gt;&lt;a class="footnote-ref" href="#fn:1"&gt;1&lt;/a&gt;&lt;/sup&gt;保护技术。如果直接安装这个驱动，肯定是用不了的。必须屏蔽SIP对kext&lt;sup id="fnref:2"&gt;&lt;a class="footnote-ref" href="#fn:2"&gt;2&lt;/a&gt;&lt;/sup&gt;的保护。&lt;/p&gt;
 &lt;p&gt;设置SIP，我们需要用到csrutil，它就是SIP的配置修改工具。使用csrutil，必须进入恢复模式。恢复模式的进入方法是：开机（重启）时，同时按CMD键和R键。进入恢复模式之后，在“实用工具”里找到“终端”，在终端里输入：&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;csrutil enable --without kext
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;csrutil&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nb"&gt;enable&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;--without&lt;span class="w"&gt; &lt;/span&gt;kext
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
 &lt;p&gt;然后重启。这时再去安装从沁恒公司网站下载的那个Mac驱动。安装完成后，再次重启，进入系统之后就能在&lt;strong&gt;/dev&lt;/strong&gt;下面找到&lt;strong&gt;tty.wchusbserial14130&lt;/strong&gt;了。注意，因为我的PID是0x7523，所以tty.wchusbserial后面的数字是14130（即0x7523的十进制数）。你也可能看到别的类似的设备文件名。&lt;/p&gt;

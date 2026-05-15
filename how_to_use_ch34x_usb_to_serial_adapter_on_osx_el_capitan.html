@@ -71,7 +71,7 @@
 <p>我们可以在“关于本机”-“系统报告”-“硬件”-“USB”里查看适配线的VID（厂商ID），来确定适配线是否基于CH34x芯片。CH34x的VID是0x1a86，我这根的PID（产品ID）是0x7523，你的PID可能不同，0x5523也是一个可用的PID。</p>
 <p>确定芯片后，就可以去找驱动程序了。沁恒的网址是<a href="http://www.wch.cn">http://www.wch.cn</a>，我们可以从上面找到我们需要的驱动。<a href="http://www.wch.cn/download/CH341SER_MAC_ZIP.html">Mac的驱动也是有的</a>，不过太老了，未经签名，所以通过不了苹果在OSX 10.11上加入的SIP<sup id="fnref:1"><a class="footnote-ref" href="#fn:1">1</a></sup>保护技术。如果直接安装这个驱动，肯定是用不了的。必须屏蔽SIP对kext<sup id="fnref:2"><a class="footnote-ref" href="#fn:2">2</a></sup>的保护。</p>
 <p>设置SIP，我们需要用到csrutil，它就是SIP的配置修改工具。使用csrutil，必须进入恢复模式。恢复模式的进入方法是：开机（重启）时，同时按CMD键和R键。进入恢复模式之后，在“实用工具”里找到“终端”，在终端里输入：</p>
-<div class="highlight"><pre><span></span><code>csrutil enable --without kext
+<div class="highlight"><pre><span></span><code>csrutil<span class="w"> </span><span class="nb">enable</span><span class="w"> </span>--without<span class="w"> </span>kext
 </code></pre></div>
 
 <p>然后重启。这时再去安装从沁恒公司网站下载的那个Mac驱动。安装完成后，再次重启，进入系统之后就能在<strong>/dev</strong>下面找到<strong>tty.wchusbserial14130</strong>了。注意，因为我的PID是0x7523，所以tty.wchusbserial后面的数字是14130（即0x7523的十进制数）。你也可能看到别的类似的设备文件名。</p>

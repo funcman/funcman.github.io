@@ -8,7 +8,7 @@
 		<!-- Metadata -->
 	<meta name="description" content="一个游戏程序员。曾经参与开发过<a href='https://www.bing.com/search?q=%E4%BB%99%E4%BE%A3%E5%A5%87%E7%BC%983'>仙侣奇缘3</a>、<a href='http://sh.70yx.com'>水浒传</a>、<a href='https://itunes.apple.com/cn/app/id938688461'>小米运动</a>、<a href='https://itunes.apple.com/cn/app/id1034182617'>米动</a>和<a href='https://www.taptap.com/app/143658'>无限激战</a>">
 	<meta property="og:description" content="一个游戏程序员。曾经参与开发过<a href='https://www.bing.com/search?q=%E4%BB%99%E4%BE%A3%E5%A5%87%E7%BC%983'>仙侣奇缘3</a>、<a href='http://sh.70yx.com'>水浒传</a>、<a href='https://itunes.apple.com/cn/app/id938688461'>小米运动</a>、<a href='https://itunes.apple.com/cn/app/id1034182617'>米动</a>和<a href='https://www.taptap.com/app/143658'>无限激战</a>">
-	<meta property="og:title" content="给Pelican增加数学式和图表的显示" />
+	<meta property="og:title" content="给Pelican增加数学公式和图表的显示" />
 	<meta property="og:type" content="article" />
 	<meta property="og:url" content="https://funcman.me/add_math_and_graphviz_to_pelican.html" />
 		<meta property="og:image" content="https://funcman.me/images/avatar.png" />
@@ -65,12 +65,12 @@
 	</div>
 </div>		<div class="content container">
 <div class="post">
-	<h1 class="post-title">给Pelican增加数学式和图表的显示</h1>
+	<h1 class="post-title">给Pelican增加数学公式和图表的显示</h1>
 	<span class="post-date">2026年05月15日 星期五</span>
 	<p>AI时代，我觉得数学在我接下来的学习和工作中太重要了，所以我决定给Pelican加上显示数学表达式的功能。</p>
 <h2>MathJax 数学公式</h2>
 <h3>方案选择</h3>
-<p>大概有三种实现方式：</p>
+<p>Pelican显示数学公式，大概有三种实现方式：</p>
 <table>
 <thead>
 <tr>
@@ -217,12 +217,12 @@
 </ul>
 <h3>效果示例</h3>
 <p>现在我们试试效果：</p>
-<p>同一行数学式：<span class="math">\(\dfrac{1}{1+x^2}\)</span></p>
+<p>同一行数学公式：<span class="math">\(\dfrac{1}{1+x^2}\)</span></p>
 <p>代码是：</p>
-<div class="highlight"><pre><span></span><code>同一行数学式：$\dfrac{1}{1+x^2}$
+<div class="highlight"><pre><span></span><code>同一行数学公式：$\dfrac{1}{1+x^2}$
 </code></pre></div>
 
-<p>独立行复杂数学式：</p>
+<p>独立行复杂数学公式：</p>
 <div class="math">$$
 \begin{pmatrix}
 a_{11} &amp; a_{12} &amp; \cdots &amp; a_{1n} \\
@@ -240,7 +240,7 @@ x_1 \\ x_2 \\ \vdots \\ x_n
 \end{pmatrix}
 $$</div>
 <p>代码是：</p>
-<div class="highlight"><pre><span></span><code>独立行复杂数学式：
+<div class="highlight"><pre><span></span><code>独立行复杂数学公式：
 
 $$
 \begin{pmatrix}
