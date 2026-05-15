@@ -8,9 +8,9 @@
 		<!-- Metadata -->
 	<meta name="description" content="一个游戏程序员。曾经参与开发过<a href='https://www.bing.com/search?q=%E4%BB%99%E4%BE%A3%E5%A5%87%E7%BC%983'>仙侣奇缘3</a>、<a href='http://sh.70yx.com'>水浒传</a>、<a href='https://itunes.apple.com/cn/app/id938688461'>小米运动</a>、<a href='https://itunes.apple.com/cn/app/id1034182617'>米动</a>和<a href='https://www.taptap.com/app/143658'>无限激战</a>">
 	<meta property="og:description" content="一个游戏程序员。曾经参与开发过<a href='https://www.bing.com/search?q=%E4%BB%99%E4%BE%A3%E5%A5%87%E7%BC%983'>仙侣奇缘3</a>、<a href='http://sh.70yx.com'>水浒传</a>、<a href='https://itunes.apple.com/cn/app/id938688461'>小米运动</a>、<a href='https://itunes.apple.com/cn/app/id1034182617'>米动</a>和<a href='https://www.taptap.com/app/143658'>无限激战</a>">
-	<meta property="og:title" content="给Pelican增加数学式的显示" />
+	<meta property="og:title" content="给Pelican增加数学式和图表的显示" />
 	<meta property="og:type" content="article" />
-	<meta property="og:url" content="https://funcman.me/add_math_to_pelican.html" />
+	<meta property="og:url" content="https://funcman.me/add_math_and_graphviz_to_pelican.html" />
 		<meta property="og:image" content="https://funcman.me/images/avatar.png" />
 
 		<!-- Enable responsiveness on mobile devices-->
@@ -65,9 +65,11 @@
 	</div>
 </div>		<div class="content container">
 <div class="post">
-	<h1 class="post-title">给Pelican增加数学式的显示</h1>
+	<h1 class="post-title">给Pelican增加数学式和图表的显示</h1>
 	<span class="post-date">2026年05月15日 星期五</span>
 	<p>AI时代，我觉得数学在我接下来的学习和工作中太重要了，所以我决定给Pelican加上显示数学表达式的功能。</p>
+<h2>MathJax 数学公式</h2>
+<h3>方案选择</h3>
 <p>大概有三种实现方式：</p>
 <table>
 <thead>
@@ -96,6 +98,7 @@
 </tbody>
 </table>
 <p>我比较了一下，第二个<code>pelican-render-math</code>的实现起来比较简单，利用Pelican原有的运行环境就能跑。</p>
+<h3>安装配置</h3>
 <p>使用<code>pip</code>安装：</p>
 <div class="highlight"><pre><span></span><code>pip<span class="w"> </span>install<span class="w"> </span>pelican-render-math
 </code></pre></div>
@@ -119,7 +122,7 @@
 <span class="p">}</span>
 </code></pre></div>
 
-<p>各参数注解：</p>
+<h3>各参数注解</h3>
 <ul>
 <li>
 <p><code>"align": "center"</code></p>
@@ -212,6 +215,7 @@
 </ul>
 </li>
 </ul>
+<h3>效果示例</h3>
 <p>现在我们试试效果：</p>
 <p>同一行数学式：<span class="math">\(\dfrac{1}{1+x^2}\)</span></p>
 <p>代码是：</p>
@@ -256,9 +260,80 @@ x<span class="ge">_1 \\ x_</span>2 \\ \vdots \\ x_n
 $$
 </code></pre></div>
 
-<p>以上，应该够用了。</p>
+<h2>Graphviz 图表</h2>
+<p>除了数学公式，我还加了 Graphviz 图表的功能，因为我感觉也很重要。</p>
+<h3>安装 Graphviz 程序</h3>
+<p>首先需要安装 Graphviz 程序本身。</p>
+<ul>
+<li>Windows</li>
+</ul>
+<div class="highlight"><pre><span></span><code><span class="n">scoop</span> <span class="n">install</span> <span class="n">graphviz</span>
+</code></pre></div>
+
+<ul>
+<li>macOS</li>
+</ul>
+<div class="highlight"><pre><span></span><code>brew<span class="w"> </span>install<span class="w"> </span>graphviz
+</code></pre></div>
+
+<ul>
+<li>Linux</li>
+</ul>
+<div class="highlight"><pre><span></span><code>apt<span class="w"> </span>install<span class="w"> </span>graphviz
+</code></pre></div>
+
+<h3>安装 pelican-graphviz 插件</h3>
+<p>如果使用<code>pip</code>安装：</p>
+<div class="highlight"><pre><span></span><code>pip<span class="w"> </span>install<span class="w"> </span>pelican-graphviz
+</code></pre></div>
+
+<p>如果是用了<code>uv</code>就用：</p>
+<div class="highlight"><pre><span></span><code>uv<span class="w"> </span>add<span class="w"> </span>pelican-graphviz
+</code></pre></div>
+
+<p>在<code>pelicanconf.py</code>中修改：</p>
+<div class="highlight"><pre><span></span><code><span class="n">PLUGINS</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;graphviz&quot;</span><span class="p">,</span> <span class="s2">&quot;render_math&quot;</span><span class="p">]</span>
+</code></pre></div>
+
+<h3>效果示例</h3>
+<p>一个比较复杂的例子：</p>
+<div class="graphviz"><img alt="finite_state_machine" src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+DQo8IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iDQogImh0dHA6Ly93d3cudzMub3JnL0dyYXBoaWNzL1NWRy8xLjEvRFREL3N2ZzExLmR0ZCI+DQo8IS0tIEdlbmVyYXRlZCBieSBncmFwaHZpeiB2ZXJzaW9uIDE0LjEuNSAoMjAyNjA0MTEuMjMzMSkNCiAtLT4NCjwhLS0gVGl0bGU6IGZpbml0ZV9zdGF0ZV9tYWNoaW5lIFBhZ2VzOiAxIC0tPg0KPHN2ZyB3aWR0aD0iNTU2cHQiIGhlaWdodD0iMjIxcHQiDQogdmlld0JveD0iMC4wMCAwLjAwIDU1Ni4wMCAyMjEuMDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiPg0KPGcgaWQ9ImdyYXBoMCIgY2xhc3M9ImdyYXBoIiB0cmFuc2Zvcm09InNjYWxlKDEgMSkgcm90YXRlKDApIHRyYW5zbGF0ZSg0IDIxNi42NCkiPg0KPHRpdGxlPmZpbml0ZV9zdGF0ZV9tYWNoaW5lPC90aXRsZT4NCjxwb2x5Z29uIGZpbGw9IndoaXRlIiBzdHJva2U9Im5vbmUiIHBvaW50cz0iLTQsNCAtNCwtMjE2LjY0IDU1MS45MSwtMjE2LjY0IDU1MS45MSw0IC00LDQiLz4NCjxnIGlkPSJjbHVzdDEiIGNsYXNzPSJjbHVzdGVyIj4NCjx0aXRsZT5jbHVzdGVyX2d1YXJkPC90aXRsZT4NCjxwb2x5Z29uIGZpbGw9Im5vbmUiIHN0cm9rZT0icHVycGxlIiBzdHJva2UtZGFzaGFycmF5PSI1LDIiIHBvaW50cz0iMzY5LjE2LC04IDM2OS4xNiwtODAgNTM5LjkxLC04MCA1MzkuOTEsLTggMzY5LjE2LC04Ii8+DQo8dGV4dCB4bWw6c3BhY2U9InByZXNlcnZlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiB4PSI0NTQuNTMiIHk9Ii02Ni41IiBmb250LWZhbWlseT0iVGltZXMgTmV3IFJvbWFuLHNlcmlmIiBmb250LXNpemU9IjEwLjAwIj7lrojmiqTmnaHku7bvvJrorqHmlbAgJmx0OyAzPC90ZXh0Pg0KPC9nPg0KPCEtLSBTMyAtLT4NCjxnIGlkPSJub2RlMSIgY2xhc3M9Im5vZGUiPg0KPHRpdGxlPlMzPC90aXRsZT4NCjxlbGxpcHNlIGZpbGw9ImxpZ2h0cGluayIgc3Ryb2tlPSJyZWQiIGN4PSIzMi4yMyIgY3k9Ii0xNDgiIHJ4PSIyMC42NCIgcnk9IjIwLjY0Ii8+DQo8ZWxsaXBzZSBmaWxsPSJub25lIiBzdHJva2U9InJlZCIgY3g9IjMyLjIzIiBjeT0iLTE0OCIgcng9IjI0LjY0IiByeT0iMjQuNjQiLz4NCjx0ZXh0IHhtbDpzcGFjZT0icHJlc2VydmUiIHRleHQtYW5jaG9yPSJtaWRkbGUiIHg9IjMyLjIzIiB5PSItMTQyLjk1IiBmb250LWZhbWlseT0iVGltZXMgTmV3IFJvbWFuLHNlcmlmIiBmb250LXNpemU9IjE0LjAwIj5TMzwvdGV4dD4NCjwvZz4NCjwhLS0gUzIgLS0+DQo8ZyBpZD0ibm9kZTMiIGNsYXNzPSJub2RlIj4NCjx0aXRsZT5TMjwvdGl0bGU+DQo8ZWxsaXBzZSBmaWxsPSJsaWdodGdyZWVuIiBzdHJva2U9ImRhcmtncmVlbiIgY3g9IjIxNy4wMSIgY3k9Ii0xNDgiIHJ4PSIyMC42NCIgcnk9IjIwLjY0Ii8+DQo8dGV4dCB4bWw6c3BhY2U9InByZXNlcnZlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiB4PSIyMTcuMDEiIHk9Ii0xNDIuOTUiIGZvbnQtZmFtaWx5PSJUaW1lcyBOZXcgUm9tYW4sc2VyaWYiIGZvbnQtc2l6ZT0iMTQuMDAiPlMyPC90ZXh0Pg0KPC9nPg0KPCEtLSBTMyYjNDU7Jmd0O1MyIC0tPg0KPGcgaWQ9ImVkZ2U0IiBjbGFzcz0iZWRnZSI+DQo8dGl0bGU+UzMmIzQ1OyZndDtTMjwvdGl0bGU+DQo8cGF0aCBmaWxsPSJub25lIiBzdHJva2U9InJlZCIgZD0iTTU3LjEyLC0xNDhDODkuODEsLTE0OCAxNDguNTQsLTE0OCAxODQuNzEsLTE0OCIvPg0KPHBvbHlnb24gZmlsbD0icmVkIiBzdHJva2U9InJlZCIgcG9pbnRzPSIxODQuNTMsLTE1MS41IDE5NC41MywtMTQ4IDE4NC41MywtMTQ0LjUgMTg0LjUzLC0xNTEuNSIvPg0KPHRleHQgeG1sOnNwYWNlPSJwcmVzZXJ2ZSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgeD0iMTI2LjYyIiB5PSItMTQ5Ljc1IiBmb250LWZhbWlseT0iVGltZXMgTmV3IFJvbWFuLHNlcmlmIiBmb250LXNpemU9IjEwLjAwIj7mgaLlpI08L3RleHQ+DQo8L2c+DQo8IS0tIFMxIC0tPg0KPGcgaWQ9Im5vZGUyIiBjbGFzcz0ibm9kZSI+DQo8dGl0bGU+UzE8L3RpdGxlPg0KPGVsbGlwc2UgZmlsbD0ibGlnaHRibHVlIiBzdHJva2U9ImJsdWUiIGN4PSI0NTQuNTMiIGN5PSItMTkyIiByeD0iMjAuNjQiIHJ5PSIyMC42NCIvPg0KPHRleHQgeG1sOnNwYWNlPSJwcmVzZXJ2ZSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgeD0iNDU0LjUzIiB5PSItMTg2Ljk1IiBmb250LWZhbWlseT0iVGltZXMgTmV3IFJvbWFuLHNlcmlmIiBmb250LXNpemU9IjE0LjAwIj5TMTwvdGV4dD4NCjwvZz4NCjwhLS0gUzEmIzQ1OyZndDtTMiAtLT4NCjxnIGlkPSJlZGdlMSIgY2xhc3M9ImVkZ2UiPg0KPHRpdGxlPlMxJiM0NTsmZ3Q7UzI8L3RpdGxlPg0KPHBhdGggZmlsbD0ibm9uZSIgc3Ryb2tlPSJibHVlIiBkPSJNNDM1LjQ4LC0xODMuNTZDNDEwLjc3LC0xNzIuNTIgMzY0Ljc0LC0xNTMuNzYgMzIzLjE2LC0xNDYuNzUgMzA5LjM1LC0xNDQuNDIgMzA1LjY2LC0xNDYuNjMgMjkxLjY2LC0xNDYuNzUgMjc3Ljc2LC0xNDYuODcgMjYyLjM4LC0xNDcuMTEgMjQ5LjI5LC0xNDcuMzUiLz4NCjxwb2x5Z29uIGZpbGw9ImJsdWUiIHN0cm9rZT0iYmx1ZSIgcG9pbnRzPSIyNDkuNDYsLTE0My44NSAyMzkuNTMsLTE0Ny41NCAyNDkuNiwtMTUwLjg1IDI0OS40NiwtMTQzLjg1Ii8+DQo8dGV4dCB4bWw6c3BhY2U9InByZXNlcnZlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiB4PSIzMDcuNDEiIHk9Ii0xNDguNSIgZm9udC1mYW1pbHk9IlRpbWVzIE5ldyBSb21hbixzZXJpZiIgZm9udC1zaXplPSIxMC4wMCI+5byA5aeLPC90ZXh0Pg0KPHRleHQgeG1sOnNwYWNlPSJwcmVzZXJ2ZSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgeD0iMzg2LjE1IiB5PSItMTM3LjI1IiBmb250LWZhbWlseT0iVGltZXMgTmV3IFJvbWFuLHNlcmlmIiBmb250LXNpemU9IjEwLjAwIj7liqjkvZzvvJrph43nva7orqHmlbDlmag8L3RleHQ+DQo8L2c+DQo8IS0tIFMyJiM0NTsmZ3Q7UzMgLS0+DQo8ZyBpZD0iZWRnZTMiIGNsYXNzPSJlZGdlIj4NCjx0aXRsZT5TMiYjNDU7Jmd0O1MzPC90aXRsZT4NCjxwYXRoIGZpbGw9Im5vbmUiIHN0cm9rZT0icmVkIiBkPSJNMjAwLjU3LC0xMzQuOTVDMTg2LjQ1LC0xMjMuOTQgMTY0LjQ2LC0xMDkgMTQyLjM3LC0xMDIuNzUgMTEzLjYxLC05NC42MiA4Mi4yNCwtMTEwLjQgNjAuNTQsLTEyNS41MSIvPg0KPHBvbHlnb24gZmlsbD0icmVkIiBzdHJva2U9InJlZCIgcG9pbnRzPSI1OC40OSwtMTIyLjY3IDUyLjUyLC0xMzEuNDEgNjIuNjQsLTEyOC4zMSA1OC40OSwtMTIyLjY3Ii8+DQo8dGV4dCB4bWw6c3BhY2U9InByZXNlcnZlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiB4PSIxMjYuNjIiIHk9Ii0xMDQuNSIgZm9udC1mYW1pbHk9IlRpbWVzIE5ldyBSb21hbixzZXJpZiIgZm9udC1zaXplPSIxMC4wMCI+6ZSZ6K+vPC90ZXh0Pg0KPHRleHQgeG1sOnNwYWNlPSJwcmVzZXJ2ZSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgeD0iNjMiIHk9Ii05MS4wNCIgZm9udC1mYW1pbHk9IlRpbWVzIE5ldyBSb21hbixzZXJpZiIgZm9udC1zaXplPSIxMC4wMCI+5p2h5Lu277ya5aKe5Yqg6K6h5pWw5ZmoPC90ZXh0Pg0KPC9nPg0KPCEtLSBTMiYjNDU7Jmd0O1MxIC0tPg0KPGcgaWQ9ImVkZ2UyIiBjbGFzcz0iZWRnZSI+DQo8dGl0bGU+UzImIzQ1OyZndDtTMTwvdGl0bGU+DQo8cGF0aCBmaWxsPSJub25lIiBzdHJva2U9ImRhcmtncmVlbiIgZD0iTTIzNy42OSwtMTUxLjY4QzI3OC42NCwtMTU5LjMzIDM3My4zMywtMTc3LjAyIDQyMi41NSwtMTg2LjIxIi8+DQo8cG9seWdvbiBmaWxsPSJkYXJrZ3JlZW4iIHN0cm9rZT0iZGFya2dyZWVuIiBwb2ludHM9IjQyMS43OSwtMTg5LjYzIDQzMi4yNiwtMTg4LjAzIDQyMy4wNywtMTgyLjc1IDQyMS43OSwtMTg5LjYzIi8+DQo8dGV4dCB4bWw6c3BhY2U9InByZXNlcnZlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiB4PSIzMDcuNDEiIHk9Ii0xNjkuMTIiIGZvbnQtZmFtaWx5PSJUaW1lcyBOZXcgUm9tYW4sc2VyaWYiIGZvbnQtc2l6ZT0iMTAuMDAiPuWBnOatojwvdGV4dD4NCjwvZz4NCjwhLS0gQzEgLS0+DQo8ZyBpZD0ibm9kZTQiIGNsYXNzPSJub2RlIj4NCjx0aXRsZT5DMTwvdGl0bGU+DQo8cG9seWdvbiBmaWxsPSJnb2xkIiBzdHJva2U9ImJsYWNrIiBwb2ludHM9IjUzMS45MSwtNTIgMzc3LjE2LC01MiAzNzcuMTYsLTE2IDUzMS45MSwtMTYgNTMxLjkxLC01MiIvPg0KPHRleHQgeG1sOnNwYWNlPSJwcmVzZXJ2ZSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgeD0iNDU0LjUzIiB5PSItMzAuMTUiIGZvbnQtZmFtaWx5PSJUaW1lcyBOZXcgUm9tYW4sc2VyaWYiIGZvbnQtc2l6ZT0iOC4wMCI+6ZSZ6K+v6K6h5pWw5ZmoPC90ZXh0Pg0KPC9nPg0KPCEtLSBTMiYjNDU7Jmd0O0MxIC0tPg0KPGcgaWQ9ImVkZ2U1IiBjbGFzcz0iZWRnZSI+DQo8dGl0bGU+UzImIzQ1OyZndDtDMTwvdGl0bGU+DQo8cGF0aCBmaWxsPSJub25lIiBzdHJva2U9InB1cnBsZSIgc3Ryb2tlLWRhc2hhcnJheT0iMSw1IiBkPSJNMjM2LjEsLTEzOS4yNEMyNzQuMzQsLTEyMC43NCAzNjQuMDgsLTc3LjMgNDE1LjUyLC01Mi40Ii8+DQo8L2c+DQo8L2c+DQo8L3N2Zz4NCg=="></div>
+<p>看看效果，它的代码是：</p>
+<div class="highlight"><pre><span></span><code>一个比较复杂的例子：
+
+..graphviz dot
+digraph finite_state_machine {
+    rankdir=LR;
+    size=&quot;8,5&quot;;
+    fontsize=10;
+    ranksep=1.5;
+    nodesep=1.0;
+    overlap=false;
+    splines=true;
+    node [fontsize=14];
+    edge [fontsize=12];
+    node [shape = doublecircle]; S3 [color=red, style=filled, fillcolor=lightpink];
+    node [shape = circle];
+    S1 [color=blue, style=filled, fillcolor=lightblue];
+    S2 [color=darkgreen, style=filled, fillcolor=lightgreen];
+    subgraph cluster_guard {
+        label = &quot;守护条件：计数 &lt; 3&quot;;
+        style=dashed;
+        fontsize=10;
+        color=purple;
+        C1 [shape=box, label=&quot;错误计数器&quot;, style=filled, fillcolor=gold, fontsize=8];
+    }
+    S1 -&gt; S2 [ label = &quot;开始&quot;, xlabel=&quot;动作：重置计数器&quot;, fontsize=10, color=blue ];
+    S2 -&gt; S1 [ label = &quot;停止&quot;, fontsize=10, color=darkgreen ];
+    S2 -&gt; S3 [ label = &quot;错误&quot;, xlabel=&quot;条件：增加计数器&quot;, fontsize=10, color=red ];
+    S3 -&gt; S2 [ label = &quot;恢复&quot;, fontsize=10, color=red ];
+    S2 -&gt; C1 [style=dotted, arrowhead=none, color=purple];
+}
+</code></pre></div>
+
+<p><strong>注意</strong>：<code>..graphviz dot</code>代码块里不能有空行。</p>
 <script type="text/javascript">if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
-    var align = "center",
+    var align = "left",
         indent = "0em",
         linebreak = "false";
 
