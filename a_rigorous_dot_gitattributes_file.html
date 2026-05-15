@@ -67,7 +67,7 @@
 <div class="post">
 	<h1 class="post-title">一个严谨的.gitattributes文件</h1>
 	<span class="post-date">2026年05月14日 星期四</span>
-	<p>一个严谨的git项目库应该有<code>.gitattributes</code>文件，来让git在不同操作系统和场景环境下，根据设定的规则处理文件。</p>
+	<p>一个严谨的Git项目库应该有<code>.gitattributes</code>文件，来让Git在不同操作系统和场景环境下，根据设定的规则处理文件。</p>
 <p><code>.gitattributes</code>文件的常见用途有：</p>
 <ol>
 <li>
@@ -135,16 +135,17 @@ Assets/Resources/Data/Data.bytes filter=lfs diff=lfs merge=lfs -text
 </code></pre></div>
 
 <p>不写好<code>.gitattributes</code>会出现潜在的问题。</p>
-<p>比如今天，我发现我司的Web后台重新部署之后，LOGO居然裂了，显示不出来。仔细一番研究比较之后，发现本地的png文件，和git库中的，在文件头上有<strong>大差异</strong>：</p>
+<p>比如今天，我发现我司的Web后台重新部署之后，LOGO居然裂了，显示不出来。仔细一番研究比较之后，发现本地的png文件，和Git库中的，在文件头上有<strong>大差异</strong>：</p>
 <div class="highlight"><pre><span></span><code>本地版本
 89 50 4E 47 0D 0A 1A 0A
 </code></pre></div>
 
-<div class="highlight"><pre><span></span><code>git库内版本
+<div class="highlight"><pre><span></span><code>Git库内版本
 89 50 4E 47 0A 1A 0A
 </code></pre></div>
 
-<p>显然是git在提交时，把<code>CRLF</code>改成了<code>LF</code>。</p>
+<p><img alt="Good and Bad PNG" src="images/good_and_bad_png.png"></p>
+<p>显然是Git在提交时，把<code>CRLF</code>改成了<code>LF</code>。</p>
 </div>
 		</div>
 	</body>
