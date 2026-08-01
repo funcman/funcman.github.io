@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="zh_cn" prefix="og: http://ogp.me/ns#">
+	<head>
+		<link href="http://gmpg.org/xfn/11" rel="profile">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta http-equiv="content-type" content="text/html; charset=utf-8">
+
+		<!-- Metadata -->
+	<meta name="description" content="一个游戏程序员。曾经参与开发过<a href='https://www.bing.com/search?q=%E4%BB%99%E4%BE%A3%E5%A5%87%E7%BC%983'>仙侣奇缘3</a>、<a href='http://sh.70yx.com'>水浒传</a>、<a href='https://itunes.apple.com/cn/app/id938688461'>小米运动</a>、<a href='https://itunes.apple.com/cn/app/id1034182617'>米动</a>和<a href='https://www.taptap.com/app/143658'>无限激战</a>">
+	<meta property="og:description" content="一个游戏程序员。曾经参与开发过<a href='https://www.bing.com/search?q=%E4%BB%99%E4%BE%A3%E5%A5%87%E7%BC%983'>仙侣奇缘3</a>、<a href='http://sh.70yx.com'>水浒传</a>、<a href='https://itunes.apple.com/cn/app/id938688461'>小米运动</a>、<a href='https://itunes.apple.com/cn/app/id1034182617'>米动</a>和<a href='https://www.taptap.com/app/143658'>无限激战</a>">
+	<meta property="og:title" content="计算机语言中的变量遮蔽（Shadowing）" />
+	<meta property="og:type" content="article" />
+	<meta property="og:url" content="https://funcman.me/about_shadowing_in_program_langauges.html" />
+		<meta property="og:image" content="https://funcman.me/images/avatar.png" />
+
+		<!-- Enable responsiveness on mobile devices-->
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+
+		<title>funcman's blog</title>
+
+		<!-- CSS -->
+		<link href="//fonts.googleapis.com/" rel="dns-prefetch">
+		<link href="//fonts.googleapis.com/css?family=Droid+Serif:400,700,400italic|Abril+Fatface|PT+Sans:400,400italic,700&amp;subset=latin,latin-ext" rel="stylesheet">
+
+		<link rel="stylesheet" href="https://funcman.me/theme/css/poole.css" />
+		<link rel="stylesheet" href="https://funcman.me/theme/css/hyde.css" />
+		<link rel="stylesheet" href="https://funcman.me/theme/css/syntax.css" />
+			<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css" crossorigin="anonymous">
+
+		<!-- Feeds -->
+<link href="https://funcman.me/rss.xml" type="application/atom+xml" rel="alternate" title="funcman's blog Full Atom Feed" />
+
+		<!-- Analytics -->
+	</head>
+
+	<body class="theme-base-0e">
+<div class="sidebar">
+	<div class="container sidebar-sticky">
+		<div class="sidebar-about">
+
+			<h1>
+				<a href="/">
+					<img class="profile-picture" src="https://funcman.me/images/avatar.png">
+					funcman's blog
+				</a>
+			</h1>
+			<p class="lead"></p>
+			<p class="lead">一个游戏程序员。曾经参与开发过<a href='https://www.bing.com/search?q=%E4%BB%99%E4%BE%A3%E5%A5%87%E7%BC%983'>仙侣奇缘3</a>、<a href='http://sh.70yx.com'>水浒传</a>、<a href='https://itunes.apple.com/cn/app/id938688461'>小米运动</a>、<a href='https://itunes.apple.com/cn/app/id1034182617'>米动</a>和<a href='https://www.taptap.com/app/143658'>无限激战</a> </p>
+			<p></p>
+		</div>
+		<nav class="sidebar-social">
+					<a class="sidebar-social-item" href="mailto:hyq1986@gmail.com">
+						<i class="fa-solid fa-envelope"></i>
+					</a>
+					<a class="sidebar-social-item" href="https://twitter.com/funcman" target="_blank">
+						<i class="fa-brands fa-twitter"></i>
+					</a>
+					<a class="sidebar-social-item" href="https://github.com/funcman" target="_blank">
+						<i class="fa-brands fa-github"></i>
+					</a>
+					<a class="sidebar-social-item" href="https://funcman.itch.io" target="_blank">
+						<i class="fa-brands fa-itch-io"></i>
+					</a>
+			<a class="sidebar-social-item" href="https://funcman.me/rss.xml">
+				<i class="fa-solid fa-rss"></i>
+			</a>
+		</nav>
+	</div>
+</div>		<div class="content container">
+<div class="post">
+	<h1 class="post-title">计算机语言中的变量遮蔽（Shadowing）</h1>
+	<span class="post-date">2026年08月01日 星期六</span>
+	<p>在编程语言里，<strong>遮蔽</strong>（Shadowing）指的是这么一种情况：在内层作用域中声明了一个与外层作用域<strong>同名</strong>的标识符（变量、函数、参数等），导致外层的那个标识符在当前作用域内暂时“看不见”了。</p>
+<h2>核心机制</h2>
+<div class="highlight"><pre><span></span><code>外层作用域:  let x = 10
+                ↓
+内层作用域:  let x = 20  ← 外层的x被遮蔽了
+                ↓
+           在内层访问x，得到的是20，而非10
+</code></pre></div>
+
+<p>要注意的是，遮蔽<strong>不是覆盖</strong>。外层的变量本身并没有被修改，只是暂时“隐身”了。一旦离开内层作用域，外层变量又恢复可见。</p>
+<h2>典型示例</h2>
+<h3>JavaScript</h3>
+<div class="highlight"><pre><span></span><code><span class="kd">let</span><span class="w"> </span><span class="nx">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;全局&quot;</span><span class="p">;</span>
+
+<span class="kd">function</span><span class="w"> </span><span class="nx">greet</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="nx">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;局部&quot;</span><span class="p">;</span><span class="w">  </span><span class="c1">// 遮蔽了外层的name</span>
+<span class="w">    </span><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">name</span><span class="p">);</span><span class="w">   </span><span class="c1">// &quot;局部&quot;</span>
+<span class="p">}</span>
+
+<span class="nx">greet</span><span class="p">();</span>
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">name</span><span class="p">);</span><span class="w">       </span><span class="c1">// &quot;全局&quot;，外层完好无损</span>
+</code></pre></div>
+
+<h3>Python</h3>
+<div class="highlight"><pre><span></span><code><span class="n">x</span> <span class="o">=</span> <span class="mi">100</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">foo</span><span class="p">():</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="mi">200</span>      <span class="c1"># 这里创建了一个新的局部变量x，遮蔽了全局的x</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>     <span class="c1"># 200</span>
+
+<span class="n">foo</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>         <span class="c1"># 100</span>
+</code></pre></div>
+
+<blockquote>
+<p>这里要注意的是，Python中如果写<code>x = 200</code>，会创建局部变量。但如果<strong>只是读取</strong>外层变量，Python是允许直接访问的（LEGB规则）。如果既想修改又想引用外层变量，就需要用<code>global</code>或<code>nonlocal</code>。</p>
+</blockquote>
+<h3>Rust（对Shadowing特别友好）</h3>
+<div class="highlight"><pre><span></span><code><span class="kd">let</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">5</span><span class="p">;</span>
+<span class="kd">let</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w">   </span><span class="c1">// 合法！这里不是修改变量，而是创建了一个同名的新绑定</span>
+<span class="kd">let</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">2</span><span class="p">;</span><span class="w">   </span><span class="c1">// 再次遮蔽</span>
+<span class="fm">println!</span><span class="p">(</span><span class="s">&quot;{x}&quot;</span><span class="p">);</span><span class="w"> </span><span class="c1">// 12</span>
+</code></pre></div>
+
+<p>Rust甚至允许用不同类型的值来遮蔽：</p>
+<div class="highlight"><pre><span></span><code><span class="kd">let</span><span class="w"> </span><span class="n">spaces</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;   &quot;</span><span class="p">;</span><span class="w">      </span><span class="c1">// &amp;str</span>
+<span class="kd">let</span><span class="w"> </span><span class="n">spaces</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">spaces</span><span class="p">.</span><span class="n">len</span><span class="p">();</span><span class="w"> </span><span class="c1">// usize，同名但不同类型</span>
+</code></pre></div>
+
+<h3>Java</h3>
+<div class="highlight"><pre><span></span><code><span class="kd">class</span> <span class="nc">Example</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">value</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">10</span><span class="p">;</span><span class="w">  </span><span class="c1">// 字段</span>
+
+<span class="w">    </span><span class="kt">void</span><span class="w"> </span><span class="nf">method</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">value</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">  </span><span class="c1">// 参数遮蔽了字段</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">value</span><span class="p">);</span><span class="w">      </span><span class="c1">// 传入的参数值</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="na">value</span><span class="p">);</span><span class="w"> </span><span class="c1">// 10，用this突破遮蔽</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<h2>遮蔽、覆盖和重定义</h2>
+<p>这几个概念容易混淆，对比一下就清楚了：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">概念</th>
+<th style="text-align: left;">发生场景</th>
+<th style="text-align: left;">本质</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">遮蔽（Shadowing）</td>
+<td style="text-align: left;">不同作用域，同名变量/参数</td>
+<td style="text-align: left;">内层标识符隐藏了外层标识符</td>
+</tr>
+<tr>
+<td style="text-align: left;">覆盖（Overriding）</td>
+<td style="text-align: left;">子类重写父类方法</td>
+<td style="text-align: left;">运行时多态，替换父类行为</td>
+</tr>
+<tr>
+<td style="text-align: left;">重定义（Redefinition）</td>
+<td style="text-align: left;">同一作用域内重复声明</td>
+<td style="text-align: left;">通常是语法错误（C/C++部分场景除外）</td>
+</tr>
+</tbody>
+</table>
+<h2>为什么要允许遮蔽？</h2>
+<ol>
+<li>避免命名污染。内层逻辑不需要关心外层用了什么名字，可以安心使用简洁的变量名，比如<code>i</code>、<code>x</code>、<code>tmp</code>。</li>
+<li>类型转换的便利。比如Rust中<code>let s = "text"; let s = s.len();</code>，可以在不改变变量名的情况下转换类型。</li>
+<li>函数参数的直观性。方法参数与字段同名（<code>this.name = name</code>）是常见且可读性强的写法。</li>
+</ol>
+<h2>潜在陷阱</h2>
+<h3>意外遮蔽导致Bug</h3>
+<div class="highlight"><pre><span></span><code><span class="kd">let</span><span class="w"> </span><span class="nx">user</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">name</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;Alice&quot;</span><span class="w"> </span><span class="p">};</span>
+
+<span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="kc">true</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="nx">user</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">null</span><span class="p">;</span><span class="w">  </span><span class="c1">// 不小心遮蔽了，后续代码可能误以为外层的user变了</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<h3>闭包中的“经典陷阱”（不算严格的遮蔽，但相关）</h3>
+<div class="highlight"><pre><span></span><code><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kd">var</span><span class="w"> </span><span class="nx">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0</span><span class="p">;</span><span class="w"> </span><span class="nx">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mf">3</span><span class="p">;</span><span class="w"> </span><span class="nx">i</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nx">setTimeout</span><span class="p">(()</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">i</span><span class="p">),</span><span class="w"> </span><span class="mf">100</span><span class="p">);</span><span class="w">  </span><span class="c1">// 输出3, 3, 3</span>
+<span class="p">}</span>
+<span class="c1">// 用let替代var后，每次迭代有自己的块级作用域，避免了这个问题</span>
+</code></pre></div>
+
+<h3>遮蔽链过长导致困惑</h3>
+<div class="highlight"><pre><span></span><code><span class="kd">let</span><span class="w"> </span><span class="nx">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1</span><span class="p">;</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="nx">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">2</span><span class="p">;</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">        </span><span class="kd">let</span><span class="w"> </span><span class="nx">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">3</span><span class="p">;</span>
+<span class="w">        </span><span class="p">{</span>
+<span class="w">            </span><span class="kd">let</span><span class="w"> </span><span class="nx">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">4</span><span class="p">;</span>
+<span class="w">            </span><span class="c1">// 此时到底是哪个a？需要向上追溯多层，可读性极差</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<h2>不同语言的态度</h2>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">语言</th>
+<th style="text-align: left;">对遮蔽的态度</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Rust</td>
+<td style="text-align: left;">鼓励，视为惯用法</td>
+</tr>
+<tr>
+<td style="text-align: left;">JavaScript/TypeScript</td>
+<td style="text-align: left;">支持，块级作用域（<code>let</code>/<code>const</code>）引入后更常见</td>
+</tr>
+<tr>
+<td style="text-align: left;">Python</td>
+<td style="text-align: left;">支持函数级遮蔽，但没有块级作用域（<code>if</code>/<code>for</code>内部赋值不形成新作用域）</td>
+</tr>
+<tr>
+<td style="text-align: left;">C/C++</td>
+<td style="text-align: left;">支持，但容易出错（比如<code>if (int x = ...) { int x = ...; }</code>）</td>
+</tr>
+<tr>
+<td style="text-align: left;">Go</td>
+<td style="text-align: left;">支持，但社区建议谨慎使用</td>
+</tr>
+<tr>
+<td style="text-align: left;">Java</td>
+<td style="text-align: left;">支持（字段被参数遮蔽很常见），编译器会警告未使用的遮蔽变量</td>
+</tr>
+</tbody>
+</table>
+<h2>总结</h2>
+<p>遮蔽是作用域系统的自然产物，它本身并不是坏事。好的遮蔽能简化代码，坏的遮蔽能隐藏Bug。</p>
+<p>所以关键在于：遮蔽的时候保持作用域层级清晰，不要嵌套太深；需要同时访问内外层同名变量时，用语言提供的机制去突破遮蔽，比如<code>this.x</code>、<code>nonlocal</code>、<code>global</code>这些。另外，团队的代码规范里也可以对“无意义的遮蔽”加以限制，比如ESLint的<code>no-shadow</code>规则。</p>
+</div>
+		</div>
+	</body>
+</html>
