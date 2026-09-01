@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="zh_cn" prefix="og: http://ogp.me/ns#">
+	<head>
+		<link href="http://gmpg.org/xfn/11" rel="profile">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta http-equiv="content-type" content="text/html; charset=utf-8">
+
+		<!-- Metadata -->
+	<meta name="description" content="一个游戏程序员。曾经参与开发过<a href='https://www.bing.com/search?q=%E4%BB%99%E4%BE%A3%E5%A5%87%E7%BC%983'>仙侣奇缘3</a>、<a href='http://sh.70yx.com'>水浒传</a>、<a href='https://itunes.apple.com/cn/app/id938688461'>小米运动</a>、<a href='https://itunes.apple.com/cn/app/id1034182617'>米动</a>和<a href='https://www.taptap.com/app/143658'>无限激战</a>">
+	<meta property="og:description" content="一个游戏程序员。曾经参与开发过<a href='https://www.bing.com/search?q=%E4%BB%99%E4%BE%A3%E5%A5%87%E7%BC%983'>仙侣奇缘3</a>、<a href='http://sh.70yx.com'>水浒传</a>、<a href='https://itunes.apple.com/cn/app/id938688461'>小米运动</a>、<a href='https://itunes.apple.com/cn/app/id1034182617'>米动</a>和<a href='https://www.taptap.com/app/143658'>无限激战</a>">
+	<meta property="og:title" content="加权求和式子的各种写法" />
+	<meta property="og:type" content="article" />
+	<meta property="og:url" content="https://funcman.me/various_notations_for_weighted_sums.html" />
+		<meta property="og:image" content="https://funcman.me/images/avatar.png" />
+
+		<!-- Enable responsiveness on mobile devices-->
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+
+		<title>funcman's blog</title>
+
+		<!-- CSS -->
+		<link href="//fonts.googleapis.com/" rel="dns-prefetch">
+		<link href="//fonts.googleapis.com/css?family=Droid+Serif:400,700,400italic|Abril+Fatface|PT+Sans:400,400italic,700&amp;subset=latin,latin-ext" rel="stylesheet">
+
+		<link rel="stylesheet" href="https://funcman.me/theme/css/poole.css" />
+		<link rel="stylesheet" href="https://funcman.me/theme/css/hyde.css" />
+		<link rel="stylesheet" href="https://funcman.me/theme/css/syntax.css" />
+			<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css" crossorigin="anonymous">
+
+		<!-- Feeds -->
+<link href="https://funcman.me/rss.xml" type="application/atom+xml" rel="alternate" title="funcman's blog Full Atom Feed" />
+
+		<!-- Analytics -->
+	</head>
+
+	<body class="theme-base-0e">
+<div class="sidebar">
+	<div class="container sidebar-sticky">
+		<div class="sidebar-about">
+
+			<h1>
+				<a href="/">
+					<img class="profile-picture" src="https://funcman.me/images/avatar.png">
+					funcman's blog
+				</a>
+			</h1>
+			<p class="lead"></p>
+			<p class="lead">一个游戏程序员。曾经参与开发过<a href='https://www.bing.com/search?q=%E4%BB%99%E4%BE%A3%E5%A5%87%E7%BC%983'>仙侣奇缘3</a>、<a href='http://sh.70yx.com'>水浒传</a>、<a href='https://itunes.apple.com/cn/app/id938688461'>小米运动</a>、<a href='https://itunes.apple.com/cn/app/id1034182617'>米动</a>和<a href='https://www.taptap.com/app/143658'>无限激战</a> </p>
+			<p></p>
+		</div>
+		<nav class="sidebar-social">
+					<a class="sidebar-social-item" href="mailto:hyq1986@gmail.com">
+						<i class="fa-solid fa-envelope"></i>
+					</a>
+					<a class="sidebar-social-item" href="https://twitter.com/funcman" target="_blank">
+						<i class="fa-brands fa-twitter"></i>
+					</a>
+					<a class="sidebar-social-item" href="https://github.com/funcman" target="_blank">
+						<i class="fa-brands fa-github"></i>
+					</a>
+					<a class="sidebar-social-item" href="https://funcman.itch.io" target="_blank">
+						<i class="fa-brands fa-itch-io"></i>
+					</a>
+			<a class="sidebar-social-item" href="https://funcman.me/rss.xml">
+				<i class="fa-solid fa-rss"></i>
+			</a>
+		</nav>
+	</div>
+</div>		<div class="content container">
+<div class="post">
+	<h1 class="post-title">加权求和式子的各种写法</h1>
+	<span class="post-date">2026年09月01日 星期二</span>
+	<p>同一个"加权求和"概念，在不同数学/物理/工程语境下有<strong>多种等价表达式</strong>。以下是常见的几种：</p>
+<h2>1. 求和符号（Sigma Notation）</h2>
+<div class="math">$$\sum_{i=1}^{n} w_i x_i$$</div>
+<p>最基础的形式，明确写出下标从 1 到 <span class="math">\(n\)</span> 遍历。</p>
+<h2>2. 点积/内积（Dot Product）</h2>
+<div class="math">$$\mathbf{w} \cdot \mathbf{x}$$</div>
+<p>这是向量语言，简洁且强调几何意义（两个向量的夹角关系）。</p>
+<h2>3. 矩阵乘法（Matrix Multiplication）</h2>
+<div class="math">$$\mathbf{w}^\top \mathbf{x}$$</div>
+<p>把向量看作列向量时，<span class="math">\(\mathbf{w}^\top\)</span>（转置）是 <span class="math">\(1 \times n\)</span> 行向量，<span class="math">\(\mathbf{x}\)</span> 是 <span class="math">\(n \times 1\)</span> 列向量，相乘得到 <span class="math">\(1 \times 1\)</span> 标量。</p>
+<h2>4. 爱因斯坦求和约定（Einstein Summation Convention）</h2>
+<div class="math">$$w_i x_i$$</div>
+<p>在物理学和微分几何中广泛使用。约定：<strong>重复的下标自动求和</strong>，不需要写 <span class="math">\(\sum\)</span> 符号。</p>
+<h2>5. 分量展开（Component-wise）</h2>
+<div class="math">$$w_1 x_1 + w_2 x_2 + \cdots + w_n x_n$$</div>
+<p>最直观，完全展开，适合初学者理解每一项的贡献。</p>
+<h2>6. 指标/下标形式（Index Notation）</h2>
+<div class="math">$$[\mathbf{w}]_i [\mathbf{x}]_i$$</div>
+<p>强调这是向量的第 <span class="math">\(i\)</span> 个分量相乘后求和。方括号表示"取第 <span class="math">\(i\)</span> 个分量"。</p>
+<h2>7. 对偶配对（Dual Pairing）</h2>
+<div class="math">$$\langle \mathbf{w}, \mathbf{x} \rangle$$</div>
+<p>泛函分析中的写法，强调这是一个线性泛函（<span class="math">\(\mathbf{w}\)</span>）作用在向量（<span class="math">\(\mathbf{x}\)</span>）上的结果。</p>
+<h2>8. 内积空间写法（Inner Product Space）</h2>
+<div class="math">$$(\mathbf{w}, \mathbf{x})$$</div>
+<p>抽象向量空间中的标准内积记号，与点积在欧几里得空间中等价。</p>
+<h2>对比总结</h2>
+<table>
+<thead>
+<tr>
+<th>表达式</th>
+<th>适用领域</th>
+<th>特点</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><span class="math">\(\sum_{i=1}^{n} w_i x_i\)</span></td>
+<td>基础数学、教学</td>
+<td>最显式，不易歧义</td>
+</tr>
+<tr>
+<td><span class="math">\(\mathbf{w} \cdot \mathbf{x}\)</span></td>
+<td>几何、物理</td>
+<td>强调向量角度</td>
+</tr>
+<tr>
+<td><span class="math">\(\mathbf{w}^\top \mathbf{x}\)</span></td>
+<td>机器学习、线性代数</td>
+<td>适合矩阵运算链</td>
+</tr>
+<tr>
+<td><span class="math">\(w_i x_i\)</span>（爱因斯坦）</td>
+<td>物理、张量分析</td>
+<td>最简洁，但需熟悉约定</td>
+</tr>
+<tr>
+<td><span class="math">\(w_1x_1 + w_2x_2 + \cdots\)</span></td>
+<td>入门讲解</td>
+<td>最直观，无抽象</td>
+</tr>
+<tr>
+<td><span class="math">\(\langle \mathbf{w}, \mathbf{x} \rangle\)</span></td>
+<td>泛函分析</td>
+<td>最抽象，最一般化</td>
+</tr>
+</tbody>
+</table>
+<p><strong>核心结论</strong>：这些写法<strong>数学上完全等价</strong>，区别只在于<strong>语境和习惯</strong>。在机器学习中，最常见的是 <strong><span class="math">\(\sum\)</span> 求和式</strong>、<strong>点积</strong> 和 <strong>转置矩阵乘法</strong> 这三种。</p>
+<script type="text/javascript">if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+    var align = "left",
+        indent = "0em",
+        linebreak = "false";
+
+    if (true) {
+        align = (screen.width < 768) ? "left" : align;
+        indent = (screen.width < 768) ? "0em" : indent;
+        linebreak = (screen.width < 768) ? 'true' : linebreak;
+    }
+
+    var mathjaxscript = document.createElement('script');
+    mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
+    mathjaxscript.type = 'text/javascript';
+    mathjaxscript.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.3/latest.js?config=TeX-AMS-MML_HTMLorMML';
+
+    var configscript = document.createElement('script');
+    configscript.type = 'text/x-mathjax-config';
+    configscript[(window.opera ? "innerHTML" : "text")] =
+        "MathJax.Hub.Config({" +
+        "    config: ['MMLorHTML.js']," +
+        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'none' } }," +
+        "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
+        "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
+        "    displayAlign: '"+ align +"'," +
+        "    displayIndent: '"+ indent +"'," +
+        "    showMathMenu: true," +
+        "    messageStyle: 'normal'," +
+        "    tex2jax: { " +
+        "        inlineMath: [ ['\\\\(','\\\\)'] ], " +
+        "        displayMath: [ ['$$','$$'] ]," +
+        "        processEscapes: true," +
+        "        preview: 'TeX'," +
+        "    }, " +
+        "    'HTML-CSS': { " +
+        "        availableFonts: ['STIX', 'TeX']," +
+        "        preferredFont: 'STIX'," +
+        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'inherit ! important'} }," +
+        "        linebreaks: { automatic: "+ linebreak +", width: '90% container' }," +
+        "    }, " +
+        "}); " +
+        "if ('default' !== 'default') {" +
+            "MathJax.Hub.Register.StartupHook('HTML-CSS Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax['HTML-CSS'].FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+            "MathJax.Hub.Register.StartupHook('SVG Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax.SVG.FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+        "}";
+
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(configscript);
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
+}
+</script>
+</div>
+		</div>
+	</body>
+</html>
