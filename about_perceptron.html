@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="zh_cn" prefix="og: http://ogp.me/ns#">
+	<head>
+		<link href="http://gmpg.org/xfn/11" rel="profile">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta http-equiv="content-type" content="text/html; charset=utf-8">
+
+		<!-- Metadata -->
+	<meta name="description" content="一个游戏程序员。曾经参与开发过<a href='https://www.bing.com/search?q=%E4%BB%99%E4%BE%A3%E5%A5%87%E7%BC%983'>仙侣奇缘3</a>、<a href='http://sh.70yx.com'>水浒传</a>、<a href='https://itunes.apple.com/cn/app/id938688461'>小米运动</a>、<a href='https://itunes.apple.com/cn/app/id1034182617'>米动</a>和<a href='https://www.taptap.com/app/143658'>无限激战</a>">
+	<meta property="og:description" content="一个游戏程序员。曾经参与开发过<a href='https://www.bing.com/search?q=%E4%BB%99%E4%BE%A3%E5%A5%87%E7%BC%983'>仙侣奇缘3</a>、<a href='http://sh.70yx.com'>水浒传</a>、<a href='https://itunes.apple.com/cn/app/id938688461'>小米运动</a>、<a href='https://itunes.apple.com/cn/app/id1034182617'>米动</a>和<a href='https://www.taptap.com/app/143658'>无限激战</a>">
+	<meta property="og:title" content="聊聊感知机" />
+	<meta property="og:type" content="article" />
+	<meta property="og:url" content="https://funcman.me/about_perceptron.html" />
+		<meta property="og:image" content="https://funcman.me/images/avatar.png" />
+
+		<!-- Enable responsiveness on mobile devices-->
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+
+		<title>funcman's blog</title>
+
+		<!-- CSS -->
+		<link href="//fonts.googleapis.com/" rel="dns-prefetch">
+		<link href="//fonts.googleapis.com/css?family=Droid+Serif:400,700,400italic|Abril+Fatface|PT+Sans:400,400italic,700&amp;subset=latin,latin-ext" rel="stylesheet">
+
+		<link rel="stylesheet" href="https://funcman.me/theme/css/poole.css" />
+		<link rel="stylesheet" href="https://funcman.me/theme/css/hyde.css" />
+		<link rel="stylesheet" href="https://funcman.me/theme/css/syntax.css" />
+			<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css" crossorigin="anonymous">
+
+		<!-- Feeds -->
+<link href="https://funcman.me/rss.xml" type="application/atom+xml" rel="alternate" title="funcman's blog Full Atom Feed" />
+
+		<!-- Analytics -->
+	</head>
+
+	<body class="theme-base-0e">
+<div class="sidebar">
+	<div class="container sidebar-sticky">
+		<div class="sidebar-about">
+
+			<h1>
+				<a href="/">
+					<img class="profile-picture" src="https://funcman.me/images/avatar.png">
+					funcman's blog
+				</a>
+			</h1>
+			<p class="lead"></p>
+			<p class="lead">一个游戏程序员。曾经参与开发过<a href='https://www.bing.com/search?q=%E4%BB%99%E4%BE%A3%E5%A5%87%E7%BC%983'>仙侣奇缘3</a>、<a href='http://sh.70yx.com'>水浒传</a>、<a href='https://itunes.apple.com/cn/app/id938688461'>小米运动</a>、<a href='https://itunes.apple.com/cn/app/id1034182617'>米动</a>和<a href='https://www.taptap.com/app/143658'>无限激战</a> </p>
+			<p></p>
+		</div>
+		<nav class="sidebar-social">
+					<a class="sidebar-social-item" href="mailto:hyq1986@gmail.com">
+						<i class="fa-solid fa-envelope"></i>
+					</a>
+					<a class="sidebar-social-item" href="https://twitter.com/funcman" target="_blank">
+						<i class="fa-brands fa-twitter"></i>
+					</a>
+					<a class="sidebar-social-item" href="https://github.com/funcman" target="_blank">
+						<i class="fa-brands fa-github"></i>
+					</a>
+					<a class="sidebar-social-item" href="https://funcman.itch.io" target="_blank">
+						<i class="fa-brands fa-itch-io"></i>
+					</a>
+			<a class="sidebar-social-item" href="https://funcman.me/rss.xml">
+				<i class="fa-solid fa-rss"></i>
+			</a>
+		</nav>
+	</div>
+</div>		<div class="content container">
+<div class="post">
+	<h1 class="post-title">聊聊感知机</h1>
+	<span class="post-date">2026年09月02日 星期三</span>
+	<p>最近在入门机器学习，从感知机学起。本来以为这个 1958 年的老模型结构那么简单，半小时就能翻篇，结果真看进去，卡住我的地方一个接一个：偏置到底为什么必须存在、超平面在二维以外长什么样、"训练就是找分割线"这个说法对不对、高维空间的数据凭什么能画在二维图上。最后干脆用 C++ 把它实现了一遍，还拿到真实数据上跑了跑。</p>
+<p>这篇就是这个学习过程的整理。昨天那篇<a href="./various_notations_for_weighted_sums.html">《加权求和式子的各种写法》</a>其实也是这次研究过程中的一个小分支，单独摘出去了。</p>
+<h2>先摆一条时间线</h2>
+<p>感知机在神经网络的历史里是什么位置？列一下就清楚了：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">年份</th>
+<th style="text-align: left;">事件</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">1958</td>
+<td style="text-align: left;">Frank Rosenblatt 提出<strong>感知机（Perceptron）</strong>，最简单的单层全连接网络</td>
+</tr>
+<tr>
+<td style="text-align: left;">1986</td>
+<td style="text-align: left;">Rumelhart 等人推广<strong>反向传播</strong>，多层全连接网络（MLP）开始实用</td>
+</tr>
+<tr>
+<td style="text-align: left;">1989</td>
+<td style="text-align: left;">Yann LeCun 等人把<strong>卷积神经网络</strong>用于手写数字识别（LeNet 雏形）</td>
+</tr>
+<tr>
+<td style="text-align: left;">1998</td>
+<td style="text-align: left;"><strong>LeNet-5</strong> 正式发表，第一个广为人知的 CNN 架构</td>
+</tr>
+</tbody>
+</table>
+<p>全连接网络比 CNN 早了大约 30 年。CNN 的出现，是为了解决全连接网络处理图像时的两个毛病：参数太多、忽略像素之间的空间结构。而这个可以追溯到 1958 年的感知机，就是下面要聊的主角。</p>
+<h2>感知机是什么</h2>
+<h3>结构：加权求和 + 阶跃函数</h3>
+<p>感知机本质上是一个<strong>二元线性分类器</strong>，结构简单到一句话能说完：输入加权求和、加个偏置、过一遍阶跃函数，输出 0 或 1。</p>
+<p><img alt="感知机的结构和阶跃激活函数" src="./images/perceptron-structure.png"></p>
+<p>数学表达式：</p>
+<div class="math">$$\hat{y} = f\Big(\sum_{i=1}^{n} w_i x_i + b\Big), \qquad f(z) = \begin{cases} 1, &amp; z &gt; 0 \\ 0, &amp; z \le 0 \end{cases}$$</div>
+<h3>几何意义：一条分割线</h3>
+<p>感知机的决策规则是 <span class="math">\(\sum_i w_i x_i + b &gt; 0\)</span>。在二维平面上，等号成立的所有点构成一条直线，把平面分成两半：一侧输出 1，另一侧输出 0。</p>
+<p>用 AND 和 XOR 两个经典问题对比最直观：</p>
+<p><img alt="AND问题与XOR问题的线性可分性对比" src="./images/perceptron-and-xor.png"></p>
+<ul>
+<li><strong>AND 问题</strong>：四个点可以被一条直线完美分开，感知机学得会；</li>
+<li><strong>XOR 问题</strong>：无论怎么画直线都分不开。这就是感知机的致命局限——<strong>它只能解决线性可分问题</strong>。</li>
+</ul>
+<h3>学习规则：错误驱动</h3>
+<p>感知机的学习方式也很朴素：<strong>预测错了就调整权重，让决策边界往减少错误的方向移动</strong>。</p>
+<div class="math">$$w \leftarrow w + \eta (y - \hat{y}) x$$</div>
+<p>其中 <span class="math">\(\eta\)</span> 是学习率（比如 0.1），<span class="math">\(y\)</span> 是真实标签，<span class="math">\(\hat{y}\)</span> 是预测值。直观理解：</p>
+<ul>
+<li>真实是 1 却预测成 0：误差 <span class="math">\(y-\hat{y}=+1\)</span>，权重增大，让 <span class="math">\(\sum w_i x_i\)</span> 变大；</li>
+<li>真实是 0 却预测成 1：误差为 <span class="math">\(-1\)</span>，权重减小；</li>
+<li>预测对了：不更新。</li>
+</ul>
+<p><img alt="感知机的学习过程" src="./images/perceptron-learning.png"></p>
+<p>上图是一次真实的模拟：从随机权重开始，每一轮把误分的样本挨个拿出来修，决策边界一步步挪过去，第 4 轮全部分类正确，收敛。</p>
+<p>这背后有个著名的<strong>感知机收敛定理</strong>（Rosenblatt 自己证的）：只要数据线性可分，这个算法保证在有限步内收敛。反过来，数据线性不可分时，它会永远震荡下去——XOR 就是这种情况。这个"震荡"不是理论上的吓唬人，本文最后的实测会亲眼看到它。</p>
+<h2>偏置到底为什么必须存在</h2>
+<p>这是我第一个真正卡住的地方。<span class="math">\(b\)</span> 看起来像个无关紧要的常数，但它的数学本质是：<strong>给决策边界一个"平移自由度"</strong>。</p>
+<p><img alt="偏置的作用" src="./images/perceptron-bias.png"></p>
+<p>可以从三个层面理解：</p>
+<p><strong>几何层面：没有偏置，边界必须过原点。</strong> 决策边界是满足 <span class="math">\(\sum_i w_i x_i + b = 0\)</span> 的所有点。如果强制 <span class="math">\(b=0\)</span>，方程变成 <span class="math">\(w \cdot x = 0\)</span>，原点 <span class="math">\(x=0\)</span> 天然满足——边界被钉死在原点上，只剩"旋转"这一个自由度。上图左半就是这种困境：那组数据明明一条斜线就能分开，但所有过原点的直线都做不到。</p>
+<p><strong>代数层面：<span class="math">\(b\)</span> 就是直线方程的常数项。</strong> 二维直线的标准写法是 <span class="math">\(ax + by + c = 0\)</span>，<span class="math">\(c\)</span> 决定位置，<span class="math">\(a\)</span>、<span class="math">\(b\)</span> 决定方向。<span class="math">\(w\)</span> 管方向、<span class="math">\(b\)</span> 管位置，缺一不可。少了 <span class="math">\(b\)</span>，表达能力直接腰斩。</p>
+<p><strong>统一视角：<span class="math">\(b\)</span> 是对"恒为 1 的虚拟输入"的权重。</strong> 这是个很优雅的理解：把输入向量增广一个维度，</p>
+<div class="math">$$\tilde{x} = (x_1, \dots, x_n, 1), \qquad \tilde{w} = (w_1, \dots, w_n, b)$$</div>
+<p>那么 <span class="math">\(\tilde{w} \cdot \tilde{x} = \sum_i w_i x_i + b\)</span>，感知机又变回了"纯加权求和"的形式，偏置不需要特殊处理。很多神经网络框架内部就是这么实现的，文末的 C++ 代码里也用了这个技巧。</p>
+<p>还可以打个直观的比方：把感知机想象成录取系统，没有偏置相当于"加权总分必须大于 0 才录取"——这个 0 的门槛写死了。偏置让你能独立调整录取线的高低，而不用动各科权重。</p>
+<p>一句话：<strong>偏置不是锦上添花，而是线性模型完整表达能力的必要组件</strong>。</p>
+<h2>超平面：不止二维</h2>
+<p>这里有个概念值得澄清：直线是二维空间的超平面吗？答案是：对，但只是特例。</p>
+<p>超平面的定义是：<strong><span class="math">\(n\)</span> 维空间中，维度为 <span class="math">\(n-1\)</span> 的线性子空间</strong>。"超"（hyper）不是说它比平面更高级，而是说它比所在空间恰好低一维。</p>
+<p><img alt="超平面在2维和3维空间中的形态" src="./images/perceptron-hyperplane.png"></p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">空间维度</th>
+<th style="text-align: left;">超平面是什么</th>
+<th style="text-align: left;">超平面维度</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">2 维</td>
+<td style="text-align: left;">直线</td>
+<td style="text-align: left;">1</td>
+</tr>
+<tr>
+<td style="text-align: left;">3 维</td>
+<td style="text-align: left;">平面</td>
+<td style="text-align: left;">2</td>
+</tr>
+<tr>
+<td style="text-align: left;">784 维（28×28 灰度图的像素）</td>
+<td style="text-align: left;">无法想象的"扁平"结构</td>
+<td style="text-align: left;">783</td>
+</tr>
+</tbody>
+</table>
+<p>不管多少维，超平面都有两个不变的性质：维度比空间少一；把空间恰好切成两个半空间。感知机的决策边界在任何维度下都满足这两条，所以它永远是一个超平面——二维时你看得见它是条线，784 维时它存在但画不出来。</p>
+<h2>训练就是找超平面，但找到的不一定是最好的</h2>
+<p>到这里可以总结一句：感知机的训练就是在找那个分割超平面。这话<strong>大方向对，但要加两个限定</strong>。</p>
+<p>第一，感知机不是解析地"算出"超平面，而是迭代试错逼近：每次更新 <span class="math">\(w \leftarrow w + \eta(y-\hat{y})x\)</span>，几何上等价于旋转和平移边界，让它朝减少错误的方向挪。</p>
+<p>第二，也是更关键的：<strong>收敛定理只保证找到"某一个"能完美分类的超平面，不保证是"最好的"</strong>。它可能刚好擦着样本边缘过去，对噪声非常敏感。</p>
+<p><img alt="感知机与SVM找到的超平面对比" src="./images/perceptron-vs-svm.png"></p>
+<p>这正是感知机和 SVM 的分水岭：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;"></th>
+<th style="text-align: left;">感知机</th>
+<th style="text-align: left;">SVM</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">目标</td>
+<td style="text-align: left;">找到<strong>一个</strong>能分开的就行</td>
+<td style="text-align: left;">找<strong>间隔最大</strong>的那个</td>
+</tr>
+<tr>
+<td style="text-align: left;">解的性质</td>
+<td style="text-align: left;">可行解，不唯一</td>
+<td style="text-align: left;">最优解，唯一</td>
+</tr>
+<tr>
+<td style="text-align: left;">对新样本</td>
+<td style="text-align: left;">可能贴着旧样本边缘，容易翻车</td>
+<td style="text-align: left;">离两类都尽量远，更稳</td>
+</tr>
+</tbody>
+</table>
+<p>所以后来 SVM 解决"找最优超平面"的问题，多层神经网络解决"数据不是线性可分"的问题——感知机的两个短板，各自催生了一条技术路线。</p>
+<h2>加权求和算出来的到底是什么</h2>
+<p>这是我第二个真正卡住的地方：看感知机的示意图时，总觉得是把高维的值"映射"到了二维平面上，但说不清其中的数学含义。拆开其实是两个问题。</p>
+<p><strong>问题一：<span class="math">\(z = \sum_i w_i x_i + b\)</span> 的结果是什么？</strong> 是一个标量，但这个标量的几何意义很丰富——它是<strong>"有符号距离"的缩放版本</strong>：</p>
+<ul>
+<li><span class="math">\(z &gt; 0\)</span>：点在边界的正侧（<span class="math">\(w\)</span> 指向的一侧），输出 1；</li>
+<li><span class="math">\(z &lt; 0\)</span>：负侧，输出 0；</li>
+<li><span class="math">\(|z|\)</span> 的大小与点到边界的垂直距离成正比（精确地说，距离 <span class="math">\(= |z| / \|w\|\)</span>）。</li>
+</ul>
+<p>换个等价的说法：<span class="math">\(z\)</span> 是向量 <span class="math">\(x\)</span> 在法向量 <span class="math">\(w\)</span> 方向上的<strong>投影长度</strong>（乘以 <span class="math">\(\|w\|\)</span> 再加 <span class="math">\(b\)</span>）。</p>
+<p><img alt="加权求和的几何意义与高维切片" src="./images/perceptron-weighted-sum.png"></p>
+<p><strong>问题二：784 维的数据凭什么画在二维图上？</strong> 答案是：我们并没有"映射"，只是<strong>切片</strong>。</p>
+<p>打个比方：给一个立方体拍正面照，照片是二维的，但立方体还是三维的，你只是看不见深度轴。图片数据同理——一张 28×28 的灰度图，把像素拉平了就是一个 784 维向量；二维散点图只显示其中 <span class="math">\(x_i\)</span>、<span class="math">\(x_j\)</span> 两个坐标，其余 782 维仍然存在，只是没画。</p>
+<p>而且这种切片图不是近似的比喻，是精确的数学事实：固定其他 782 个变量后，<span class="math">\(w_i x_i + w_j x_j + (\text{常数}) = 0\)</span> 在 <span class="math">\((x_i, x_j)\)</span> 平面上就是一条直线。<strong>783 维超平面与二维坐标平面的交线，必然是直线</strong>。</p>
+<p>顺带一提，<span class="math">\(\sum_i w_i x_i\)</span> 这个式子本身还有很多等价写法（点积、矩阵乘法、爱因斯坦求和约定……），我单独整理在了<a href="./various_notations_for_weighted_sums.html">上一篇</a>里，这里不重复了。</p>
+<h2>能不能只用一维来观察</h2>
+<p>顺着切片的思路再进一步：既然 2D 只是切片，那能不能用 1D 来观察分割？答案是可以，但 1D 观察会丢信息，甚至产生误导。</p>
+<p>把边界方程 <span class="math">\(w_1 x_1 + w_2 x_2 + b = 0\)</span> 里的 <span class="math">\(x_2\)</span> 固定住，解出来就是一个 1D 阈值点：</p>
+<div class="math">$$x_1 = -\frac{w_2 x_2 + b}{w_1}$$</div>
+<p>问题在于：<strong>这个阈值依赖你藏起来的那个维度</strong>。</p>
+<p><img alt="1D切片与2D观察的对比" src="./images/perceptron-slice-1d-2d.png"></p>
+<p>上图左边是完整的 2D 视图，中间和右边是沿 <span class="math">\(x_2 = 1.0\)</span> 和 <span class="math">\(x_2 = 3.2\)</span> 切出来的两条 1D 数轴——同一个超平面，切出来的阈值一个在 3.1、一个在 1.0，完全不同。而且中间那张图里，两个红点和蓝方块的投影挤在阈值附近，在 1D 上你根本判断不了它们的真实空间关系。</p>
+<p>打比方说：1D 观察像透过门缝看房间，2D 观察像透过窗户看——窗户仍是投影，但至少能看清两个维度如何共同决定分类。</p>
+<p>当然 1D 也不是没用：分析单个特征的贡献、理解决策树（决策树本质上就是一串 1D 阈值分割）、向非技术人员解释"这个指标超过某值就判正类"，这些场景下 1D 阈值反而是最直观的。只是要心里清楚：<strong>那只是高维超平面在你选定的切片方向上的一个"影子"</strong>。</p>
+<h2>动手实现：C++ 写一个感知机</h2>
+<p>理论说完了，不如动手写一遍。感知机简单到核心代码 30 行就够了（C++17，零依赖）：</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// 单层感知机：ŷ = step(w·x + b)</span>
+<span class="k">struct</span><span class="w"> </span><span class="nc">Perceptron</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span><span class="w"> </span><span class="n">w</span><span class="p">;</span>
+<span class="w">    </span><span class="kt">double</span><span class="w"> </span><span class="n">b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.0</span><span class="p">;</span>
+<span class="w">    </span><span class="kt">double</span><span class="w"> </span><span class="n">lr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.1</span><span class="p">;</span><span class="w">                 </span><span class="c1">// 学习率 η</span>
+
+<span class="w">    </span><span class="k">explicit</span><span class="w"> </span><span class="n">Perceptron</span><span class="p">(</span><span class="kt">size_t</span><span class="w"> </span><span class="n">n</span><span class="p">)</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">w</span><span class="p">(</span><span class="n">n</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">)</span><span class="w"> </span><span class="p">{}</span>
+
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">predict</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;&amp;</span><span class="w"> </span><span class="n">x</span><span class="p">)</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="kt">double</span><span class="w"> </span><span class="n">z</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">b</span><span class="p">;</span>
+<span class="w">        </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">size_t</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">x</span><span class="p">.</span><span class="n">size</span><span class="p">();</span><span class="w"> </span><span class="o">++</span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="n">z</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="n">w</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">];</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">z</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="c1">// 错误驱动：预测错了才更新 w ← w + η(y-ŷ)x</span>
+<span class="w">    </span><span class="kt">void</span><span class="w"> </span><span class="n">update</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;&amp;</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">y</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">d</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">y</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">predict</span><span class="p">(</span><span class="n">x</span><span class="p">);</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">d</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="k">return</span><span class="p">;</span>
+<span class="w">        </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">size_t</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">w</span><span class="p">.</span><span class="n">size</span><span class="p">();</span><span class="w"> </span><span class="o">++</span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="n">w</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="n">lr</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">d</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">];</span>
+<span class="w">        </span><span class="n">b</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="n">lr</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">d</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">};</span>
+</code></pre></div>
+
+<p><code>predict</code> 就是前文的 <span class="math">\(\hat{y} = f(\sum_i w_i x_i + b)\)</span>，<code>update</code> 就是学习规则 <span class="math">\(w \leftarrow w + \eta(y-\hat{y})x\)</span>，逐行对应，没有别的东西了。</p>
+<h3>先跑 AND：6 轮收敛</h3>
+<p>拿 AND 问题的 4 个样本喂给它，输出：</p>
+<div class="highlight"><pre><span></span><code>AND: epoch 6 收敛, w=(0.20, 0.10), b=-0.20
+  (0, 0) -&gt; 0 (期望 0)
+  (0, 1) -&gt; 0 (期望 0)
+  (1, 0) -&gt; 0 (期望 0)
+  (1, 1) -&gt; 1 (期望 1)
+</code></pre></div>
+
+<p>第 6 轮收敛，学到的边界是 <span class="math">\(0.2x_1 + 0.1x_2 - 0.2 = 0\)</span>，即 <span class="math">\(2x_1 + x_2 = 2\)</span>——正好把 <span class="math">\((1,1)\)</span> 和其他三个点分开。和收敛定理说的一样：线性可分，有限步内搞定。</p>
+<h3>再上真实数据：亲眼看到"震荡"</h3>
+<p>再拿它跑一个真实任务：一个经典的手写数字图片数据集，60,000 张训练图 + 10,000 张测试图，每张 28×28 灰度、共 10 类。文件格式很简单——4 字节大端魔数 + 维度信息 + 原始像素字节，十几行代码就能解析。数据可以从官方镜像下载：<a href="https://storage.googleapis.com/cvdf-datasets/mnist/">storage.googleapis.com/cvdf-datasets/mnist</a>。</p>
+<p>感知机是二分类器，做 10 分类的标准做法是<strong>one-vs-rest</strong>：训练 10 个感知机，第 <span class="math">\(k\)</span> 个只负责回答"是不是数字 <span class="math">\(k\)</span>"；预测时取加权和 <span class="math">\(z\)</span> 最大的那个。像素归一化到 <span class="math">\([0,1]\)</span>，输入末尾增广一维常数 1，把偏置并进权重——就是偏置那节说的技巧。实测输出（学习率 0.1，逐样本更新，10 轮）：</p>
+<div class="highlight"><pre><span></span><code>epoch  1: 测试集准确率 85.95%
+epoch  2: 测试集准确率 85.88%
+epoch  3: 测试集准确率 86.05%
+epoch  4: 测试集准确率 87.42%
+epoch  5: 测试集准确率 84.95%
+epoch  6: 测试集准确率 85.07%
+epoch  7: 测试集准确率 89.03%
+epoch  8: 测试集准确率 87.95%
+epoch  9: 测试集准确率 88.52%
+epoch 10: 测试集准确率 87.52%
+</code></pre></div>
+
+<p>注意这个曲线的形状：<strong>它不稳定上升，也不收敛，就在 85%~89% 之间来回晃</strong>——第 4 轮 87.42%，第 5 轮反而掉到 84.95%。这正是收敛定理的另一面：手写数字的像素空间不是线性可分的，不存在零误分的超平面，感知机只能永远修修补补。理论预言的震荡，实测真的看到了。</p>
+<h3>对照组：加两层隐藏层值多少钱</h3>
+<p>我之前从零写过一个三层全连接网络（784→256→128→10，ReLU + Softmax + 交叉熵 + 反向传播）跑同一份数据，实测测试集准确率 <strong>97.35%</strong>，而且准确率随训练稳定上升。摆在一起看：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;"></th>
+<th style="text-align: left;">单层感知机 ×10</th>
+<th style="text-align: left;">三层全连接网络</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">结构</td>
+<td style="text-align: left;">784 → 10（纯线性）</td>
+<td style="text-align: left;">784 → 256 → 128 → 10</td>
+</tr>
+<tr>
+<td style="text-align: left;">决策边界</td>
+<td style="text-align: left;">10 个超平面</td>
+<td style="text-align: left;">分片线性的"折面"</td>
+</tr>
+<tr>
+<td style="text-align: left;">测试集准确率</td>
+<td style="text-align: left;">85%~89%，震荡不收敛</td>
+<td style="text-align: left;">97.35%，稳定收敛</td>
+</tr>
+<tr>
+<td style="text-align: left;">训练方式</td>
+<td style="text-align: left;">错误驱动的更新规则</td>
+<td style="text-align: left;">反向传播 + SGD</td>
+</tr>
+</tbody>
+</table>
+<p>这中间约 10 个点的差距，就是那两层隐藏层买来的东西：把"只能画直线"升级成"能折出曲面"。完整的 IDX 解析和数据加载代码就不贴了（读魔数、读维度、逐字节归一化，都是体力活），核心逻辑全在上面那 30 行里。</p>
+<h2>最后</h2>
+<p>一圈研究下来，感知机这个 1958 年的老模型比我想象的耐嚼：</p>
+<ul>
+<li>结构极简：加权求和 + 偏置 + 阶跃函数，30 行 C++ 就能实现；</li>
+<li>几何本质：线性分类器，决策边界是超平面；</li>
+<li>学习方式：错误驱动的迭代，线性可分必收敛；</li>
+<li>两个短板：只保证"可行"不保证"最优"，线性不可分直接无解——实测中准确率震荡不收敛，就是这个短板的实锤；</li>
+<li>历史地位：它的失败直接催生了多层神经网络和 SVM。</li>
+</ul>
+<p>没有感知机的失败，可能就没有后来的深度学习——这话不算夸张。而我自己的收获是，学这类模型时，<strong>把每个符号都追问到几何意义上</strong>（偏置是什么、标量 <span class="math">\(z\)</span> 是什么、图是怎么画出来的），再动手把代码写出来跑一遍，比背公式有用得多。</p>
+<p>这篇是学习笔记性质的整理，我自己的理解未必都对，有说错的地方欢迎指教。</p>
+<p><strong>参考资料</strong></p>
+<ul>
+<li>F. Rosenblatt, <em>The Perceptron: A Probabilistic Model for Information Storage and Organization in the Brain</em>, 1958</li>
+<li>M. Minsky &amp; S. Papert, <em>Perceptrons: An Introduction to Computational Geometry</em>, 1969</li>
+<li>李航《统计学习方法》第 2 章：感知机</li>
+<li>周志华《机器学习》第 5 章：神经网络</li>
+<li>手写数字数据集（IDX 格式）：<a href="https://storage.googleapis.com/cvdf-datasets/mnist/">storage.googleapis.com/cvdf-datasets/mnist</a></li>
+</ul>
+<script type="text/javascript">if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+    var align = "left",
+        indent = "0em",
+        linebreak = "false";
+
+    if (true) {
+        align = (screen.width < 768) ? "left" : align;
+        indent = (screen.width < 768) ? "0em" : indent;
+        linebreak = (screen.width < 768) ? 'true' : linebreak;
+    }
+
+    var mathjaxscript = document.createElement('script');
+    mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
+    mathjaxscript.type = 'text/javascript';
+    mathjaxscript.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.3/latest.js?config=TeX-AMS-MML_HTMLorMML';
+
+    var configscript = document.createElement('script');
+    configscript.type = 'text/x-mathjax-config';
+    configscript[(window.opera ? "innerHTML" : "text")] =
+        "MathJax.Hub.Config({" +
+        "    config: ['MMLorHTML.js']," +
+        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'none' } }," +
+        "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
+        "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
+        "    displayAlign: '"+ align +"'," +
+        "    displayIndent: '"+ indent +"'," +
+        "    showMathMenu: true," +
+        "    messageStyle: 'normal'," +
+        "    tex2jax: { " +
+        "        inlineMath: [ ['\\\\(','\\\\)'] ], " +
+        "        displayMath: [ ['$$','$$'] ]," +
+        "        processEscapes: true," +
+        "        preview: 'TeX'," +
+        "    }, " +
+        "    'HTML-CSS': { " +
+        "        availableFonts: ['STIX', 'TeX']," +
+        "        preferredFont: 'STIX'," +
+        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'inherit ! important'} }," +
+        "        linebreaks: { automatic: "+ linebreak +", width: '90% container' }," +
+        "    }, " +
+        "}); " +
+        "if ('default' !== 'default') {" +
+            "MathJax.Hub.Register.StartupHook('HTML-CSS Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax['HTML-CSS'].FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+            "MathJax.Hub.Register.StartupHook('SVG Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax.SVG.FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+        "}";
+
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(configscript);
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
+}
+</script>
+</div>
+		</div>
+	</body>
+</html>

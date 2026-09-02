@@ -1,5 +1,327 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>funcman's blog</title><link href="https://funcman.me/" rel="alternate"/><link href="https://funcman.me/rss.xml" rel="self"/><id>https://funcman.me/</id><updated>2026-09-02T17:21:51+08:00</updated><entry><title>如何开发一款2026年的3A级红白机游戏</title><link href="https://funcman.me/how_to_develop_a_aaa_nes_game_in_2026.html" rel="alternate"/><published>2026-09-02T17:21:51+08:00</published><updated>2026-09-02T17:21:51+08:00</updated><author><name>funcman</name></author><id>tag:funcman.me,2026-09-02:/how_to_develop_a_aaa_nes_game_in_2026.html</id><summary type="html">&lt;p&gt;调研了一下2026年的FC/NES开发：cc65+neslib写代码、Mesen调试、Mapper怎么选（UNROM/MMC3/自定义FPGA方案）、国产FPGA替代，以及把游戏做成实体卡带的成本和流程。&lt;/p&gt;</summary><content type="html">&lt;p&gt;最近又关注起红白机开发这个圈子。我以前写过&lt;a href="./mmc3_irqs.html"&gt;MMC3的IRQ中断&lt;/a&gt;，还分析过&lt;a href="./why_is_it_difficult_to_chineseize_fc_mother.html"&gt;《地球冒险》为什么难以汉化&lt;/a&gt;，算是对这块有点兴趣但一直没真做过游戏。&lt;/p&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>funcman's blog</title><link href="https://funcman.me/" rel="alternate"/><link href="https://funcman.me/rss.xml" rel="self"/><id>https://funcman.me/</id><updated>2026-09-02T17:30:00+08:00</updated><entry><title>聊聊感知机</title><link href="https://funcman.me/about_perceptron.html" rel="alternate"/><published>2026-09-02T17:30:00+08:00</published><updated>2026-09-02T17:30:00+08:00</updated><author><name>funcman</name></author><id>tag:funcman.me,2026-09-02:/about_perceptron.html</id><summary type="html">&lt;p&gt;感知机的结构和学习规则、偏置的数学意义、超平面在不同维度下的形态、"找一个超平面"和"找最优超平面"的区别、高维空间为什么只能切片观察，最后用一个 30 行的 C++ 实现在真实数据上验证它的能力和局限。&lt;/p&gt;</summary><content type="html">&lt;p&gt;最近在入门机器学习，从感知机学起。本来以为这个 1958 年的老模型结构那么简单，半小时就能翻篇，结果真看进去，卡住我的地方一个接一个：偏置到底为什么必须存在、超平面在二维以外长什么样、"训练就是找分割线"这个说法对不对、高维空间的数据凭什么能画在二维图上。最后干脆用 C++ 把它实现了一遍，还拿到真实数据上跑了跑。&lt;/p&gt;
+&lt;p&gt;这篇就是这个学习过程的整理。昨天那篇&lt;a href="./various_notations_for_weighted_sums.html"&gt;《加权求和式子的各种写法》&lt;/a&gt;其实也是这次研究过程中的一个小分支，单独摘出去了。&lt;/p&gt;
+&lt;h2&gt;先摆一条时间线&lt;/h2&gt;
+&lt;p&gt;感知机在神经网络的历史里是什么位置？列一下就清楚了：&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th style="text-align: left;"&gt;年份&lt;/th&gt;
+&lt;th style="text-align: left;"&gt;事件&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td style="text-align: left;"&gt;1958&lt;/td&gt;
+&lt;td style="text-align: left;"&gt;Frank Rosenblatt 提出&lt;strong&gt;感知机（Perceptron）&lt;/strong&gt;，最简单的单层全连接网络&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="text-align: left;"&gt;1986&lt;/td&gt;
+&lt;td style="text-align: left;"&gt;Rumelhart 等人推广&lt;strong&gt;反向传播&lt;/strong&gt;，多层全连接网络（MLP）开始实用&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="text-align: left;"&gt;1989&lt;/td&gt;
+&lt;td style="text-align: left;"&gt;Yann LeCun 等人把&lt;strong&gt;卷积神经网络&lt;/strong&gt;用于手写数字识别（LeNet 雏形）&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="text-align: left;"&gt;1998&lt;/td&gt;
+&lt;td style="text-align: left;"&gt;&lt;strong&gt;LeNet-5&lt;/strong&gt; 正式发表，第一个广为人知的 CNN 架构&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;全连接网络比 CNN 早了大约 30 年。CNN 的出现，是为了解决全连接网络处理图像时的两个毛病：参数太多、忽略像素之间的空间结构。而这个可以追溯到 1958 年的感知机，就是下面要聊的主角。&lt;/p&gt;
+&lt;h2&gt;感知机是什么&lt;/h2&gt;
+&lt;h3&gt;结构：加权求和 + 阶跃函数&lt;/h3&gt;
+&lt;p&gt;感知机本质上是一个&lt;strong&gt;二元线性分类器&lt;/strong&gt;，结构简单到一句话能说完：输入加权求和、加个偏置、过一遍阶跃函数，输出 0 或 1。&lt;/p&gt;
+&lt;p&gt;&lt;img alt="感知机的结构和阶跃激活函数" src="./images/perceptron-structure.png"&gt;&lt;/p&gt;
+&lt;p&gt;数学表达式：&lt;/p&gt;
+&lt;div class="math"&gt;$$\hat{y} = f\Big(\sum_{i=1}^{n} w_i x_i + b\Big), \qquad f(z) = \begin{cases} 1, &amp;amp; z &amp;gt; 0 \\ 0, &amp;amp; z \le 0 \end{cases}$$&lt;/div&gt;
+&lt;h3&gt;几何意义：一条分割线&lt;/h3&gt;
+&lt;p&gt;感知机的决策规则是 &lt;span class="math"&gt;\(\sum_i w_i x_i + b &amp;gt; 0\)&lt;/span&gt;。在二维平面上，等号成立的所有点构成一条直线，把平面分成两半：一侧输出 1，另一侧输出 0。&lt;/p&gt;
+&lt;p&gt;用 AND 和 XOR 两个经典问题对比最直观：&lt;/p&gt;
+&lt;p&gt;&lt;img alt="AND问题与XOR问题的线性可分性对比" src="./images/perceptron-and-xor.png"&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;AND 问题&lt;/strong&gt;：四个点可以被一条直线完美分开，感知机学得会；&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;XOR 问题&lt;/strong&gt;：无论怎么画直线都分不开。这就是感知机的致命局限——&lt;strong&gt;它只能解决线性可分问题&lt;/strong&gt;。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3&gt;学习规则：错误驱动&lt;/h3&gt;
+&lt;p&gt;感知机的学习方式也很朴素：&lt;strong&gt;预测错了就调整权重，让决策边界往减少错误的方向移动&lt;/strong&gt;。&lt;/p&gt;
+&lt;div class="math"&gt;$$w \leftarrow w + \eta (y - \hat{y}) x$$&lt;/div&gt;
+&lt;p&gt;其中 &lt;span class="math"&gt;\(\eta\)&lt;/span&gt; 是学习率（比如 0.1），&lt;span class="math"&gt;\(y\)&lt;/span&gt; 是真实标签，&lt;span class="math"&gt;\(\hat{y}\)&lt;/span&gt; 是预测值。直观理解：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;真实是 1 却预测成 0：误差 &lt;span class="math"&gt;\(y-\hat{y}=+1\)&lt;/span&gt;，权重增大，让 &lt;span class="math"&gt;\(\sum w_i x_i\)&lt;/span&gt; 变大；&lt;/li&gt;
+&lt;li&gt;真实是 0 却预测成 1：误差为 &lt;span class="math"&gt;\(-1\)&lt;/span&gt;，权重减小；&lt;/li&gt;
+&lt;li&gt;预测对了：不更新。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;img alt="感知机的学习过程" src="./images/perceptron-learning.png"&gt;&lt;/p&gt;
+&lt;p&gt;上图是一次真实的模拟：从随机权重开始，每一轮把误分的样本挨个拿出来修，决策边界一步步挪过去，第 4 轮全部分类正确，收敛。&lt;/p&gt;
+&lt;p&gt;这背后有个著名的&lt;strong&gt;感知机收敛定理&lt;/strong&gt;（Rosenblatt 自己证的）：只要数据线性可分，这个算法保证在有限步内收敛。反过来，数据线性不可分时，它会永远震荡下去——XOR 就是这种情况。这个"震荡"不是理论上的吓唬人，本文最后的实测会亲眼看到它。&lt;/p&gt;
+&lt;h2&gt;偏置到底为什么必须存在&lt;/h2&gt;
+&lt;p&gt;这是我第一个真正卡住的地方。&lt;span class="math"&gt;\(b\)&lt;/span&gt; 看起来像个无关紧要的常数，但它的数学本质是：&lt;strong&gt;给决策边界一个"平移自由度"&lt;/strong&gt;。&lt;/p&gt;
+&lt;p&gt;&lt;img alt="偏置的作用" src="./images/perceptron-bias.png"&gt;&lt;/p&gt;
+&lt;p&gt;可以从三个层面理解：&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;几何层面：没有偏置，边界必须过原点。&lt;/strong&gt; 决策边界是满足 &lt;span class="math"&gt;\(\sum_i w_i x_i + b = 0\)&lt;/span&gt; 的所有点。如果强制 &lt;span class="math"&gt;\(b=0\)&lt;/span&gt;，方程变成 &lt;span class="math"&gt;\(w \cdot x = 0\)&lt;/span&gt;，原点 &lt;span class="math"&gt;\(x=0\)&lt;/span&gt; 天然满足——边界被钉死在原点上，只剩"旋转"这一个自由度。上图左半就是这种困境：那组数据明明一条斜线就能分开，但所有过原点的直线都做不到。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;代数层面：&lt;span class="math"&gt;\(b\)&lt;/span&gt; 就是直线方程的常数项。&lt;/strong&gt; 二维直线的标准写法是 &lt;span class="math"&gt;\(ax + by + c = 0\)&lt;/span&gt;，&lt;span class="math"&gt;\(c\)&lt;/span&gt; 决定位置，&lt;span class="math"&gt;\(a\)&lt;/span&gt;、&lt;span class="math"&gt;\(b\)&lt;/span&gt; 决定方向。&lt;span class="math"&gt;\(w\)&lt;/span&gt; 管方向、&lt;span class="math"&gt;\(b\)&lt;/span&gt; 管位置，缺一不可。少了 &lt;span class="math"&gt;\(b\)&lt;/span&gt;，表达能力直接腰斩。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;统一视角：&lt;span class="math"&gt;\(b\)&lt;/span&gt; 是对"恒为 1 的虚拟输入"的权重。&lt;/strong&gt; 这是个很优雅的理解：把输入向量增广一个维度，&lt;/p&gt;
+&lt;div class="math"&gt;$$\tilde{x} = (x_1, \dots, x_n, 1), \qquad \tilde{w} = (w_1, \dots, w_n, b)$$&lt;/div&gt;
+&lt;p&gt;那么 &lt;span class="math"&gt;\(\tilde{w} \cdot \tilde{x} = \sum_i w_i x_i + b\)&lt;/span&gt;，感知机又变回了"纯加权求和"的形式，偏置不需要特殊处理。很多神经网络框架内部就是这么实现的，文末的 C++ 代码里也用了这个技巧。&lt;/p&gt;
+&lt;p&gt;还可以打个直观的比方：把感知机想象成录取系统，没有偏置相当于"加权总分必须大于 0 才录取"——这个 0 的门槛写死了。偏置让你能独立调整录取线的高低，而不用动各科权重。&lt;/p&gt;
+&lt;p&gt;一句话：&lt;strong&gt;偏置不是锦上添花，而是线性模型完整表达能力的必要组件&lt;/strong&gt;。&lt;/p&gt;
+&lt;h2&gt;超平面：不止二维&lt;/h2&gt;
+&lt;p&gt;这里有个概念值得澄清：直线是二维空间的超平面吗？答案是：对，但只是特例。&lt;/p&gt;
+&lt;p&gt;超平面的定义是：&lt;strong&gt;&lt;span class="math"&gt;\(n\)&lt;/span&gt; 维空间中，维度为 &lt;span class="math"&gt;\(n-1\)&lt;/span&gt; 的线性子空间&lt;/strong&gt;。"超"（hyper）不是说它比平面更高级，而是说它比所在空间恰好低一维。&lt;/p&gt;
+&lt;p&gt;&lt;img alt="超平面在2维和3维空间中的形态" src="./images/perceptron-hyperplane.png"&gt;&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th style="text-align: left;"&gt;空间维度&lt;/th&gt;
+&lt;th style="text-align: left;"&gt;超平面是什么&lt;/th&gt;
+&lt;th style="text-align: left;"&gt;超平面维度&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td style="text-align: left;"&gt;2 维&lt;/td&gt;
+&lt;td style="text-align: left;"&gt;直线&lt;/td&gt;
+&lt;td style="text-align: left;"&gt;1&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="text-align: left;"&gt;3 维&lt;/td&gt;
+&lt;td style="text-align: left;"&gt;平面&lt;/td&gt;
+&lt;td style="text-align: left;"&gt;2&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="text-align: left;"&gt;784 维（28×28 灰度图的像素）&lt;/td&gt;
+&lt;td style="text-align: left;"&gt;无法想象的"扁平"结构&lt;/td&gt;
+&lt;td style="text-align: left;"&gt;783&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;不管多少维，超平面都有两个不变的性质：维度比空间少一；把空间恰好切成两个半空间。感知机的决策边界在任何维度下都满足这两条，所以它永远是一个超平面——二维时你看得见它是条线，784 维时它存在但画不出来。&lt;/p&gt;
+&lt;h2&gt;训练就是找超平面，但找到的不一定是最好的&lt;/h2&gt;
+&lt;p&gt;到这里可以总结一句：感知机的训练就是在找那个分割超平面。这话&lt;strong&gt;大方向对，但要加两个限定&lt;/strong&gt;。&lt;/p&gt;
+&lt;p&gt;第一，感知机不是解析地"算出"超平面，而是迭代试错逼近：每次更新 &lt;span class="math"&gt;\(w \leftarrow w + \eta(y-\hat{y})x\)&lt;/span&gt;，几何上等价于旋转和平移边界，让它朝减少错误的方向挪。&lt;/p&gt;
+&lt;p&gt;第二，也是更关键的：&lt;strong&gt;收敛定理只保证找到"某一个"能完美分类的超平面，不保证是"最好的"&lt;/strong&gt;。它可能刚好擦着样本边缘过去，对噪声非常敏感。&lt;/p&gt;
+&lt;p&gt;&lt;img alt="感知机与SVM找到的超平面对比" src="./images/perceptron-vs-svm.png"&gt;&lt;/p&gt;
+&lt;p&gt;这正是感知机和 SVM 的分水岭：&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th style="text-align: left;"&gt;&lt;/th&gt;
+&lt;th style="text-align: left;"&gt;感知机&lt;/th&gt;
+&lt;th style="text-align: left;"&gt;SVM&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td style="text-align: left;"&gt;目标&lt;/td&gt;
+&lt;td style="text-align: left;"&gt;找到&lt;strong&gt;一个&lt;/strong&gt;能分开的就行&lt;/td&gt;
+&lt;td style="text-align: left;"&gt;找&lt;strong&gt;间隔最大&lt;/strong&gt;的那个&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="text-align: left;"&gt;解的性质&lt;/td&gt;
+&lt;td style="text-align: left;"&gt;可行解，不唯一&lt;/td&gt;
+&lt;td style="text-align: left;"&gt;最优解，唯一&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="text-align: left;"&gt;对新样本&lt;/td&gt;
+&lt;td style="text-align: left;"&gt;可能贴着旧样本边缘，容易翻车&lt;/td&gt;
+&lt;td style="text-align: left;"&gt;离两类都尽量远，更稳&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;所以后来 SVM 解决"找最优超平面"的问题，多层神经网络解决"数据不是线性可分"的问题——感知机的两个短板，各自催生了一条技术路线。&lt;/p&gt;
+&lt;h2&gt;加权求和算出来的到底是什么&lt;/h2&gt;
+&lt;p&gt;这是我第二个真正卡住的地方：看感知机的示意图时，总觉得是把高维的值"映射"到了二维平面上，但说不清其中的数学含义。拆开其实是两个问题。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;问题一：&lt;span class="math"&gt;\(z = \sum_i w_i x_i + b\)&lt;/span&gt; 的结果是什么？&lt;/strong&gt; 是一个标量，但这个标量的几何意义很丰富——它是&lt;strong&gt;"有符号距离"的缩放版本&lt;/strong&gt;：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;span class="math"&gt;\(z &amp;gt; 0\)&lt;/span&gt;：点在边界的正侧（&lt;span class="math"&gt;\(w\)&lt;/span&gt; 指向的一侧），输出 1；&lt;/li&gt;
+&lt;li&gt;&lt;span class="math"&gt;\(z &amp;lt; 0\)&lt;/span&gt;：负侧，输出 0；&lt;/li&gt;
+&lt;li&gt;&lt;span class="math"&gt;\(|z|\)&lt;/span&gt; 的大小与点到边界的垂直距离成正比（精确地说，距离 &lt;span class="math"&gt;\(= |z| / \|w\|\)&lt;/span&gt;）。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;换个等价的说法：&lt;span class="math"&gt;\(z\)&lt;/span&gt; 是向量 &lt;span class="math"&gt;\(x\)&lt;/span&gt; 在法向量 &lt;span class="math"&gt;\(w\)&lt;/span&gt; 方向上的&lt;strong&gt;投影长度&lt;/strong&gt;（乘以 &lt;span class="math"&gt;\(\|w\|\)&lt;/span&gt; 再加 &lt;span class="math"&gt;\(b\)&lt;/span&gt;）。&lt;/p&gt;
+&lt;p&gt;&lt;img alt="加权求和的几何意义与高维切片" src="./images/perceptron-weighted-sum.png"&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;问题二：784 维的数据凭什么画在二维图上？&lt;/strong&gt; 答案是：我们并没有"映射"，只是&lt;strong&gt;切片&lt;/strong&gt;。&lt;/p&gt;
+&lt;p&gt;打个比方：给一个立方体拍正面照，照片是二维的，但立方体还是三维的，你只是看不见深度轴。图片数据同理——一张 28×28 的灰度图，把像素拉平了就是一个 784 维向量；二维散点图只显示其中 &lt;span class="math"&gt;\(x_i\)&lt;/span&gt;、&lt;span class="math"&gt;\(x_j\)&lt;/span&gt; 两个坐标，其余 782 维仍然存在，只是没画。&lt;/p&gt;
+&lt;p&gt;而且这种切片图不是近似的比喻，是精确的数学事实：固定其他 782 个变量后，&lt;span class="math"&gt;\(w_i x_i + w_j x_j + (\text{常数}) = 0\)&lt;/span&gt; 在 &lt;span class="math"&gt;\((x_i, x_j)\)&lt;/span&gt; 平面上就是一条直线。&lt;strong&gt;783 维超平面与二维坐标平面的交线，必然是直线&lt;/strong&gt;。&lt;/p&gt;
+&lt;p&gt;顺带一提，&lt;span class="math"&gt;\(\sum_i w_i x_i\)&lt;/span&gt; 这个式子本身还有很多等价写法（点积、矩阵乘法、爱因斯坦求和约定……），我单独整理在了&lt;a href="./various_notations_for_weighted_sums.html"&gt;上一篇&lt;/a&gt;里，这里不重复了。&lt;/p&gt;
+&lt;h2&gt;能不能只用一维来观察&lt;/h2&gt;
+&lt;p&gt;顺着切片的思路再进一步：既然 2D 只是切片，那能不能用 1D 来观察分割？答案是可以，但 1D 观察会丢信息，甚至产生误导。&lt;/p&gt;
+&lt;p&gt;把边界方程 &lt;span class="math"&gt;\(w_1 x_1 + w_2 x_2 + b = 0\)&lt;/span&gt; 里的 &lt;span class="math"&gt;\(x_2\)&lt;/span&gt; 固定住，解出来就是一个 1D 阈值点：&lt;/p&gt;
+&lt;div class="math"&gt;$$x_1 = -\frac{w_2 x_2 + b}{w_1}$$&lt;/div&gt;
+&lt;p&gt;问题在于：&lt;strong&gt;这个阈值依赖你藏起来的那个维度&lt;/strong&gt;。&lt;/p&gt;
+&lt;p&gt;&lt;img alt="1D切片与2D观察的对比" src="./images/perceptron-slice-1d-2d.png"&gt;&lt;/p&gt;
+&lt;p&gt;上图左边是完整的 2D 视图，中间和右边是沿 &lt;span class="math"&gt;\(x_2 = 1.0\)&lt;/span&gt; 和 &lt;span class="math"&gt;\(x_2 = 3.2\)&lt;/span&gt; 切出来的两条 1D 数轴——同一个超平面，切出来的阈值一个在 3.1、一个在 1.0，完全不同。而且中间那张图里，两个红点和蓝方块的投影挤在阈值附近，在 1D 上你根本判断不了它们的真实空间关系。&lt;/p&gt;
+&lt;p&gt;打比方说：1D 观察像透过门缝看房间，2D 观察像透过窗户看——窗户仍是投影，但至少能看清两个维度如何共同决定分类。&lt;/p&gt;
+&lt;p&gt;当然 1D 也不是没用：分析单个特征的贡献、理解决策树（决策树本质上就是一串 1D 阈值分割）、向非技术人员解释"这个指标超过某值就判正类"，这些场景下 1D 阈值反而是最直观的。只是要心里清楚：&lt;strong&gt;那只是高维超平面在你选定的切片方向上的一个"影子"&lt;/strong&gt;。&lt;/p&gt;
+&lt;h2&gt;动手实现：C++ 写一个感知机&lt;/h2&gt;
+&lt;p&gt;理论说完了，不如动手写一遍。感知机简单到核心代码 30 行就够了（C++17，零依赖）：&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="c1"&gt;// 单层感知机：ŷ = step(w·x + b)&lt;/span&gt;
+&lt;span class="k"&gt;struct&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nc"&gt;Perceptron&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="n"&gt;std&lt;/span&gt;&lt;span class="o"&gt;::&lt;/span&gt;&lt;span class="n"&gt;vector&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="kt"&gt;double&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;w&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="kt"&gt;double&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;b&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mf"&gt;0.0&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="kt"&gt;double&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;lr&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mf"&gt;0.1&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;span class="w"&gt;                 &lt;/span&gt;&lt;span class="c1"&gt;// 学习率 η&lt;/span&gt;
+
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="k"&gt;explicit&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;Perceptron&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kt"&gt;size_t&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;n&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;w&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;n&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mf"&gt;0.0&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{}&lt;/span&gt;
+
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="kt"&gt;int&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;predict&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="k"&gt;const&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;std&lt;/span&gt;&lt;span class="o"&gt;::&lt;/span&gt;&lt;span class="n"&gt;vector&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="kt"&gt;double&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&amp;amp;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;x&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;const&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;
+&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="kt"&gt;double&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;z&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;b&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="k"&gt;for&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kt"&gt;size_t&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;i&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;i&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;x&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;size&lt;/span&gt;&lt;span class="p"&gt;();&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;++&lt;/span&gt;&lt;span class="n"&gt;i&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;z&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;+=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;w&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;i&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;x&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;i&lt;/span&gt;&lt;span class="p"&gt;];&lt;/span&gt;
+&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="k"&gt;return&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;z&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;?&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;
+
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="c1"&gt;// 错误驱动：预测错了才更新 w ← w + η(y-ŷ)x&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="kt"&gt;void&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;update&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="k"&gt;const&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;std&lt;/span&gt;&lt;span class="o"&gt;::&lt;/span&gt;&lt;span class="n"&gt;vector&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="kt"&gt;double&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&amp;amp;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;x&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kt"&gt;int&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;y&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;
+&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="kt"&gt;int&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;d&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;y&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;predict&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;x&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="k"&gt;if&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;d&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;==&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;return&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="k"&gt;for&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kt"&gt;size_t&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;i&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;i&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;w&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;size&lt;/span&gt;&lt;span class="p"&gt;();&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;++&lt;/span&gt;&lt;span class="n"&gt;i&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;w&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;i&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;+=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;lr&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;d&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;x&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;i&lt;/span&gt;&lt;span class="p"&gt;];&lt;/span&gt;
+&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="n"&gt;b&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;+=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;lr&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;d&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;span class="p"&gt;};&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;&lt;code&gt;predict&lt;/code&gt; 就是前文的 &lt;span class="math"&gt;\(\hat{y} = f(\sum_i w_i x_i + b)\)&lt;/span&gt;，&lt;code&gt;update&lt;/code&gt; 就是学习规则 &lt;span class="math"&gt;\(w \leftarrow w + \eta(y-\hat{y})x\)&lt;/span&gt;，逐行对应，没有别的东西了。&lt;/p&gt;
+&lt;h3&gt;先跑 AND：6 轮收敛&lt;/h3&gt;
+&lt;p&gt;拿 AND 问题的 4 个样本喂给它，输出：&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;AND: epoch 6 收敛, w=(0.20, 0.10), b=-0.20
+  (0, 0) -&amp;gt; 0 (期望 0)
+  (0, 1) -&amp;gt; 0 (期望 0)
+  (1, 0) -&amp;gt; 0 (期望 0)
+  (1, 1) -&amp;gt; 1 (期望 1)
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;第 6 轮收敛，学到的边界是 &lt;span class="math"&gt;\(0.2x_1 + 0.1x_2 - 0.2 = 0\)&lt;/span&gt;，即 &lt;span class="math"&gt;\(2x_1 + x_2 = 2\)&lt;/span&gt;——正好把 &lt;span class="math"&gt;\((1,1)\)&lt;/span&gt; 和其他三个点分开。和收敛定理说的一样：线性可分，有限步内搞定。&lt;/p&gt;
+&lt;h3&gt;再上真实数据：亲眼看到"震荡"&lt;/h3&gt;
+&lt;p&gt;再拿它跑一个真实任务：一个经典的手写数字图片数据集，60,000 张训练图 + 10,000 张测试图，每张 28×28 灰度、共 10 类。文件格式很简单——4 字节大端魔数 + 维度信息 + 原始像素字节，十几行代码就能解析。数据可以从官方镜像下载：&lt;a href="https://storage.googleapis.com/cvdf-datasets/mnist/"&gt;storage.googleapis.com/cvdf-datasets/mnist&lt;/a&gt;。&lt;/p&gt;
+&lt;p&gt;感知机是二分类器，做 10 分类的标准做法是&lt;strong&gt;one-vs-rest&lt;/strong&gt;：训练 10 个感知机，第 &lt;span class="math"&gt;\(k\)&lt;/span&gt; 个只负责回答"是不是数字 &lt;span class="math"&gt;\(k\)&lt;/span&gt;"；预测时取加权和 &lt;span class="math"&gt;\(z\)&lt;/span&gt; 最大的那个。像素归一化到 &lt;span class="math"&gt;\([0,1]\)&lt;/span&gt;，输入末尾增广一维常数 1，把偏置并进权重——就是偏置那节说的技巧。实测输出（学习率 0.1，逐样本更新，10 轮）：&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;epoch  1: 测试集准确率 85.95%
+epoch  2: 测试集准确率 85.88%
+epoch  3: 测试集准确率 86.05%
+epoch  4: 测试集准确率 87.42%
+epoch  5: 测试集准确率 84.95%
+epoch  6: 测试集准确率 85.07%
+epoch  7: 测试集准确率 89.03%
+epoch  8: 测试集准确率 87.95%
+epoch  9: 测试集准确率 88.52%
+epoch 10: 测试集准确率 87.52%
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;注意这个曲线的形状：&lt;strong&gt;它不稳定上升，也不收敛，就在 85%~89% 之间来回晃&lt;/strong&gt;——第 4 轮 87.42%，第 5 轮反而掉到 84.95%。这正是收敛定理的另一面：手写数字的像素空间不是线性可分的，不存在零误分的超平面，感知机只能永远修修补补。理论预言的震荡，实测真的看到了。&lt;/p&gt;
+&lt;h3&gt;对照组：加两层隐藏层值多少钱&lt;/h3&gt;
+&lt;p&gt;我之前从零写过一个三层全连接网络（784→256→128→10，ReLU + Softmax + 交叉熵 + 反向传播）跑同一份数据，实测测试集准确率 &lt;strong&gt;97.35%&lt;/strong&gt;，而且准确率随训练稳定上升。摆在一起看：&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th style="text-align: left;"&gt;&lt;/th&gt;
+&lt;th style="text-align: left;"&gt;单层感知机 ×10&lt;/th&gt;
+&lt;th style="text-align: left;"&gt;三层全连接网络&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td style="text-align: left;"&gt;结构&lt;/td&gt;
+&lt;td style="text-align: left;"&gt;784 → 10（纯线性）&lt;/td&gt;
+&lt;td style="text-align: left;"&gt;784 → 256 → 128 → 10&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="text-align: left;"&gt;决策边界&lt;/td&gt;
+&lt;td style="text-align: left;"&gt;10 个超平面&lt;/td&gt;
+&lt;td style="text-align: left;"&gt;分片线性的"折面"&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="text-align: left;"&gt;测试集准确率&lt;/td&gt;
+&lt;td style="text-align: left;"&gt;85%~89%，震荡不收敛&lt;/td&gt;
+&lt;td style="text-align: left;"&gt;97.35%，稳定收敛&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="text-align: left;"&gt;训练方式&lt;/td&gt;
+&lt;td style="text-align: left;"&gt;错误驱动的更新规则&lt;/td&gt;
+&lt;td style="text-align: left;"&gt;反向传播 + SGD&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;这中间约 10 个点的差距，就是那两层隐藏层买来的东西：把"只能画直线"升级成"能折出曲面"。完整的 IDX 解析和数据加载代码就不贴了（读魔数、读维度、逐字节归一化，都是体力活），核心逻辑全在上面那 30 行里。&lt;/p&gt;
+&lt;h2&gt;最后&lt;/h2&gt;
+&lt;p&gt;一圈研究下来，感知机这个 1958 年的老模型比我想象的耐嚼：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;结构极简：加权求和 + 偏置 + 阶跃函数，30 行 C++ 就能实现；&lt;/li&gt;
+&lt;li&gt;几何本质：线性分类器，决策边界是超平面；&lt;/li&gt;
+&lt;li&gt;学习方式：错误驱动的迭代，线性可分必收敛；&lt;/li&gt;
+&lt;li&gt;两个短板：只保证"可行"不保证"最优"，线性不可分直接无解——实测中准确率震荡不收敛，就是这个短板的实锤；&lt;/li&gt;
+&lt;li&gt;历史地位：它的失败直接催生了多层神经网络和 SVM。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;没有感知机的失败，可能就没有后来的深度学习——这话不算夸张。而我自己的收获是，学这类模型时，&lt;strong&gt;把每个符号都追问到几何意义上&lt;/strong&gt;（偏置是什么、标量 &lt;span class="math"&gt;\(z\)&lt;/span&gt; 是什么、图是怎么画出来的），再动手把代码写出来跑一遍，比背公式有用得多。&lt;/p&gt;
+&lt;p&gt;这篇是学习笔记性质的整理，我自己的理解未必都对，有说错的地方欢迎指教。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;参考资料&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;F. Rosenblatt, &lt;em&gt;The Perceptron: A Probabilistic Model for Information Storage and Organization in the Brain&lt;/em&gt;, 1958&lt;/li&gt;
+&lt;li&gt;M. Minsky &amp;amp; S. Papert, &lt;em&gt;Perceptrons: An Introduction to Computational Geometry&lt;/em&gt;, 1969&lt;/li&gt;
+&lt;li&gt;李航《统计学习方法》第 2 章：感知机&lt;/li&gt;
+&lt;li&gt;周志华《机器学习》第 5 章：神经网络&lt;/li&gt;
+&lt;li&gt;手写数字数据集（IDX 格式）：&lt;a href="https://storage.googleapis.com/cvdf-datasets/mnist/"&gt;storage.googleapis.com/cvdf-datasets/mnist&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;script type="text/javascript"&gt;if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+    var align = "left",
+        indent = "0em",
+        linebreak = "false";
+
+    if (true) {
+        align = (screen.width &lt; 768) ? "left" : align;
+        indent = (screen.width &lt; 768) ? "0em" : indent;
+        linebreak = (screen.width &lt; 768) ? 'true' : linebreak;
+    }
+
+    var mathjaxscript = document.createElement('script');
+    mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
+    mathjaxscript.type = 'text/javascript';
+    mathjaxscript.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.3/latest.js?config=TeX-AMS-MML_HTMLorMML';
+
+    var configscript = document.createElement('script');
+    configscript.type = 'text/x-mathjax-config';
+    configscript[(window.opera ? "innerHTML" : "text")] =
+        "MathJax.Hub.Config({" +
+        "    config: ['MMLorHTML.js']," +
+        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'none' } }," +
+        "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
+        "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
+        "    displayAlign: '"+ align +"'," +
+        "    displayIndent: '"+ indent +"'," +
+        "    showMathMenu: true," +
+        "    messageStyle: 'normal'," +
+        "    tex2jax: { " +
+        "        inlineMath: [ ['\\\\(','\\\\)'] ], " +
+        "        displayMath: [ ['$$','$$'] ]," +
+        "        processEscapes: true," +
+        "        preview: 'TeX'," +
+        "    }, " +
+        "    'HTML-CSS': { " +
+        "        availableFonts: ['STIX', 'TeX']," +
+        "        preferredFont: 'STIX'," +
+        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'inherit ! important'} }," +
+        "        linebreaks: { automatic: "+ linebreak +", width: '90% container' }," +
+        "    }, " +
+        "}); " +
+        "if ('default' !== 'default') {" +
+            "MathJax.Hub.Register.StartupHook('HTML-CSS Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax['HTML-CSS'].FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+            "MathJax.Hub.Register.StartupHook('SVG Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax.SVG.FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+        "}";
+
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(configscript);
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
+}
+&lt;/script&gt;</content><category term="mathematics"/><category term="C++"/><category term="感知机"/><category term="数学"/><category term="机器学习"/><category term="神经网络"/><category term="笔记"/></entry><entry><title>如何开发一款2026年的3A级红白机游戏</title><link href="https://funcman.me/how_to_develop_a_aaa_nes_game_in_2026.html" rel="alternate"/><published>2026-09-02T17:21:51+08:00</published><updated>2026-09-02T17:21:51+08:00</updated><author><name>funcman</name></author><id>tag:funcman.me,2026-09-02:/how_to_develop_a_aaa_nes_game_in_2026.html</id><summary type="html">&lt;p&gt;调研了一下2026年的FC/NES开发：cc65+neslib写代码、Mesen调试、Mapper怎么选（UNROM/MMC3/自定义FPGA方案）、国产FPGA替代，以及把游戏做成实体卡带的成本和流程。&lt;/p&gt;</summary><content type="html">&lt;p&gt;最近又关注起红白机开发这个圈子。我以前写过&lt;a href="./mmc3_irqs.html"&gt;MMC3的IRQ中断&lt;/a&gt;，还分析过&lt;a href="./why_is_it_difficult_to_chineseize_fc_mother.html"&gt;《地球冒险》为什么难以汉化&lt;/a&gt;，算是对这块有点兴趣但一直没真做过游戏。&lt;/p&gt;
 &lt;p&gt;然后我就想了一个问题：2026年了，如果想做一款"3A级"的FC游戏，现在是个什么玩法？&lt;/p&gt;
 &lt;p&gt;这里的"3A"当然是打引号的。PS5 Pro都普及了，虚幻5的画面已经逼近电影，在40年前的8位机上谈3A，听起来像个玩笑。但《Former Dawn》这个游戏真的把这件事做出来了——Something Nerdy Studios开发的NES平台JRPG，号称"不可能完成的NES RPG"：960图块/屏的背景、8×1粒度的属性表、64个精灵同屏不闪烁、接近SFC水准的配乐。而它的载体，是一张普普通通的72Pin NES卡带。&lt;/p&gt;
 &lt;p&gt;先看一张它的战斗画面，体会一下"这真的是FC？"的感觉：&lt;/p&gt;
@@ -310,7 +632,7 @@ td&lt;span class="w"&gt; &lt;/span&gt;-mode&lt;span class="w"&gt; &lt;/span&gt;b
     (document.body || document.getElementsByTagName('head')[0]).appendChild(configscript);
     (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
 }
-&lt;/script&gt;</content><category term="gamedev"/><category term="红白机"/><category term="FC"/><category term="NES"/><category term="Mapper"/><category term="游戏开发"/></entry><entry><title>加权求和式子的各种写法</title><link href="https://funcman.me/various_notations_for_weighted_sums.html" rel="alternate"/><published>2026-09-01T11:07:36+08:00</published><updated>2026-09-01T11:07:36+08:00</updated><author><name>funcman</name></author><id>tag:funcman.me,2026-09-01:/various_notations_for_weighted_sums.html</id><summary type="html">&lt;p&gt;同一个"加权求和"在数学、物理和工程中有多种不同的书写方式，它们本质完全等价，区别仅在于不同学科的习惯和语境。&lt;/p&gt;</summary><content type="html">&lt;p&gt;同一个"加权求和"概念，在不同数学/物理/工程语境下有&lt;strong&gt;多种等价表达式&lt;/strong&gt;。以下是常见的几种：&lt;/p&gt;
+&lt;/script&gt;</content><category term="gamedev"/><category term="FC"/><category term="Mapper"/><category term="NES"/><category term="游戏开发"/><category term="红白机"/></entry><entry><title>加权求和式子的各种写法</title><link href="https://funcman.me/various_notations_for_weighted_sums.html" rel="alternate"/><published>2026-09-01T11:07:36+08:00</published><updated>2026-09-01T11:07:36+08:00</updated><author><name>funcman</name></author><id>tag:funcman.me,2026-09-01:/various_notations_for_weighted_sums.html</id><summary type="html">&lt;p&gt;同一个"加权求和"在数学、物理和工程中有多种不同的书写方式，它们本质完全等价，区别仅在于不同学科的习惯和语境。&lt;/p&gt;</summary><content type="html">&lt;p&gt;同一个"加权求和"概念，在不同数学/物理/工程语境下有&lt;strong&gt;多种等价表达式&lt;/strong&gt;。以下是常见的几种：&lt;/p&gt;
 &lt;h2&gt;1. 求和符号（Sigma Notation）&lt;/h2&gt;
 &lt;div class="math"&gt;$$\sum_{i=1}^{n} w_i x_i$$&lt;/div&gt;
 &lt;p&gt;最基础的形式，明确写出下标从 1 到 &lt;span class="math"&gt;\(n\)&lt;/span&gt; 遍历。&lt;/p&gt;
@@ -439,7 +761,7 @@ td&lt;span class="w"&gt; &lt;/span&gt;-mode&lt;span class="w"&gt; &lt;/span&gt;b
     (document.body || document.getElementsByTagName('head')[0]).appendChild(configscript);
     (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
 }
-&lt;/script&gt;</content><category term="mathematics"/><category term="求和公式"/><category term="数学"/></entry><entry><title>计算机语言中的变量遮蔽（Shadowing）</title><link href="https://funcman.me/about_shadowing_in_program_langauges.html" rel="alternate"/><published>2026-08-01T18:56:23+08:00</published><updated>2026-08-01T18:56:23+08:00</updated><author><name>funcman</name></author><id>tag:funcman.me,2026-08-01:/about_shadowing_in_program_langauges.html</id><summary type="html">&lt;p&gt;遮蔽是编程语言中一种作用域机制：内层作用域声明同名标识符时，会暂时隐藏外层同名标识符，使其在当前作用域内不可见，但外层变量本身未被修改。&lt;/p&gt;</summary><content type="html">&lt;p&gt;在编程语言里，&lt;strong&gt;遮蔽&lt;/strong&gt;（Shadowing）指的是这么一种情况：在内层作用域中声明了一个与外层作用域&lt;strong&gt;同名&lt;/strong&gt;的标识符（变量、函数、参数等），导致外层的那个标识符在当前作用域内暂时“看不见”了。&lt;/p&gt;
+&lt;/script&gt;</content><category term="mathematics"/><category term="数学"/><category term="求和公式"/></entry><entry><title>计算机语言中的变量遮蔽（Shadowing）</title><link href="https://funcman.me/about_shadowing_in_program_langauges.html" rel="alternate"/><published>2026-08-01T18:56:23+08:00</published><updated>2026-08-01T18:56:23+08:00</updated><author><name>funcman</name></author><id>tag:funcman.me,2026-08-01:/about_shadowing_in_program_langauges.html</id><summary type="html">&lt;p&gt;遮蔽是编程语言中一种作用域机制：内层作用域声明同名标识符时，会暂时隐藏外层同名标识符，使其在当前作用域内不可见，但外层变量本身未被修改。&lt;/p&gt;</summary><content type="html">&lt;p&gt;在编程语言里，&lt;strong&gt;遮蔽&lt;/strong&gt;（Shadowing）指的是这么一种情况：在内层作用域中声明了一个与外层作用域&lt;strong&gt;同名&lt;/strong&gt;的标识符（变量、函数、参数等），导致外层的那个标识符在当前作用域内暂时“看不见”了。&lt;/p&gt;
 &lt;h2&gt;核心机制&lt;/h2&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;外层作用域:  let x = 10
                 ↓
@@ -600,7 +922,7 @@ td&lt;span class="w"&gt; &lt;/span&gt;-mode&lt;span class="w"&gt; &lt;/span&gt;b
 &lt;/table&gt;
 &lt;h2&gt;总结&lt;/h2&gt;
 &lt;p&gt;遮蔽是作用域系统的自然产物，它本身并不是坏事。好的遮蔽能简化代码，坏的遮蔽能隐藏Bug。&lt;/p&gt;
-&lt;p&gt;所以关键在于：遮蔽的时候保持作用域层级清晰，不要嵌套太深；需要同时访问内外层同名变量时，用语言提供的机制去突破遮蔽，比如&lt;code&gt;this.x&lt;/code&gt;、&lt;code&gt;nonlocal&lt;/code&gt;、&lt;code&gt;global&lt;/code&gt;这些。另外，团队的代码规范里也可以对“无意义的遮蔽”加以限制，比如ESLint的&lt;code&gt;no-shadow&lt;/code&gt;规则。&lt;/p&gt;</content><category term="coding"/><category term="计算机语言"/><category term="遮蔽"/></entry><entry><title>Intel大小核CPU在Windows上的优化</title><link href="https://funcman.me/optimizing_intel_hybrid_architecture_cpu_on_windows.html" rel="alternate"/><published>2026-07-13T10:16:17+08:00</published><updated>2026-07-13T10:16:17+08:00</updated><author><name>funcman</name></author><id>tag:funcman.me,2026-07-13:/optimizing_intel_hybrid_architecture_cpu_on_windows.html</id><summary type="html">&lt;p&gt;工作用电脑的CPU是i5-13400F，每天开机大量细碎的启动任务被Windows派到小核上跑，一到办公室血压就上来了...&lt;/p&gt;</summary><content type="html">&lt;p&gt;通过修改Windows隐藏的电源设置，强制系统优先使用大核心（P核、性能核）。&lt;/p&gt;
+&lt;p&gt;所以关键在于：遮蔽的时候保持作用域层级清晰，不要嵌套太深；需要同时访问内外层同名变量时，用语言提供的机制去突破遮蔽，比如&lt;code&gt;this.x&lt;/code&gt;、&lt;code&gt;nonlocal&lt;/code&gt;、&lt;code&gt;global&lt;/code&gt;这些。另外，团队的代码规范里也可以对“无意义的遮蔽”加以限制，比如ESLint的&lt;code&gt;no-shadow&lt;/code&gt;规则。&lt;/p&gt;</content><category term="coding"/><category term="编程语言"/><category term="遮蔽"/></entry><entry><title>Intel大小核CPU在Windows上的优化</title><link href="https://funcman.me/optimizing_intel_hybrid_architecture_cpu_on_windows.html" rel="alternate"/><published>2026-07-13T10:16:17+08:00</published><updated>2026-07-13T10:16:17+08:00</updated><author><name>funcman</name></author><id>tag:funcman.me,2026-07-13:/optimizing_intel_hybrid_architecture_cpu_on_windows.html</id><summary type="html">&lt;p&gt;工作用电脑的CPU是i5-13400F，每天开机大量细碎的启动任务被Windows派到小核上跑，一到办公室血压就上来了...&lt;/p&gt;</summary><content type="html">&lt;p&gt;通过修改Windows隐藏的电源设置，强制系统优先使用大核心（P核、性能核）。&lt;/p&gt;
 &lt;h2&gt;打开隐藏的电源选项&lt;/h2&gt;
 &lt;p&gt;以&lt;strong&gt;管理员身份&lt;/strong&gt;运行命令提示符（CMD）或PowerShell，依次输入以下命令并回车：&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;powercfg&lt;span class="w"&gt; &lt;/span&gt;-attributes&lt;span class="w"&gt; &lt;/span&gt;SUB_PROCESSOR&lt;span class="w"&gt; &lt;/span&gt;7f2f5cfa-f10c-4823-b5e1-e93ae85f46b5&lt;span class="w"&gt; &lt;/span&gt;-ATTRIB_HIDE
@@ -614,7 +936,7 @@ powercfg&lt;span class="w"&gt; &lt;/span&gt;-attributes&lt;span class="w"&gt; &l
 &lt;p&gt;“生效的异类策略”：设置为“使用异类策略0”。&lt;/p&gt;
 &lt;p&gt;“异类线程调度策略”：设置为“首选高性能处理器”。&lt;/p&gt;
 &lt;p&gt;“异类短运行线程调度策略”：设置为“首选高性能处理器”。&lt;/p&gt;
-&lt;p&gt;&lt;img alt="电源选项" src="./images/power-options.jpg"&gt;&lt;/p&gt;</content><category term="others"/><category term="Windows"/><category term="CPU"/><category term="优化"/></entry><entry><title>给Pelican增加数学公式和图表的显示</title><link href="https://funcman.me/add_math_and_graphviz_to_pelican.html" rel="alternate"/><published>2026-05-15T11:02:12+08:00</published><updated>2026-05-15T11:02:12+08:00</updated><author><name>funcman</name></author><id>tag:funcman.me,2026-05-15:/add_math_and_graphviz_to_pelican.html</id><summary type="html">&lt;p&gt;AI时代，数学太重要了，所以给Pelican增加了数学表达式的显示。额外的还加了Graphviz图表的功能，因为我感觉也很重要...&lt;/p&gt;</summary><content type="html">&lt;p&gt;AI时代，我觉得数学在我接下来的学习和工作中太重要了，所以我决定给Pelican加上显示数学表达式的功能。&lt;/p&gt;
+&lt;p&gt;&lt;img alt="电源选项" src="./images/power-options.jpg"&gt;&lt;/p&gt;</content><category term="others"/><category term="CPU"/><category term="Windows"/><category term="优化"/></entry><entry><title>给Pelican增加数学公式和图表的显示</title><link href="https://funcman.me/add_math_and_graphviz_to_pelican.html" rel="alternate"/><published>2026-05-15T11:02:12+08:00</published><updated>2026-05-15T11:02:12+08:00</updated><author><name>funcman</name></author><id>tag:funcman.me,2026-05-15:/add_math_and_graphviz_to_pelican.html</id><summary type="html">&lt;p&gt;AI时代，数学太重要了，所以给Pelican增加了数学表达式的显示。额外的还加了Graphviz图表的功能，因为我感觉也很重要...&lt;/p&gt;</summary><content type="html">&lt;p&gt;AI时代，我觉得数学在我接下来的学习和工作中太重要了，所以我决定给Pelican加上显示数学表达式的功能。&lt;/p&gt;
 &lt;h2&gt;MathJax 数学公式&lt;/h2&gt;
 &lt;h3&gt;方案选择&lt;/h3&gt;
 &lt;p&gt;Pelican显示数学公式，大概有三种实现方式：&lt;/p&gt;
@@ -940,7 +1262,7 @@ digraph finite_state_machine {
     (document.body || document.getElementsByTagName('head')[0]).appendChild(configscript);
     (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
 }
-&lt;/script&gt;</content><category term="others"/><category term="Pelican"/><category term="数学"/></entry><entry><title>一个严谨的.gitattributes文件</title><link href="https://funcman.me/a_rigorous_dot_gitattributes_file.html" rel="alternate"/><published>2026-05-14T21:33:24+08:00</published><updated>2026-05-14T21:33:24+08:00</updated><author><name>funcman</name></author><id>tag:funcman.me,2026-05-14:/a_rigorous_dot_gitattributes_file.html</id><summary type="html">&lt;p&gt;一个严谨的.gitattributes文件要怎么写？&lt;/p&gt;</summary><content type="html">&lt;p&gt;一个严谨的Git项目库应该有&lt;code&gt;.gitattributes&lt;/code&gt;文件，来让Git在不同操作系统和场景环境下，根据设定的规则处理文件。&lt;/p&gt;
+&lt;/script&gt;</content><category term="others"/><category term="Pelican"/><category term="博客"/><category term="数学"/></entry><entry><title>一个严谨的.gitattributes文件</title><link href="https://funcman.me/a_rigorous_dot_gitattributes_file.html" rel="alternate"/><published>2026-05-14T21:33:24+08:00</published><updated>2026-05-14T21:33:24+08:00</updated><author><name>funcman</name></author><id>tag:funcman.me,2026-05-14:/a_rigorous_dot_gitattributes_file.html</id><summary type="html">&lt;p&gt;一个严谨的.gitattributes文件要怎么写？&lt;/p&gt;</summary><content type="html">&lt;p&gt;一个严谨的Git项目库应该有&lt;code&gt;.gitattributes&lt;/code&gt;文件，来让Git在不同操作系统和场景环境下，根据设定的规则处理文件。&lt;/p&gt;
 &lt;p&gt;&lt;code&gt;.gitattributes&lt;/code&gt;文件的常见用途有：&lt;/p&gt;
 &lt;ol&gt;
 &lt;li&gt;
@@ -1019,7 +1341,7 @@ Assets/Resources/Data/Data.bytes filter=lfs diff=lfs merge=lfs -text
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
 &lt;p&gt;&lt;img alt="Good and Bad PNG" src="images/good-and-bad-png.png"&gt;&lt;/p&gt;
-&lt;p&gt;显然是Git在提交时，把&lt;code&gt;CRLF&lt;/code&gt;改成了&lt;code&gt;LF&lt;/code&gt;。&lt;/p&gt;</content><category term="coding"/><category term="Git"/><category term="Debug"/></entry><entry><title>Arch Linux 的基本安装</title><link href="https://funcman.me/basic_arch_linux_installation.html" rel="alternate"/><published>2026-04-18T23:47:37+08:00</published><updated>2026-04-18T23:47:37+08:00</updated><author><name>funcman</name></author><id>tag:funcman.me,2026-04-18:/basic_arch_linux_installation.html</id><summary type="html">&lt;p&gt;上班摸鱼时，在虚拟机上安装了一套 Arch Linux...&lt;/p&gt;</summary><content type="html">&lt;p&gt;好久没写博客，最近AI浪潮，忙疯了，反而做事的效率上来了。于是开了一堆坑，比如继续写博客。&lt;/p&gt;
+&lt;p&gt;显然是Git在提交时，把&lt;code&gt;CRLF&lt;/code&gt;改成了&lt;code&gt;LF&lt;/code&gt;。&lt;/p&gt;</content><category term="coding"/><category term="Debug"/><category term="Git"/></entry><entry><title>Arch Linux 的基本安装</title><link href="https://funcman.me/basic_arch_linux_installation.html" rel="alternate"/><published>2026-04-18T23:47:37+08:00</published><updated>2026-04-18T23:47:37+08:00</updated><author><name>funcman</name></author><id>tag:funcman.me,2026-04-18:/basic_arch_linux_installation.html</id><summary type="html">&lt;p&gt;上班摸鱼时，在虚拟机上安装了一套 Arch Linux...&lt;/p&gt;</summary><content type="html">&lt;p&gt;好久没写博客，最近AI浪潮，忙疯了，反而做事的效率上来了。于是开了一堆坑，比如继续写博客。&lt;/p&gt;
 &lt;h2&gt;为什么是Arch？&lt;/h2&gt;
 &lt;p&gt;我一直是Debian/Ubuntu的用户，以前还作为Desktop来用。这几年它们主要作为Server的OS，很好用，也不打算换。&lt;/p&gt;
 &lt;p&gt;而Arch，我主要是看中它的高度可折腾性。我希望借由Arch能够回到将Linux作为Desktop方面的生产主力的状态。&lt;/p&gt;
@@ -1257,7 +1579,7 @@ reboot&lt;span class="w"&gt;         &lt;/span&gt;&lt;span class="c1"&gt;#重启
 &lt;p&gt;我是去年看华尔街日报的一篇文章说华尔街的精英作息就是早上五点起床给老板汇报，然后去上班，下午早早结束工作，然后晚上运动一下到九点就睡。这很有意思，所以我才决定学着做做。&lt;/p&gt;
 &lt;p&gt;然后就断断续续这么做了，有点不容易做到。主要还是事情太多了，尤其工作上。&lt;/p&gt;
 &lt;p&gt;后来我想到，其实我完全没必要在工作上耗费过多的精力。因为实际上我少花一点精力，一样可以给公司带来同样的效益。&lt;/p&gt;
-&lt;p&gt;今年的改变就是基于以上。&lt;/p&gt;</content><category term="others"/><category term="生活"/><category term="睡眠"/></entry><entry><title>收集了一些前期的图像视频芯片的信息</title><link href="https://funcman.me/about_some_oldschool_gpus.html" rel="alternate"/><published>2023-01-16T11:24:07+08:00</published><updated>2023-01-16T11:24:07+08:00</updated><author><name>funcman</name></author><id>tag:funcman.me,2023-01-16:/about_some_oldschool_gpus.html</id><summary type="html">&lt;p&gt;收集整理早期家用电脑与游戏机中的图像视频芯片信息（CRTC、PPU、VDP、VIC、GDC等），列举MOS、德州仪器、摩托罗拉、雅马哈、NEC等厂商的代表芯片型号，为自制复古家用电脑做准备。&lt;/p&gt;</summary><content type="html">&lt;p&gt;现代的计算机系统，无论是台式电脑、笔记本、手机、游戏机，基本上都有专门的图形芯片，用于图像的输出。今天，我们一般将这种图形芯片，称为GPU（Graphic Processing Unit），即图形处理单元。&lt;/p&gt;
+&lt;p&gt;今年的改变就是基于以上。&lt;/p&gt;</content><category term="others"/><category term="博客"/><category term="生活"/><category term="睡眠"/><category term="随笔"/></entry><entry><title>收集了一些前期的图像视频芯片的信息</title><link href="https://funcman.me/about_some_oldschool_gpus.html" rel="alternate"/><published>2023-01-16T11:24:07+08:00</published><updated>2023-01-16T11:24:07+08:00</updated><author><name>funcman</name></author><id>tag:funcman.me,2023-01-16:/about_some_oldschool_gpus.html</id><summary type="html">&lt;p&gt;收集整理早期家用电脑与游戏机中的图像视频芯片信息（CRTC、PPU、VDP、VIC、GDC等），列举MOS、德州仪器、摩托罗拉、雅马哈、NEC等厂商的代表芯片型号，为自制复古家用电脑做准备。&lt;/p&gt;</summary><content type="html">&lt;p&gt;现代的计算机系统，无论是台式电脑、笔记本、手机、游戏机，基本上都有专门的图形芯片，用于图像的输出。今天，我们一般将这种图形芯片，称为GPU（Graphic Processing Unit），即图形处理单元。&lt;/p&gt;
 &lt;p&gt;除了一些作为控制器使用MCU系统，一般的通用型计算机系统，都包括了CPU。在PC上，GPU在显卡上存在。而手机等系统，GPU则作为SoC（System on a Chip）的一部分，在主芯片上存在。&lt;/p&gt;
 &lt;p&gt;在计算机的发展早期，是没有专门的芯片用于图像输出的，早期的计算机系统甚至没有图像输出。后来计算机越来越为个人所使用，图像输出变得重要起来。于是就有了专门的芯片。&lt;/p&gt;
 &lt;p&gt;本篇记录和罗列一些我收集到的前期图像视频芯片的信息，后面会做陆续更新。&lt;/p&gt;
@@ -1395,7 +1717,7 @@ reboot&lt;span class="w"&gt;         &lt;/span&gt;&lt;span class="c1"&gt;#重启
 &lt;/tr&gt;
 &lt;/tbody&gt;
 &lt;/table&gt;
-&lt;p&gt;做这些信息的收集，主要是为了后面自制怀旧风格&lt;a href="https://en.wikipedia.org/wiki/Home_computer" title="这里的“家用电脑”，英文是“Home Computer”。特指七十年代末期出现，八十年代大行其道的个人计算机。它们往往用八位微处理器，键盘和主机集成在一起，用电视作为显示器。中国与之对应的概念是“电脑学习机”。著名的有苹果2、C64、TRS-80等。"&gt;家用电脑&lt;/a&gt;做准备。&lt;/p&gt;</content><category term="gamedev"/><category term="GPU"/><category term="PPU"/><category term="VDP"/><category term="CRTC"/><category term="芯片"/></entry><entry><title>这可能是FC游戏《地球冒险》难以汉化的原因</title><link href="https://funcman.me/why_is_it_difficult_to_chineseize_fc_mother.html" rel="alternate"/><published>2023-01-13T09:36:45+08:00</published><updated>2023-01-13T09:36:45+08:00</updated><author><name>funcman</name></author><id>tag:funcman.me,2023-01-13:/why_is_it_difficult_to_chineseize_fc_mother.html</id><summary type="html">&lt;p&gt;通过Mesen模拟器PPU调试，分析FC游戏《地球冒险》利用MMC3 IRQ在单扫描线内切换CHR-ROM映射实现分区域绘制的技术机制，解释为何这种精密时序导致中文字模无法适配，并探讨CHR-RAM扩容汉化方案的可行性。&lt;/p&gt;</summary><content type="html">&lt;p&gt;FC游戏《地球冒险》是红白机上的知名作品。作为一个RPG，它有大量的文字。这样的游戏理应出现汉化版，毕竟中文游戏圈已经做了这么多年汉化了。但是事实上就是没有弄出来。我作为一个红白机开发技术上的萌新，尝试一下从技术上分析，这个游戏的汉化难度。&lt;/p&gt;
+&lt;p&gt;做这些信息的收集，主要是为了后面自制怀旧风格&lt;a href="https://en.wikipedia.org/wiki/Home_computer" title="这里的“家用电脑”，英文是“Home Computer”。特指七十年代末期出现，八十年代大行其道的个人计算机。它们往往用八位微处理器，键盘和主机集成在一起，用电视作为显示器。中国与之对应的概念是“电脑学习机”。著名的有苹果2、C64、TRS-80等。"&gt;家用电脑&lt;/a&gt;做准备。&lt;/p&gt;</content><category term="gamedev"/><category term="CRTC"/><category term="GPU"/><category term="PPU"/><category term="VDP"/><category term="芯片"/></entry><entry><title>这可能是FC游戏《地球冒险》难以汉化的原因</title><link href="https://funcman.me/why_is_it_difficult_to_chineseize_fc_mother.html" rel="alternate"/><published>2023-01-13T09:36:45+08:00</published><updated>2023-01-13T09:36:45+08:00</updated><author><name>funcman</name></author><id>tag:funcman.me,2023-01-13:/why_is_it_difficult_to_chineseize_fc_mother.html</id><summary type="html">&lt;p&gt;通过Mesen模拟器PPU调试，分析FC游戏《地球冒险》利用MMC3 IRQ在单扫描线内切换CHR-ROM映射实现分区域绘制的技术机制，解释为何这种精密时序导致中文字模无法适配，并探讨CHR-RAM扩容汉化方案的可行性。&lt;/p&gt;</summary><content type="html">&lt;p&gt;FC游戏《地球冒险》是红白机上的知名作品。作为一个RPG，它有大量的文字。这样的游戏理应出现汉化版，毕竟中文游戏圈已经做了这么多年汉化了。但是事实上就是没有弄出来。我作为一个红白机开发技术上的萌新，尝试一下从技术上分析，这个游戏的汉化难度。&lt;/p&gt;
 &lt;p&gt;&lt;img alt="《地球冒险》标题" src="./images/fc-mother-title.png"&gt; &lt;img alt="《地球冒险》对话" src="./images/fc-mother-talk.png"&gt;&lt;/p&gt;
 &lt;p&gt;《地球冒险》的一些基本信息：它是个日版游戏，标题名称为“Mother”。没有出过官方英文版，但是有爱好者改制的英化版。从Mapper的角度看，它是一个Mapper4游戏，使用了MMC3芯片。&lt;/p&gt;
 &lt;p&gt;&lt;a href="./mmc3_irqs.html"&gt;MMC3支持IRQ中断&lt;/a&gt;，它可以对扫描线进行计数，可以在PPU绘制第N条扫描线时，触发IRQ中断。在IRQ中断执行代码中，我们可以更改PPU绘制时依赖的各种数据。这意味着，我们可以实现屏幕分区域的绘制。比如在第N条扫描线时，改变图样表（Pattern Table）对CHR-ROM的映射。然后在第M条扫描线时，把图样表改回来。这样就能跨段（Bank）绘制更多的CHR（在背景中）。&lt;/p&gt;
@@ -1460,7 +1782,7 @@ reboot&lt;span class="w"&gt;         &lt;/span&gt;&lt;span class="c1"&gt;#重启
 &lt;p&gt;&lt;img alt="对话框覆盖了场景" src="./images/fc-metal-max-zh2.png"&gt; &lt;img alt="场景全貌" src="./images/fc-metal-max-zh3.png"&gt;&lt;/p&gt;
 &lt;p&gt;好了，说到这里，大致已经讲清了《地球冒险》的汉化难度。应该不是不可能，只是难度极高。游戏扩容时要加入CHR-RAM的支持，要选择合适的Mapper方案。模拟器也不一定能支持得好（看下图）。如果我们想把汉化后的游戏放进&lt;a href="https://krikzz.com/our-products/cartridges/n8-pro-fami.html"&gt;N8烧录卡&lt;/a&gt;，或者做一张MMC3实体卡带，达到运行无误也是有难度的。&lt;/p&gt;
 &lt;p&gt;&lt;img alt="Mesen并不能很好支持对带CHR-RAM的游戏的CHR的查看" src="./images/mesen-donot-support-show-chr-with-ram.png"&gt;&lt;/p&gt;
-&lt;p&gt;作为一个萌新，可能难免有所失误，希望得到指教。&lt;/p&gt;</content><category term="gamedev"/><category term="红白机"/><category term="FC"/><category term="NES"/><category term="MMC3"/><category term="Mapper"/><category term="汉化"/><category term="游戏"/></entry><entry><title>MMC3的IRQ中断</title><link href="https://funcman.me/mmc3_irqs.html" rel="alternate"/><published>2023-01-11T13:26:34+08:00</published><updated>2023-01-11T13:26:34+08:00</updated><author><name>funcman</name></author><id>tag:funcman.me,2023-01-11:/mmc3_irqs.html</id><summary type="html">&lt;p&gt;翻译介绍MMC3 Mapper的IRQ机制：四个关键寄存器（计数器、锁存器、禁用器、启动器）的作用与配合方式，以及如何在NMI中设置IRQ实现分屏卷动效果，附nbasic完整示例代码。&lt;/p&gt;</summary><content type="html">&lt;p&gt;&lt;a href="http://bobrost.com/nes/files/mmc3irqs.txt"&gt;原文&lt;/a&gt;作者：Allan Blomquist&lt;/p&gt;
+&lt;p&gt;作为一个萌新，可能难免有所失误，希望得到指教。&lt;/p&gt;</content><category term="gamedev"/><category term="FC"/><category term="MMC3"/><category term="Mapper"/><category term="NES"/><category term="汉化"/><category term="红白机"/></entry><entry><title>MMC3的IRQ中断</title><link href="https://funcman.me/mmc3_irqs.html" rel="alternate"/><published>2023-01-11T13:26:34+08:00</published><updated>2023-01-11T13:26:34+08:00</updated><author><name>funcman</name></author><id>tag:funcman.me,2023-01-11:/mmc3_irqs.html</id><summary type="html">&lt;p&gt;翻译介绍MMC3 Mapper的IRQ机制：四个关键寄存器（计数器、锁存器、禁用器、启动器）的作用与配合方式，以及如何在NMI中设置IRQ实现分屏卷动效果，附nbasic完整示例代码。&lt;/p&gt;</summary><content type="html">&lt;p&gt;&lt;a href="http://bobrost.com/nes/files/mmc3irqs.txt"&gt;原文&lt;/a&gt;作者：Allan Blomquist&lt;/p&gt;
 &lt;p&gt;iNES Mapper #4 (MMC3)提供了一种方便的方法，来对PPU进行帧间改变，以实现NES游戏中的&lt;strong&gt;分屏卷动&lt;/strong&gt;等“特殊效果”。与其使用&lt;code&gt;Sprite-0 Hits&lt;/code&gt;去择机写入PPU硬件，不如使用IRQ。这可以使CPU在一帧内就做完工作，而不是浪费时间去轮询&lt;code&gt;Sprite-0 Hits&lt;/code&gt;标志。 MMC3有4个寄存器，是MMC3为IRQ触发而设的：&lt;/p&gt;
 &lt;p&gt;&lt;code&gt;$C000&lt;/code&gt; - &lt;strong&gt;IRQ计数器&lt;/strong&gt; - Mapper用它来倒计时以触发IRQ。每一条扫描线，该值减一；当它到0时，IRQ就触发。&lt;/p&gt;
 &lt;blockquote&gt;
@@ -1646,7 +1968,7 @@ reboot&lt;span class="w"&gt;         &lt;/span&gt;&lt;span class="c1"&gt;#重启
     (document.body || document.getElementsByTagName('head')[0]).appendChild(configscript);
     (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
 }
-&lt;/script&gt;</content><category term="gamedev"/><category term="红白机"/><category term="FC"/><category term="NES"/><category term="IRQ"/><category term="MMC3"/><category term="芯片"/></entry><entry><title>如何配置运行在Docker中的GitLab的外部地址</title><link href="https://funcman.me/how_to_configure_gitlab_external_url_in_docker.html" rel="alternate"/><published>2022-06-09T15:56:42+08:00</published><updated>2022-06-09T15:56:42+08:00</updated><author><name>funcman</name></author><id>tag:funcman.me,2022-06-09:/how_to_configure_gitlab_external_url_in_docker.html</id><summary type="html">&lt;p&gt;解决Docker中部署GitLab时external_url带端口导致内部监听端口改变、SSH克隆地址错误的坑，给出正确的端口映射方案和gitlab.rb配置方法。&lt;/p&gt;</summary><content type="html">&lt;p&gt;家里弄了个NAS服务器，在NAS上安装了一个Docker，于是弄了很多内部服务放在Docker上跑。&lt;/p&gt;
+&lt;/script&gt;</content><category term="gamedev"/><category term="FC"/><category term="IRQ"/><category term="MMC3"/><category term="NES"/><category term="红白机"/><category term="芯片"/></entry><entry><title>如何配置运行在Docker中的GitLab的外部地址</title><link href="https://funcman.me/how_to_configure_gitlab_external_url_in_docker.html" rel="alternate"/><published>2022-06-09T15:56:42+08:00</published><updated>2022-06-09T15:56:42+08:00</updated><author><name>funcman</name></author><id>tag:funcman.me,2022-06-09:/how_to_configure_gitlab_external_url_in_docker.html</id><summary type="html">&lt;p&gt;解决Docker中部署GitLab时external_url带端口导致内部监听端口改变、SSH克隆地址错误的坑，给出正确的端口映射方案和gitlab.rb配置方法。&lt;/p&gt;</summary><content type="html">&lt;p&gt;家里弄了个NAS服务器，在NAS上安装了一个Docker，于是弄了很多内部服务放在Docker上跑。&lt;/p&gt;
 &lt;p&gt;但是在设置GitLab时遇到了点问题，经过一番折腾，得到这个很简单的处理方式。&lt;/p&gt;
 &lt;p&gt;先说问题。大多数服务都是基于Web的，会要求暴露出80端口。Docker上有很多服务，IP共用主机的没问题，但是端口必须特别指定，然后映射到容器里的80端口上。&lt;/p&gt;
 &lt;p&gt;比如这样：&lt;/p&gt;
@@ -1729,7 +2051,7 @@ unix&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="m"&gt;2&lt;/span&gt;&lt
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
 &lt;p&gt;因为&lt;code&gt;external_url&lt;/code&gt;的配置，GitLab完全没有用到&lt;code&gt;80&lt;/code&gt;端口，而是&lt;code&gt;11480&lt;/code&gt;。&lt;/p&gt;
-&lt;p&gt;GitLab居然会根据外部地址的端口，指定内部使用的端口，这谁能想到啊。&lt;/p&gt;</content><category term="others"/><category term="GitLab"/><category term="Docker"/><category term="编程环境"/></entry><entry><title>Unity ShaderLab 个人学习笔记</title><link href="https://funcman.me/unity_shader_lab_note.html" rel="alternate"/><published>2021-12-21T11:44:12+08:00</published><updated>2021-12-21T11:44:12+08:00</updated><author><name>funcman</name></author><id>tag:funcman.me,2021-12-21:/unity_shader_lab_note.html</id><summary type="html">&lt;p&gt;Unity ShaderLab学习笔记，记录ShaderLab基本结构、Properties属性定义、SubShader与Pass组织方式，以及Cull、ZTest、Blend等常用RenderSetup渲染状态设置。&lt;/p&gt;</summary><content type="html">&lt;p&gt;最近在回顾Unity的着色器知识。&lt;/p&gt;
+&lt;p&gt;GitLab居然会根据外部地址的端口，指定内部使用的端口，这谁能想到啊。&lt;/p&gt;</content><category term="others"/><category term="Docker"/><category term="GitLab"/><category term="编程环境"/></entry><entry><title>Unity ShaderLab 个人学习笔记</title><link href="https://funcman.me/unity_shader_lab_note.html" rel="alternate"/><published>2021-12-21T11:44:12+08:00</published><updated>2021-12-21T11:44:12+08:00</updated><author><name>funcman</name></author><id>tag:funcman.me,2021-12-21:/unity_shader_lab_note.html</id><summary type="html">&lt;p&gt;Unity ShaderLab学习笔记，记录ShaderLab基本结构、Properties属性定义、SubShader与Pass组织方式，以及Cull、ZTest、Blend等常用RenderSetup渲染状态设置。&lt;/p&gt;</summary><content type="html">&lt;p&gt;最近在回顾Unity的着色器知识。&lt;/p&gt;
 &lt;p&gt;这里主要记录个人在ShaderLab中遇到的一些重点内容。&lt;/p&gt;
 &lt;p&gt;这篇会做持续记录，直到完成此遍回顾。&lt;/p&gt;
 &lt;h2&gt;ShaderLab的基本结构&lt;/h2&gt;
@@ -1863,7 +2185,7 @@ unix&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="m"&gt;2&lt;/span&gt;&lt
 &lt;td&gt;打开并设置混合模式&lt;/td&gt;
 &lt;/tr&gt;
 &lt;/tbody&gt;
-&lt;/table&gt;</content><category term="gamedev"/><category term="Unity"/><category term="ShaderLab"/></entry><entry><title>Orthodox C++</title><link href="https://funcman.me/orthodox_cpp.html" rel="alternate"/><published>2021-12-17T09:40:38+08:00</published><updated>2021-12-17T09:40:38+08:00</updated><author><name>funcman</name></author><id>tag:funcman.me,2021-12-17:/orthodox_cpp.html</id><summary type="html">&lt;p&gt;翻译介绍Orthodox C++理念——一种拒绝RTTI、异常、iostream、STL容器分配器等现代特性的最小C++子集，以C风格编写更简单、更易移植、更老编译器友好的代码。&lt;/p&gt;</summary><content type="html">&lt;p&gt;本文翻译自&lt;a href="https://gist.github.com/bkaradzic/2e39896bc7d8c34e042b"&gt;https://gist.github.com/bkaradzic/2e39896bc7d8c34e042b&lt;/a&gt;，原作者是&lt;a href="https://twitter.com/bkaradzic"&gt;Бранимир Караџић&lt;/a&gt;。&lt;/p&gt;
+&lt;/table&gt;</content><category term="gamedev"/><category term="ShaderLab"/><category term="Unity"/><category term="笔记"/></entry><entry><title>Orthodox C++</title><link href="https://funcman.me/orthodox_cpp.html" rel="alternate"/><published>2021-12-17T09:40:38+08:00</published><updated>2021-12-17T09:40:38+08:00</updated><author><name>funcman</name></author><id>tag:funcman.me,2021-12-17:/orthodox_cpp.html</id><summary type="html">&lt;p&gt;翻译介绍Orthodox C++理念——一种拒绝RTTI、异常、iostream、STL容器分配器等现代特性的最小C++子集，以C风格编写更简单、更易移植、更老编译器友好的代码。&lt;/p&gt;</summary><content type="html">&lt;p&gt;本文翻译自&lt;a href="https://gist.github.com/bkaradzic/2e39896bc7d8c34e042b"&gt;https://gist.github.com/bkaradzic/2e39896bc7d8c34e042b&lt;/a&gt;，原作者是&lt;a href="https://twitter.com/bkaradzic"&gt;Бранимир Караџић&lt;/a&gt;。&lt;/p&gt;
 &lt;h2&gt;什么是Orthodox C++？&lt;/h2&gt;
 &lt;p&gt;Orthodox C++（有时被称为&lt;strong&gt;C+&lt;/strong&gt;）是C++的最小子集，它改进了C，但避免了所谓的现代C++中所有不必要的东西。它与&lt;a href="https://stackoverflow.com/questions/3661237/what-is-modern-c"&gt;现代C++&lt;/a&gt;的预设恰好相反。&lt;/p&gt;
 &lt;h2&gt;为什么否定现代C++?&lt;/h2&gt;
@@ -1951,7 +2273,7 @@ unix&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="m"&gt;2&lt;/span&gt;&lt
 &lt;p&gt;显而易见，我的&lt;strong&gt;extra&lt;/strong&gt;目录下还放了&lt;strong&gt;CNAME&lt;/strong&gt;和&lt;strong&gt;rebots.txt&lt;/strong&gt;，Pelican在生成时，会把他们都放到&lt;strong&gt;output&lt;/strong&gt;目录的根部。&lt;/p&gt;
 &lt;p&gt;通过运行&lt;code&gt;pelican content&lt;/code&gt;很容易就在&lt;strong&gt;output&lt;/strong&gt;下生成了全部的静态网页，把这些页面通过git更新到Github Pages上即可完成发布。因为我之前用的是Jekyll，所以我删除了原有的全部文件。另外，这个博客的Pelican的工程需要单独开仓库存储。&lt;/p&gt;
 &lt;p&gt;另外，Pelican可以更换主题，可以通过网站&lt;a href="http://www.pelicanthemes.com"&gt;Pelican Themes&lt;/a&gt;找到你喜欢的主题。等我发完这篇，我就来弄主题。&lt;/p&gt;
-&lt;p&gt;大致就是这样。&lt;/p&gt;</content><category term="others"/><category term="Pelican"/></entry><entry><title>另一种在Windows10下使用Jekyll的方法</title><link href="https://funcman.me/another_way_to_use_jekyll_on_windows_10.html" rel="alternate"/><published>2019-03-31T08:37:45+08:00</published><updated>2019-03-31T08:37:45+08:00</updated><author><name>funcman</name></author><id>tag:funcman.me,2019-03-31:/another_way_to_use_jekyll_on_windows_10.html</id><summary type="html">&lt;p&gt;不安装RubyInstaller，直接在已有MSYS2环境下通过pacman安装mingw-w64 Ruby工具链，再用Gem安装Bundler和Jekyll的完整步骤，适合已配置MSYS2开发环境的Windows用户。&lt;/p&gt;</summary><content type="html">&lt;p&gt;最近准备继续记博客，需要安装Jekyll环境。&lt;/p&gt;
+&lt;p&gt;大致就是这样。&lt;/p&gt;</content><category term="others"/><category term="Pelican"/><category term="博客"/></entry><entry><title>另一种在Windows10下使用Jekyll的方法</title><link href="https://funcman.me/another_way_to_use_jekyll_on_windows_10.html" rel="alternate"/><published>2019-03-31T08:37:45+08:00</published><updated>2019-03-31T08:37:45+08:00</updated><author><name>funcman</name></author><id>tag:funcman.me,2019-03-31:/another_way_to_use_jekyll_on_windows_10.html</id><summary type="html">&lt;p&gt;不安装RubyInstaller，直接在已有MSYS2环境下通过pacman安装mingw-w64 Ruby工具链，再用Gem安装Bundler和Jekyll的完整步骤，适合已配置MSYS2开发环境的Windows用户。&lt;/p&gt;</summary><content type="html">&lt;p&gt;最近准备继续记博客，需要安装Jekyll环境。&lt;/p&gt;
 &lt;p&gt;手头既有Mac也有PC，考虑到上班期间带的是PC，所以还是要在Windows下配置一个Jekyll环境。&lt;/p&gt;
 &lt;p&gt;按照Jekyll官网的方法，是去安装RubyInstaller。但是，RubyInstaller本身是基于MSYS2的，我的PC已经装了MSYS2，不想再多搞一套，于是决定基于MSYS2安装Ruby和Jekyll。&lt;/p&gt;
 &lt;p&gt;MSYS2类似Cygwin（其实就是一个Cygwin分支），可以让用户在Windows下使用UNIX环境的套件。这里先介绍一下相关概念：&lt;/p&gt;
@@ -1994,7 +2316,7 @@ unix&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="m"&gt;2&lt;/span&gt;&lt
 &lt;p&gt;升级完成之后，就可以继续&lt;a href="https://jekyllrb.com/docs/step-by-step/01-setup"&gt;用Jekyll写博客&lt;/a&gt;了。&lt;/p&gt;
 &lt;p&gt;PS：&lt;/p&gt;
 &lt;p&gt;我为了复习怎么用Jekyll，粗略的看了一下&lt;a href="https://jekyllrb.com/docs/step-by-step/01-setup"&gt;Jekyll Step by Step Tutorial&lt;/a&gt;。它在第一步里讲使用jekyll serve来运行Jekyll，这和我们平常使用bundle exec jekyll serve的方式有点不一样。实际上在第十步里有解释&lt;a href="https://jekyllrb.com/docs/step-by-step/10-deployment/#gemfile"&gt;怎么一回事&lt;/a&gt;。我也不是很熟悉Ruby，使用Jekyll的很多人估计也是这样。反正Bundler大概是一个处理相同Gem的不同版本被同时引用的工具，我们记得用它就行了。&lt;/p&gt;
-&lt;p&gt;另外，这一篇虽然标题是Windows10，并不是说不适用于之前的Windows版本，我只是没有试过。&lt;/p&gt;</content><category term="others"/><category term="Jekyll"/><category term="Ruby"/><category term="编程环境"/></entry><entry><title>“你是如果管理内存的？”</title><link href="https://funcman.me/how_do_you_manage_memory.html" rel="alternate"/><published>2016-07-22T04:46:07+08:00</published><updated>2016-07-22T04:46:07+08:00</updated><author><name>funcman</name></author><id>tag:funcman.me,2016-07-22:/how_do_you_manage_memory.html</id><summary type="html">&lt;p&gt;面试题复盘笔记，系统梳理C/C++内存管理策略：内存池分配、内存泄漏跟踪器、树状父子结构自动释放、引用计数、智能指针，以及何时该用简单方法、何时才需特殊手段。&lt;/p&gt;</summary><content type="html">&lt;p&gt;还没找到工作，面了几家，都没下文。我脸皮厚，写点总结发博客。&lt;/p&gt;
+&lt;p&gt;另外，这一篇虽然标题是Windows10，并不是说不适用于之前的Windows版本，我只是没有试过。&lt;/p&gt;</content><category term="others"/><category term="Jekyll"/><category term="Ruby"/><category term="Windows"/><category term="博客"/><category term="编程环境"/></entry><entry><title>“你是如果管理内存的？”</title><link href="https://funcman.me/how_do_you_manage_memory.html" rel="alternate"/><published>2016-07-22T04:46:07+08:00</published><updated>2016-07-22T04:46:07+08:00</updated><author><name>funcman</name></author><id>tag:funcman.me,2016-07-22:/how_do_you_manage_memory.html</id><summary type="html">&lt;p&gt;面试题复盘笔记，系统梳理C/C++内存管理策略：内存池分配、内存泄漏跟踪器、树状父子结构自动释放、引用计数、智能指针，以及何时该用简单方法、何时才需特殊手段。&lt;/p&gt;</summary><content type="html">&lt;p&gt;还没找到工作，面了几家，都没下文。我脸皮厚，写点总结发博客。&lt;/p&gt;
 &lt;p&gt;像标题这样的面试问题，这些天遇到不止一两次。第一次我略懵，毕竟好久没被面了，没什么准备，所以没做出全面的回答。不过，就算到现在，我也没能在面试时把这个问题回答得很到位。可能这个问题对我来说已经不是什么困扰，平时想得也不多，遇到了我也能解决。这里做一下笔记，这样再遇到这个问题，我可以表现得好一些。&lt;/p&gt;
 &lt;p&gt;首先破题，为什么需要考虑管理内存的事，因为C/C++主要提供的是一种很原始的手工释放内存的方式。人难免出错，如果申请了内存，最后忘记释放，就会造成内存泄漏。此外，对于那些在好几个模块之间共享的内存，怎样才能做到正确且合理地释放，也是个问题。如果其中某个模块做了解引用（dereference）操作，还要专门去通知别的模块，再根据情况的不同决定是否需要真的释放内存，那模块之间必然是紧耦合的。所以，并不是小心谨慎就能解决好内存管理问题，好的内存管理一定要借助合适的方法和工具。&lt;/p&gt;
 &lt;p&gt;我这里第一个要谈的工具，是内存池。内存池实际上是在一开始申请一大块内存，再将这大块的内存按照一定规则划分成几个尺寸的小块内存集合。同一尺寸的小块内存用一个叫FreeList的东西串起来，有几种尺寸就搞几条FreeList。当我们需要内存时，根据需要的尺寸，就近找到一条合适的FreeList（比如系统内有8 Bytes和16 Bytes等尺寸的FreeList，我们需要9 Bytes的内存，那么就挑16 Bytes的FreeList），从中拿一个小块即可。当这个内存不再使用时，被释放的过程，就是将它还回FreeList的过程。当然，内存池有其它的实现方式，但也是差不多的东西，大同小异。&lt;/p&gt;
@@ -2006,12 +2328,12 @@ unix&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="m"&gt;2&lt;/span&gt;&lt
 &lt;p&gt;对于最简单的引用计数器实现来说，加一、减一操作，往往要我们手工进行。即使将加一、减一隐藏在构造、析构、赋值运算符中，依然需要我们手工写释放操作来进一步触发减一机制。要解决这一问题，我们可以引入智能指针技术：栈对象在出作用域时会自动触发析构，智能指针对象其实就是一种栈对象，它能自动触发减一操作。实际上，新的C++1x的std::shared_ptr，就是一种结合了引用计数的高级智能指针。&lt;/p&gt;
 &lt;p&gt;引用计数技术有个问题，就是一旦对象之间出现循环引用的关系时，就会出问题，无法正常的释放。因为对象的引用计数，由于循环引用的存在，无法降为0。这时需要手工将循环引用关系打断，才能正常的释放。而在真实的编码中，我们会极力避免循环引用的出现，所依赖的手段是好的程序结构。&lt;/p&gt;
 &lt;p&gt;对于C/C++的内存管理，一般不谈论GC垃圾回收。我不把引用计数归为GC，这里说的GC是指使用标记法之类的那种GC。它们普遍比引用计数低效一些，C/C++这种比较偏向执行效率的语言，人们不太将它与GC一起谈。虽然C/C++也是有GC库可用的，但是一旦使用GC库，GC库分配的内存，就必须由GC库管理，且缺乏语言的语法支持。至于细节，不同的GC库使用不同的算法，和那么支持GC的语言并没有太多本质上的区别，其特点可以参考其它语言。GC对比引用计数机制，有一个好处，就是不担心循环引用。&lt;/p&gt;
-&lt;p&gt;对于使用什么手段来解决内存管理问题，不能一概而论，没有方法是最优的。优化程序结构，可以在大的结构节点，使用手工申请、释放的方式控制内存；可以在系统逻辑主干部分，设计结构性强的对象关系，系统地进行对象的释放。不过度设计，减少不必要的机制，比如不滥用Lazy初始化，固化对象生命周期的次序，减少发生循环引用的可能。需要我们编写复杂代码的地方，应该是对性能有严格要求的地方。但即使是游戏编程，也不是所有地方都对性能有强烈的需求。对于那些真正有需求的地方，我们则采取一些特别的手段来管理内存，且要付出的代价不仅仅在编码实现上，还需要有足量的测试，一切根据实际出发。而多数地方，我们要采用现成的、性价比好的方法。&lt;/p&gt;</content><category term="coding"/><category term="面试"/><category term="内存管理"/><category term="内存池"/></entry><entry><title>✔ JUST DO IT</title><link href="https://funcman.me/just_do_it.html" rel="alternate"/><published>2016-07-12T17:07:07+08:00</published><updated>2016-07-12T17:07:07+08:00</updated><author><name>funcman</name></author><id>tag:funcman.me,2016-07-12:/just_do_it.html</id><summary type="html">&lt;p&gt;辞职准备回归游戏行业的随感。面对行业困境和外部环境的无力感，决定少想多做，专注于程序员的手艺本身，Just Do It。&lt;/p&gt;</summary><content type="html">&lt;p&gt;最近辞职了，准备回游戏业，在找工作。&lt;/p&gt;
+&lt;p&gt;对于使用什么手段来解决内存管理问题，不能一概而论，没有方法是最优的。优化程序结构，可以在大的结构节点，使用手工申请、释放的方式控制内存；可以在系统逻辑主干部分，设计结构性强的对象关系，系统地进行对象的释放。不过度设计，减少不必要的机制，比如不滥用Lazy初始化，固化对象生命周期的次序，减少发生循环引用的可能。需要我们编写复杂代码的地方，应该是对性能有严格要求的地方。但即使是游戏编程，也不是所有地方都对性能有强烈的需求。对于那些真正有需求的地方，我们则采取一些特别的手段来管理内存，且要付出的代价不仅仅在编码实现上，还需要有足量的测试，一切根据实际出发。而多数地方，我们要采用现成的、性价比好的方法。&lt;/p&gt;</content><category term="coding"/><category term="C"/><category term="C++"/><category term="内存管理"/><category term="笔记"/><category term="面试"/></entry><entry><title>✔ JUST DO IT</title><link href="https://funcman.me/just_do_it.html" rel="alternate"/><published>2016-07-12T17:07:07+08:00</published><updated>2016-07-12T17:07:07+08:00</updated><author><name>funcman</name></author><id>tag:funcman.me,2016-07-12:/just_do_it.html</id><summary type="html">&lt;p&gt;辞职准备回归游戏行业的随感。面对行业困境和外部环境的无力感，决定少想多做，专注于程序员的手艺本身，Just Do It。&lt;/p&gt;</summary><content type="html">&lt;p&gt;最近辞职了，准备回游戏业，在找工作。&lt;/p&gt;
 &lt;p&gt;其实游戏业给我的，是一种失败感，尤其最近。比如斧子的惨状。再如手游审批这事，其实我对这块不感冒，但也有殃及池鱼的感觉。总结起来，就是一个没劲。主机解禁没带来多少改变，现在又闹这一出，一代又一代的人深陷魔掌无法脱出。&lt;/p&gt;
 &lt;p&gt;特佩服也特感谢一些没心没肺的观点——自己做好了不怕外界环境恶劣。这话是对的，比如放在斧子游戏机这事上，不是大家不挺你，是有些事你自己作死。能这么想的人，都是内心坚毅的人。而且，作为弱者，不干了这碗鸡汤，还能怎样。&lt;/p&gt;
 &lt;p&gt;以前老大批评我想太多，我很认同。业内如何，轮不上我这样的去想，想了也没用。我是程序员，不专注在自己手艺上是不行的。你看老罗，虽然手机做得还行，至少做出来了，但是总给人一种只会耍嘴炮的感觉，间接也耽误了锤子的行情。所以呢，我还是只专注于技术，不然哪一天风云幻变，做出中国巫师、中国神海的人里就没有我了（笑）。&lt;/p&gt;
 &lt;p&gt;十岁想做游戏，二十岁在做游戏，三十岁再回来。觉得对的事，就去做吧。&lt;/p&gt;
-&lt;p&gt;&lt;img alt="JUSE FUCKING DO IT" src="https://funcman.me/images/just-fucking-do-it.png"&gt;&lt;/p&gt;</content><category term="gamedev"/><category term="职业"/><category term="事业"/><category term="工作"/></entry><entry><title>如何在OSX El Capitan下使用基于CH34x芯片的USB串口适配线</title><link href="https://funcman.me/how_to_use_ch34x_usb_to_serial_adapter_on_osx_el_capitan.html" rel="alternate"/><published>2015-12-10T07:47:23+08:00</published><updated>2015-12-10T07:47:23+08:00</updated><author><name>funcman</name></author><id>tag:funcman.me,2015-12-10:/how_to_use_ch34x_usb_to_serial_adapter_on_osx_el_capitan.html</id><summary type="html">&lt;p&gt;解决基于CH34x芯片的廉价USB转串口线在OSX El Capitan及更新版本中因SIP安全机制无法安装驱动的办法：进入恢复模式，用csrutil放宽内核扩展保护后再安装官方驱动。&lt;/p&gt;</summary><content type="html">&lt;p&gt;淘宝上有很多廉价的USB转串口的适配线，这其中不少使用的是南京的沁恒公司的CH34x芯片。&lt;/p&gt;
+&lt;p&gt;&lt;img alt="JUSE FUCKING DO IT" src="https://funcman.me/images/just-fucking-do-it.png"&gt;&lt;/p&gt;</content><category term="gamedev"/><category term="职业"/><category term="随笔"/></entry><entry><title>如何在OSX El Capitan下使用基于CH34x芯片的USB串口适配线</title><link href="https://funcman.me/how_to_use_ch34x_usb_to_serial_adapter_on_osx_el_capitan.html" rel="alternate"/><published>2015-12-10T07:47:23+08:00</published><updated>2015-12-10T07:47:23+08:00</updated><author><name>funcman</name></author><id>tag:funcman.me,2015-12-10:/how_to_use_ch34x_usb_to_serial_adapter_on_osx_el_capitan.html</id><summary type="html">&lt;p&gt;解决基于CH34x芯片的廉价USB转串口线在OSX El Capitan及更新版本中因SIP安全机制无法安装驱动的办法：进入恢复模式，用csrutil放宽内核扩展保护后再安装官方驱动。&lt;/p&gt;</summary><content type="html">&lt;p&gt;淘宝上有很多廉价的USB转串口的适配线，这其中不少使用的是南京的沁恒公司的CH34x芯片。&lt;/p&gt;
 &lt;p&gt;我们可以在“关于本机”-“系统报告”-“硬件”-“USB”里查看适配线的VID（厂商ID），来确定适配线是否基于CH34x芯片。CH34x的VID是0x1a86，我这根的PID（产品ID）是0x7523，你的PID可能不同，0x5523也是一个可用的PID。&lt;/p&gt;
 &lt;p&gt;确定芯片后，就可以去找驱动程序了。沁恒的网址是&lt;a href="http://www.wch.cn"&gt;http://www.wch.cn&lt;/a&gt;，我们可以从上面找到我们需要的驱动。&lt;a href="http://www.wch.cn/download/CH341SER_MAC_ZIP.html"&gt;Mac的驱动也是有的&lt;/a&gt;，不过太老了，未经签名，所以通过不了苹果在OSX 10.11上加入的SIP&lt;sup id="fnref:1"&gt;&lt;a class="footnote-ref" href="#fn:1"&gt;1&lt;/a&gt;&lt;/sup&gt;保护技术。如果直接安装这个驱动，肯定是用不了的。必须屏蔽SIP对kext&lt;sup id="fnref:2"&gt;&lt;a class="footnote-ref" href="#fn:2"&gt;2&lt;/a&gt;&lt;/sup&gt;的保护。&lt;/p&gt;
 &lt;p&gt;设置SIP，我们需要用到csrutil，它就是SIP的配置修改工具。使用csrutil，必须进入恢复模式。恢复模式的进入方法是：开机（重启）时，同时按CMD键和R键。进入恢复模式之后，在“实用工具”里找到“终端”，在终端里输入：&lt;/p&gt;
@@ -2030,7 +2352,7 @@ unix&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="m"&gt;2&lt;/span&gt;&lt
 &lt;p&gt;OSX的内核扩展，驱动一般是以这种形式存在的&amp;#160;&lt;a class="footnote-backref" href="#fnref:2" title="Jump back to footnote 2 in the text"&gt;&amp;#8617;&lt;/a&gt;&lt;/p&gt;
 &lt;/li&gt;
 &lt;/ol&gt;
-&lt;/div&gt;</content><category term="coding"/><category term="OSX El Capitan"/><category term="CH34x"/><category term="串口"/></entry><entry><title>如何背单词</title><link href="https://funcman.me/how_to_remember_english_words.html" rel="alternate"/><published>2015-11-25T06:44:07+08:00</published><updated>2015-11-25T06:44:07+08:00</updated><author><name>funcman</name></author><id>tag:funcman.me,2015-11-25:/how_to_remember_english_words.html</id><summary type="html">&lt;p&gt;背单词屡屡放弃的症结在于贪婪——求多求全导致没有正面反馈。降低预期到"看到英文能想起中文意思"即可，用渐进式成就感建立持续学习的动力。&lt;/p&gt;</summary><content type="html">&lt;p&gt;我是个英语很烂的人，所有关于英语的能力，都来自于技术工作中对英文的不得不进行的接触。因为英语太烂，也失去了一些不错的机会。怎么学英语，我是不懂的。至于背单词，大多数英语好的人，应该都去尝试过。我也尝试过，但一直不得其法。&lt;/p&gt;
+&lt;/div&gt;</content><category term="coding"/><category term="CH34x"/><category term="OSX El Capitan"/><category term="串口"/></entry><entry><title>如何背单词</title><link href="https://funcman.me/how_to_remember_english_words.html" rel="alternate"/><published>2015-11-25T06:44:07+08:00</published><updated>2015-11-25T06:44:07+08:00</updated><author><name>funcman</name></author><id>tag:funcman.me,2015-11-25:/how_to_remember_english_words.html</id><summary type="html">&lt;p&gt;背单词屡屡放弃的症结在于贪婪——求多求全导致没有正面反馈。降低预期到"看到英文能想起中文意思"即可，用渐进式成就感建立持续学习的动力。&lt;/p&gt;</summary><content type="html">&lt;p&gt;我是个英语很烂的人，所有关于英语的能力，都来自于技术工作中对英文的不得不进行的接触。因为英语太烂，也失去了一些不错的机会。怎么学英语，我是不懂的。至于背单词，大多数英语好的人，应该都去尝试过。我也尝试过，但一直不得其法。&lt;/p&gt;
 &lt;p&gt;现在，为了完成学业，我又准备拿起单词书，再次尝试一下。在开始做这件事时，我想了一下，到底是什么阻碍了我之前在背单词上的持续努力？&lt;/p&gt;
 &lt;p&gt;我不是没有目的的去学习一个东西，相反，学好了英语对我来说有很多积极的意义。在我内心里，是有学习的冲动的。所以，之前的不顺利，应该是方法上出了问题。&lt;/p&gt;
 &lt;p&gt;背单词是一种记忆活动，在记忆领域，人们有一个普遍的共识，就是人脑记忆新事物遵循着“艾宾浩斯记忆曲线”。我之前也采用了遵循这种规律的记忆复习方法，相信在这类方法的应用上，没有什么问题。&lt;/p&gt;
@@ -2038,22 +2360,22 @@ unix&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="m"&gt;2&lt;/span&gt;&lt
 &lt;p&gt;人有一种既贪婪又懦弱的通性。人做一件事情，是由欲望驱使的，欲望总是使人在得到的同时还想得到更多。人的能力有限，无法驾驭所有，当欲望发展成贪婪，无法得到完全的满足时，人的懦弱的本性就开始产生作用：放弃掉全部追求。&lt;/p&gt;
 &lt;p&gt;这就是贪婪导致毁灭的道理。在之前的背单词过程中，我渴望着把每一个单词记住记牢，用法、特例、近义词、反义词等等通通收入脑子里。实际上我做不到，也没有产生什么益处。这样背完一百个单词后，我感觉不到任何提高。我觉得自己在做没有意义的事，于是放弃就成了轻易且自然的事情。&lt;/p&gt;
 &lt;p&gt;所有智慧都在说一件事，克制住欲望。背单词也一样，我不需要记住那么多，甚至不需要记住每一个单词的拼写。我只需要对这些单词有种“我接触过”的印象，就能在英文阅读中有&lt;strong&gt;能力提升的感觉&lt;/strong&gt;。然后，当我发现某些单词需要经常书写时，再去记住它们的拼写。如此循序渐进，总能获取到学习的正面反馈，也就有了不断坚持下去的&lt;strong&gt;动力&lt;/strong&gt;。&lt;/p&gt;
-&lt;p&gt;在&lt;a href="https://itunes.apple.com/app/id888483369/"&gt;墨墨背单词&lt;/a&gt;这个应用中，“记住一个单词”的定义是&lt;strong&gt;由用户决定&lt;/strong&gt;的。用户只需要告诉应用，对于某个单词，在一次测试过程中，是记住了还是忘记了，或是模模糊糊记不清。然后应用根据用户的记忆反馈，为用户提供这个单词在下次出现的时机和频率。至于用户怎么定义“记住了”，完全由用户根据自己追求的目标进行判断。对于我来说，看到一个英文单词，能想到它的中文意思，那就是记住了。就这么简单。&lt;/p&gt;</content><category term="others"/><category term="英语"/><category term="背单词"/></entry><entry><title>如何正确编写苹果健康程序</title><link href="https://funcman.me/how_to_save_data_to_apple_health_correctly.html" rel="alternate"/><published>2015-10-27T10:45:00+08:00</published><updated>2015-10-27T10:45:00+08:00</updated><author><name>funcman</name></author><id>tag:funcman.me,2015-10-27:/how_to_save_data_to_apple_health_correctly.html</id><summary type="html">&lt;p&gt;HealthKit的读写权限完全分离且由用户控制，可能导致重复写入。本文指出在APP端或云端对同步数据做标记是避免重复的最佳实践，并讨论了HK数据融合机制的局限。&lt;/p&gt;</summary><content type="html">&lt;p&gt;苹果健康使用HealthKit接收数据的提交和读取，很多时候，我们从程序编写的角度，把两者看做同一个东西，下文简称HK。&lt;/p&gt;
+&lt;p&gt;在&lt;a href="https://itunes.apple.com/app/id888483369/"&gt;墨墨背单词&lt;/a&gt;这个应用中，“记住一个单词”的定义是&lt;strong&gt;由用户决定&lt;/strong&gt;的。用户只需要告诉应用，对于某个单词，在一次测试过程中，是记住了还是忘记了，或是模模糊糊记不清。然后应用根据用户的记忆反馈，为用户提供这个单词在下次出现的时机和频率。至于用户怎么定义“记住了”，完全由用户根据自己追求的目标进行判断。对于我来说，看到一个英文单词，能想到它的中文意思，那就是记住了。就这么简单。&lt;/p&gt;</content><category term="others"/><category term="背单词"/><category term="英语"/></entry><entry><title>如何正确编写苹果健康程序</title><link href="https://funcman.me/how_to_save_data_to_apple_health_correctly.html" rel="alternate"/><published>2015-10-27T10:45:00+08:00</published><updated>2015-10-27T10:45:00+08:00</updated><author><name>funcman</name></author><id>tag:funcman.me,2015-10-27:/how_to_save_data_to_apple_health_correctly.html</id><summary type="html">&lt;p&gt;HealthKit的读写权限完全分离且由用户控制，可能导致重复写入。本文指出在APP端或云端对同步数据做标记是避免重复的最佳实践，并讨论了HK数据融合机制的局限。&lt;/p&gt;</summary><content type="html">&lt;p&gt;苹果健康使用HealthKit接收数据的提交和读取，很多时候，我们从程序编写的角度，把两者看做同一个东西，下文简称HK。&lt;/p&gt;
 &lt;p&gt;HK在权限管理方面，有个很特（guai）别（yi）的地方，也是一个坑，即：读权限和写权限是完全分离的，存在可写但不可读的情况。由于权限控制权完全在用户手中，即使程序同时请求读写权限，也可能只是获得到写权限，而无读权限。这就造成一个问题：程序无法直接知道HK里已经存有哪些数据，如果不想办法规避这个坑，同一条数据有可能被重复写入HK。&lt;/p&gt;
 &lt;p&gt;为了避免重复写入数据，我们需要在APP端甚至云端的数据存储中，对每条需要同步到HK的数据，进行标记。这样，才能将HK的数据同步做到最佳。&lt;/p&gt;
-&lt;p&gt;我个人对HK本身的设计有个想法：HK应该自动把同一个数据源提交来的相同数据进行合并。如果几个数据，它们的起止时间，数值等，都是相同的，把它们看做同一个数据，是完全合理的。其实HK对于重复数据，是有一个融合算法的，并不会把数据进行累加。但是，用户点开“显示所有数据”时，看到有数据重复的情况，多多少少心里会有些膈应，会怪罪APP端。苹果对HK的数据隐私，看得格外重要，才设计出如此怪异的权限机制，牺牲了不少的可用性。&lt;/p&gt;</content><category term="coding"/><category term="苹果健康"/><category term="HealthKit"/></entry><entry><title>谈一谈个人在接下来几年的游戏技术方向</title><link href="https://funcman.me/talk_about_my_next_interests_in_game_technologys.html" rel="alternate"/><published>2015-01-08T14:46:00+08:00</published><updated>2015-01-08T14:46:00+08:00</updated><author><name>funcman</name></author><id>tag:funcman.me,2015-01-08:/talk_about_my_next_interests_in_game_technologys.html</id><summary type="html">&lt;p&gt;计划未来几年攒技术做一款个人2D引擎：用Flash+JSFL做动画/粒子编辑器，借鉴Unity Component系统，深度使用Lua作为脚本层，并探索Go/skynet服务端技术。&lt;/p&gt;</summary><content type="html">&lt;p&gt;我对目前火爆的手游和之前火爆的端游、页游通通不感兴趣。除非项目非常nice，或者团队的人非常有趣，否则我不太会积极地回到游戏行业中。理想的状态是，我是一群酷爱游戏且专业的人的之一，做着一款看着就好玩的电视、电脑游戏。虽然Xbox ONE已经来中国了，PS4也要上市了，但是中国电视游戏的春天恐怕还要等上几年。所以，我考虑在这几年积攒一下技术。&lt;/p&gt;
+&lt;p&gt;我个人对HK本身的设计有个想法：HK应该自动把同一个数据源提交来的相同数据进行合并。如果几个数据，它们的起止时间，数值等，都是相同的，把它们看做同一个数据，是完全合理的。其实HK对于重复数据，是有一个融合算法的，并不会把数据进行累加。但是，用户点开“显示所有数据”时，看到有数据重复的情况，多多少少心里会有些膈应，会怪罪APP端。苹果对HK的数据隐私，看得格外重要，才设计出如此怪异的权限机制，牺牲了不少的可用性。&lt;/p&gt;</content><category term="coding"/><category term="HealthKit"/><category term="苹果健康"/></entry><entry><title>谈一谈个人在接下来几年的游戏技术方向</title><link href="https://funcman.me/talk_about_my_next_interests_in_game_technologys.html" rel="alternate"/><published>2015-01-08T14:46:00+08:00</published><updated>2015-01-08T14:46:00+08:00</updated><author><name>funcman</name></author><id>tag:funcman.me,2015-01-08:/talk_about_my_next_interests_in_game_technologys.html</id><summary type="html">&lt;p&gt;计划未来几年攒技术做一款个人2D引擎：用Flash+JSFL做动画/粒子编辑器，借鉴Unity Component系统，深度使用Lua作为脚本层，并探索Go/skynet服务端技术。&lt;/p&gt;</summary><content type="html">&lt;p&gt;我对目前火爆的手游和之前火爆的端游、页游通通不感兴趣。除非项目非常nice，或者团队的人非常有趣，否则我不太会积极地回到游戏行业中。理想的状态是，我是一群酷爱游戏且专业的人的之一，做着一款看着就好玩的电视、电脑游戏。虽然Xbox ONE已经来中国了，PS4也要上市了，但是中国电视游戏的春天恐怕还要等上几年。所以，我考虑在这几年积攒一下技术。&lt;/p&gt;
 &lt;p&gt;所谓的积攒技术，就是做一个2D引擎，其实也就是造轮子。如果是即刻投身商业开发，那么造轮子，一定是件可耻的事情。Unity或者cocos2d-x已经足够好了。而这对于我来说，只是个人私事。理由不具体直接解释了，反正我就是爱折腾。&lt;/p&gt;
 &lt;p&gt;我个人很喜欢Unity的快捷和强大，但也感到如果Unity和cocos2d-x一样开源，很多事会好办很多。而对于后者，我不太喜欢它的设计。cocos2d吸收了很多Cocoa的特点，但对于一个游戏引擎来说，有些地方还是简洁点好。&lt;/p&gt;
 &lt;p&gt;对于一个2D引擎来说，图形底层并不复杂，只要把Sprite做出来，这个引擎就能用来做游戏了。一个成熟的2D引擎，必不可少要有一套动画系统。以前的2D游戏多采用序列帧，现在基本上是实时演算的关键帧插值动画。动画编辑器的开发量是不小的，我考虑使用Flash作为动画编辑器，用JSFL做数据导出。Flash可做的事情非常多，比如还可以作为UI布局器使用，甚至粒子特效编辑器也省了。使用通用编辑器来取代内部编辑器，是节省成本的一个好方法。&lt;/p&gt;
 &lt;p&gt;我个人是很喜欢Unity的，尤其是它的Editor，和Component系统。UnityEditor级别的开发，不是几个人能完成的，所以就不是我要借鉴的对象。我要学习的是Component系统。游戏是OO设计最经典的应用场景之一（另一个是GUI），Component系统是我见过的最好理解的游戏OOD。好理解意味着好用，开发快捷方便。&lt;/p&gt;
 &lt;p&gt;我考虑在这个引擎中深度应用Lua语言，而不是像我以前的项目那样，只是把Lua作为写回调功能的工具。我偏向C/C++只为Lua提供回调功能，单纯去解决真正的性能问题。引擎应用程序员是面向Lua工作的，C/C++只需要做好核心的即可。&lt;/p&gt;
-&lt;p&gt;以上说的是2D引擎技术，此外，我还对服务端技术感兴趣，这是我没有真正做过的，需要去常识的。我曾经了解过一段时间node.js，并且网易的一群人还弄出了一个Pomelo，但我不考虑node。JavaScript的爱好者很喜欢摆弄异步回调，node上也充满了这种风格的东西。但异步毕竟是个烧脑的东西，我更喜欢简单直接的。我对go和云风的skynet很感兴趣，尤其后者是我喜欢的“C+Lua”。&lt;/p&gt;</content><category term="gamedev"/><category term="技术选型"/></entry><entry><title>关于有理数、无理数中的“理”字</title><link href="https://funcman.me/about_logos_of_the_rational_number_and_irrational_number.html" rel="alternate"/><published>2014-12-17T15:00:00+08:00</published><updated>2014-12-17T15:00:00+08:00</updated><author><name>funcman</name></author><id>tag:funcman.me,2014-12-17:/about_logos_of_the_rational_number_and_irrational_number.html</id><summary type="html">&lt;p&gt;追溯"有理数/无理数"中"理"的词源：希腊文logos（规律/可被言说）→拉丁文ratio（比值/可被理解），探讨毕达哥拉斯学派与无理数发现背后的思想史。&lt;/p&gt;</summary><content type="html">&lt;p&gt;我们知道有理数就是可以用整数比值表示的数字。但对于无理数，我们就不好下定义，只好说不能用整数比值表示的数字就是无理数。&lt;/p&gt;
+&lt;p&gt;以上说的是2D引擎技术，此外，我还对服务端技术感兴趣，这是我没有真正做过的，需要去常识的。我曾经了解过一段时间node.js，并且网易的一群人还弄出了一个Pomelo，但我不考虑node。JavaScript的爱好者很喜欢摆弄异步回调，node上也充满了这种风格的东西。但异步毕竟是个烧脑的东西，我更喜欢简单直接的。我对go和云风的skynet很感兴趣，尤其后者是我喜欢的“C+Lua”。&lt;/p&gt;</content><category term="gamedev"/><category term="技术选型"/><category term="游戏开发"/></entry><entry><title>关于有理数、无理数中的“理”字</title><link href="https://funcman.me/about_logos_of_the_rational_number_and_irrational_number.html" rel="alternate"/><published>2014-12-17T15:00:00+08:00</published><updated>2014-12-17T15:00:00+08:00</updated><author><name>funcman</name></author><id>tag:funcman.me,2014-12-17:/about_logos_of_the_rational_number_and_irrational_number.html</id><summary type="html">&lt;p&gt;追溯"有理数/无理数"中"理"的词源：希腊文logos（规律/可被言说）→拉丁文ratio（比值/可被理解），探讨毕达哥拉斯学派与无理数发现背后的思想史。&lt;/p&gt;</summary><content type="html">&lt;p&gt;我们知道有理数就是可以用整数比值表示的数字。但对于无理数，我们就不好下定义，只好说不能用整数比值表示的数字就是无理数。&lt;/p&gt;
 &lt;p&gt;对于有理数、无理数中间这个“理”字，我们也不太容易理解，数字不具备位格，怎么还能讲道理。其实这两个名词，来自日文。我们知道，很多汉语里采用的日式外来词，和汉语字词意思多少有些出入，理解起来就会有点“无厘头”。&lt;/p&gt;
 &lt;p&gt;我在网上随便搜索了一下，据说这个日式外来词，在翻译时也受到了徐光启和利玛窦翻译的《几何原本》的影响。根据网上的说法，在徐、利版本的《几何原本》中，将比值作为“理”字翻译出来。但是我不太确信这样的解释，我不清楚文言文中的“理”字可作比值的意思。&lt;/p&gt;
 &lt;p&gt;我所知道的，这个“理”字，在最早希腊文中，是用logos表示。logos大概就是事物本质规律的意思，也有话语、可被语言表达的事物的意思。圣经里，面向希腊语地区读者的《约翰福音》，用logos来关联上帝的话语，中文版本圣经里翻作“道”字。而拉丁文，logos被转译为ratio，也就是英文中的比值和rational（可理解的）的词根。我不知道logos有没有比值的意思，retio既有比值的意思，也有可被理解的意思。&lt;/p&gt;
 &lt;p&gt;所以，至少我们可以把有理数和无理数，在字面上理解为可以理解的数和不可理解的数，这样多少可以说得通。&lt;/p&gt;
 &lt;p&gt;无论在圣经中，还是在发现有理数的古希腊毕达哥拉斯学派的眼里，logos都是一个高大上的词。所以，发现无理数这样不logos的数的希伯索斯，被认为亵渎了神圣，最后被狂热的毕门学者投入了地中海。当然，这和基督教没有关系，基督教是在其后几百年才有的。很多科学史上的迫害，问题不在于信仰什么，而是拜宗教狂热所赐，不管是基督教下的，还是这种拜科学教背景的。&lt;/p&gt;
-&lt;p&gt;乱七八糟讲了这么多，回过头来，我们还是很难通过字面和简单的语言，来提供一种本文第一段第二句之外的对无理数的定义或解释。摊手~&lt;/p&gt;</content><category term="mathematics"/><category term="有理数"/><category term="数学"/></entry><entry><title>关于std::list的排序</title><link href="https://funcman.me/about_sqrt_of_std_list.html" rel="alternate"/><published>2010-09-04T12:58:00+08:00</published><updated>2010-09-04T12:58:00+08:00</updated><author><name>funcman</name></author><id>tag:funcman.me,2010-09-04:/about_sqrt_of_std_list.html</id><summary type="html">&lt;p&gt;std::list不支持随机访问，因此无法使用STL算法库的sort()，必须使用list容器自身的sort()成员函数进行排序。附示例代码。&lt;/p&gt;</summary><content type="html">&lt;p&gt;std::list和std::vector不同，无法使用STL算法库里的sort()，因为std::list不支持随机访问（random access）。&lt;/p&gt;
+&lt;p&gt;乱七八糟讲了这么多，回过头来，我们还是很难通过字面和简单的语言，来提供一种本文第一段第二句之外的对无理数的定义或解释。摊手~&lt;/p&gt;</content><category term="mathematics"/><category term="数学"/><category term="有理数"/></entry><entry><title>关于std::list的排序</title><link href="https://funcman.me/about_sqrt_of_std_list.html" rel="alternate"/><published>2010-09-04T12:58:00+08:00</published><updated>2010-09-04T12:58:00+08:00</updated><author><name>funcman</name></author><id>tag:funcman.me,2010-09-04:/about_sqrt_of_std_list.html</id><summary type="html">&lt;p&gt;std::list不支持随机访问，因此无法使用STL算法库的sort()，必须使用list容器自身的sort()成员函数进行排序。附示例代码。&lt;/p&gt;</summary><content type="html">&lt;p&gt;std::list和std::vector不同，无法使用STL算法库里的sort()，因为std::list不支持随机访问（random access）。&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="c1"&gt;// std::list排序示例&lt;/span&gt;
 
 &lt;span class="cp"&gt;#include&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="cpf"&gt;&amp;lt;stdio.h&amp;gt;&lt;/span&gt;
@@ -2095,7 +2417,7 @@ unix&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="m"&gt;2&lt;/span&gt;&lt
 
 &lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="k"&gt;return&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
 &lt;span class="p"&gt;}&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</content><category term="coding"/><category term="STL"/><category term="list"/><category term="容器"/></entry><entry><title>一个Win32控制台类</title><link href="https://funcman.me/win32_console_class.html" rel="alternate"/><published>2010-06-06T10:54:00+08:00</published><updated>2010-06-06T10:54:00+08:00</updated><author><name>funcman</name></author><id>tag:funcman.me,2010-06-06:/win32_console_class.html</id><summary type="html">&lt;p&gt;为Win32程序（尤其是游戏）提供一个DbgCon类，利用AllocConsole在运行时动态创建控制台窗口，支持显示、隐藏、置顶，方便输出实时调试日志而无需依赖VC调试器。&lt;/p&gt;</summary><content type="html">&lt;p&gt;对于编写Win32程序，尤其是游戏这种实时性高的程序来说，断点调试未必是最合适的调试方法。很多时候，我们更渴望看到实时打印的调试信息。&lt;/p&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</content><category term="coding"/><category term="C++"/><category term="STL"/><category term="容器"/></entry><entry><title>一个Win32控制台类</title><link href="https://funcman.me/win32_console_class.html" rel="alternate"/><published>2010-06-06T10:54:00+08:00</published><updated>2010-06-06T10:54:00+08:00</updated><author><name>funcman</name></author><id>tag:funcman.me,2010-06-06:/win32_console_class.html</id><summary type="html">&lt;p&gt;为Win32程序（尤其是游戏）提供一个DbgCon类，利用AllocConsole在运行时动态创建控制台窗口，支持显示、隐藏、置顶，方便输出实时调试日志而无需依赖VC调试器。&lt;/p&gt;</summary><content type="html">&lt;p&gt;对于编写Win32程序，尤其是游戏这种实时性高的程序来说，断点调试未必是最合适的调试方法。很多时候，我们更渴望看到实时打印的调试信息。&lt;/p&gt;
 &lt;p&gt;一种方法是使用VC的调试函数OutputDebugString()，将信息输出给VC调试控制台。还有一种方法是在Win32控制台工程的基础上创建窗口程序（入口为main而非WinMain）。可以用宏来控制编译，使Debug版本时有控制台，Release版本没有控制台，像这样：&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="c1"&gt;// 一个简单的方法&lt;/span&gt;
 &lt;span class="cp"&gt;#ifndef _DEBUG&lt;/span&gt;
@@ -2184,7 +2506,7 @@ unix&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="m"&gt;2&lt;/span&gt;&lt
 &lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="c1"&gt;// 取消置顶&lt;/span&gt;
 &lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="n"&gt;SetWindowPos&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;HWnd_&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;HWND_NOTOPMOST&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;SWP_NOMOVE&lt;/span&gt;&lt;span class="o"&gt;||&lt;/span&gt;&lt;span class="n"&gt;SWP_NOSIZE&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
 &lt;span class="p"&gt;}&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</content><category term="coding"/><category term="C++"/><category term="Win32"/><category term="控制台"/></entry><entry><title>C语言对数据的隐藏封装</title><link href="https://funcman.me/data_hiding_in_c.html" rel="alternate"/><published>2010-05-16T19:48:00+08:00</published><updated>2010-05-16T19:48:00+08:00</updated><author><name>funcman</name></author><id>tag:funcman.me,2010-05-16:/data_hiding_in_c.html</id><summary type="html">&lt;p&gt;展示C语言中利用不完整类型（typedef struct Demo* Demo）实现数据隐藏与接口封装的技巧，头文件仅暴露指针类型和函数接口，实现细节完全隐藏在编译单元中。&lt;/p&gt;</summary><content type="html">&lt;p&gt;在C++中，如果我们想把数据结构隐藏起来，只为用户提供接口，可以通过实现继承接口类的方式到达目的。那C中，可以采用什么方式呢。下面有一例：&lt;/p&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</content><category term="coding"/><category term="C++"/><category term="Debug"/><category term="Win32"/><category term="Windows"/><category term="控制台"/></entry><entry><title>C语言对数据的隐藏封装</title><link href="https://funcman.me/data_hiding_in_c.html" rel="alternate"/><published>2010-05-16T19:48:00+08:00</published><updated>2010-05-16T19:48:00+08:00</updated><author><name>funcman</name></author><id>tag:funcman.me,2010-05-16:/data_hiding_in_c.html</id><summary type="html">&lt;p&gt;展示C语言中利用不完整类型（typedef struct Demo* Demo）实现数据隐藏与接口封装的技巧，头文件仅暴露指针类型和函数接口，实现细节完全隐藏在编译单元中。&lt;/p&gt;</summary><content type="html">&lt;p&gt;在C++中，如果我们想把数据结构隐藏起来，只为用户提供接口，可以通过实现继承接口类的方式到达目的。那C中，可以采用什么方式呢。下面有一例：&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="c1"&gt;// demo.h&lt;/span&gt;
 
 &lt;span class="cp"&gt;#ifndef DEMO_H&lt;/span&gt;
@@ -2234,7 +2556,7 @@ unix&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="m"&gt;2&lt;/span&gt;&lt
 &lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="n"&gt;DemoDestory&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;demo&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
 &lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="k"&gt;return&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
 &lt;span class="p"&gt;}&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</content><category term="coding"/><category term="C语言"/><category term="接口"/><category term="封装"/></entry><entry><title>艾未未作品《4851》观后感</title><link href="https://funcman.me/review_of_4851_by_ai_weiwei.html" rel="alternate"/><published>2010-01-10T02:44:00+08:00</published><updated>2010-01-10T02:44:00+08:00</updated><author><name>funcman</name></author><id>tag:funcman.me,2010-01-10:/review_of_4851_by_ai_weiwei.html</id><summary type="html">&lt;p&gt;艾未未作品《4851》观后感。87分钟的片长像一味催化剂，认为观众的观看方式本身也是作品的一部分，能够同时从理性与感性触发对5·12的思考。&lt;/p&gt;</summary><content type="html">&lt;p&gt;艾未未先生的《4851》是我看到的最深刻的艺术作品。&lt;/p&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</content><category term="coding"/><category term="C"/><category term="封装"/><category term="接口"/></entry><entry><title>艾未未作品《4851》观后感</title><link href="https://funcman.me/review_of_4851_by_ai_weiwei.html" rel="alternate"/><published>2010-01-10T02:44:00+08:00</published><updated>2010-01-10T02:44:00+08:00</updated><author><name>funcman</name></author><id>tag:funcman.me,2010-01-10:/review_of_4851_by_ai_weiwei.html</id><summary type="html">&lt;p&gt;艾未未作品《4851》观后感。87分钟的片长像一味催化剂，认为观众的观看方式本身也是作品的一部分，能够同时从理性与感性触发对5·12的思考。&lt;/p&gt;</summary><content type="html">&lt;p&gt;艾未未先生的《4851》是我看到的最深刻的艺术作品。&lt;/p&gt;
 &lt;p&gt;87分钟的片长，可能没几个人会真的花87分钟完整地看完这部片子。&lt;/p&gt;
 &lt;p&gt;没关系，你的观看方式已经是这部艺术作品的一部分。&lt;/p&gt;
 &lt;p&gt;这是部完美的艺术作品，像一味催化剂。&lt;/p&gt;
@@ -2242,9 +2564,9 @@ unix&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="m"&gt;2&lt;/span&gt;&lt
 &lt;p&gt;你可以通过YouTube观看：&lt;a href="https://www.youtube.com/watch?v=4IZpRHDOJpg"&gt;《4851》&lt;/a&gt;（中国用户访问YouTube需要跨越GFW）&lt;/p&gt;</content><category term="others"/><category term="艺术"/><category term="艾未未"/></entry><entry><title>动物保护的逻辑──小论《海豚湾》的政治正确性</title><link href="https://funcman.me/logic_of_animal_protectionism.html" rel="alternate"/><published>2009-12-21T19:34:00+08:00</published><updated>2009-12-21T19:34:00+08:00</updated><author><name>funcman</name></author><id>tag:funcman.me,2009-12-21:/logic_of_animal_protectionism.html</id><summary type="html">&lt;p&gt;从功利主义角度论证动物保护主义的合理性：保护性情近人的动物是维护人道情感，保护野生动物是维系地球生态，两者最终都服务于人类自身利益。并评价《海豚湾》作为纪录片的成熟行事方式。&lt;/p&gt;</summary><content type="html">&lt;p&gt;一、某些动物性情趋向于人，人们能从这些动物身上获得人道情感，保护这些动物是在维护人道主义。之所有争取一些动物不作为牲畜屠宰，争取一些牲口在屠宰时更快死亡以减少受虐程度，是基于这样一个泛功利的动机。&lt;/p&gt;
 &lt;p&gt;二、野生动物是地球生态的重要组成部分，保护野生动物，是为了地球生态能够正常运行下去。地球生态的正常运作，才能让人们和他们的后台得以更好地生存。这也是一个功利的理由。&lt;/p&gt;
 &lt;p&gt;所以即使抛弃崇高的理念，以现实利益为名，动物保护主义也是完全站得住脚的。&lt;/p&gt;
-&lt;p&gt;《海豚湾》作为一部动物保护主义题材的环保纪录片，它的拍摄，是在遵从上面两个重要逻辑的前提下展开的。海豚保护组织最终在国际规则制定会议（法的层面）上，展出血淋淋的证据，给日本滥杀海豚的恶行以有力一击。这种行事方式十分成熟。&lt;/p&gt;</content><category term="others"/><category term="电影"/><category term="纪录片"/><category term="动物保护"/><category term="政治正确"/></entry><entry><title>应该在何时判断一个指针是否为NULL</title><link href="https://funcman.me/when_should_determine_whether_a-pointer_is_null.html" rel="alternate"/><published>2007-10-12T11:20:00+08:00</published><updated>2007-10-12T11:20:00+08:00</updated><author><name>funcman</name></author><id>tag:funcman.me,2007-10-12:/when_should_determine_whether_a-pointer_is_null.html</id><summary type="html">&lt;p&gt;辨析C/C++指针操作中NULL判断的时机：delete对NULL是安全的无需判断，而strlen等函数接收NULL会崩溃必须在调用前检测。参数校验应前置，函数内部用assert兼顾效率。&lt;/p&gt;</summary><content type="html">&lt;p&gt;今天看到一篇Blog：&lt;a href="http://fsfoundry.org/codefreak/2007/09/16/a-couple-of-things-about-pointer-to-null/"&gt;《NULL指标两三事》&lt;/a&gt;，文中谈的主题即是我这篇Blog的题目，我这里也只是对原文的做些简单的记录。&lt;/p&gt;
+&lt;p&gt;《海豚湾》作为一部动物保护主义题材的环保纪录片，它的拍摄，是在遵从上面两个重要逻辑的前提下展开的。海豚保护组织最终在国际规则制定会议（法的层面）上，展出血淋淋的证据，给日本滥杀海豚的恶行以有力一击。这种行事方式十分成熟。&lt;/p&gt;</content><category term="others"/><category term="动物保护"/><category term="政治正确"/><category term="电影"/><category term="纪录片"/></entry><entry><title>应该在何时判断一个指针是否为NULL</title><link href="https://funcman.me/when_should_determine_whether_a-pointer_is_null.html" rel="alternate"/><published>2007-10-12T11:20:00+08:00</published><updated>2007-10-12T11:20:00+08:00</updated><author><name>funcman</name></author><id>tag:funcman.me,2007-10-12:/when_should_determine_whether_a-pointer_is_null.html</id><summary type="html">&lt;p&gt;辨析C/C++指针操作中NULL判断的时机：delete对NULL是安全的无需判断，而strlen等函数接收NULL会崩溃必须在调用前检测。参数校验应前置，函数内部用assert兼顾效率。&lt;/p&gt;</summary><content type="html">&lt;p&gt;今天看到一篇Blog：&lt;a href="http://fsfoundry.org/codefreak/2007/09/16/a-couple-of-things-about-pointer-to-null/"&gt;《NULL指标两三事》&lt;/a&gt;，文中谈的主题即是我这篇Blog的题目，我这里也只是对原文的做些简单的记录。&lt;/p&gt;
 &lt;p&gt;文中谈到的问题，也是我们平常出现的问题，即在操作一个指针前，我们常常在不需要判断指针是否为NULL时做了判断，而在需要判断时却想当然地把它漏掉了。&lt;/p&gt;
 &lt;p&gt;例如：delete时，完全可以对一个NULL指针进行操作，而我们却要多余地加上一个&lt;code&gt;if(ptr!=NULL)&lt;/code&gt;判断；
 又如：strlen时，如果参数给了一个NULL指针，就可能造成整个程序崩掉，我们却以为strlen自己会做NULL指针判读，并在获得一个NULL参数时return。&lt;/p&gt;
 &lt;p&gt;另外，在原文的评论栏中有一问一答，合理地解释了为什么strlen这样的接受指针参数的函数，会不做&lt;code&gt;if(NULL==ptr)return;&lt;/code&gt;这样的操作。嗯，为了效率，这么做充分体验了C的精神。想像一下，对于一个错误的参数，检测函数的返回难道比在调用前就检测参数更省事么；何况如果同一个参数穿过层层的函数调用，一个个检测函数返回是多么可怕的事，不如在调用函数事先来个参数检测。实际上，像strlen这样的函数，也不是没有在函数内部做参数检测，只不过它用的是非常合理的assert断言机制，即满足了功能，又满足了效率。&lt;/p&gt;
-&lt;p&gt;以后再操作指针时，要记得有这么回事~&lt;/p&gt;</content><category term="coding"/><category term="C"/><category term="C++"/><category term="指针"/><category term="pointer"/></entry></feed>
+&lt;p&gt;以后再操作指针时，要记得有这么回事~&lt;/p&gt;</content><category term="coding"/><category term="C"/><category term="C++"/><category term="指针"/></entry></feed>
