@@ -69,14 +69,22 @@
 </div>		<div class="content container">
 	<div class="posts">
 			<div class="post">
+				<h1 class="post-title" href="https://funcman.me/mmc3_irqs.html">
+					<a href="https://funcman.me/mmc3_irqs.html">MMC3的IRQ中断</a>
+				</h1>
+				<span class="post-date">2023年01月11日 星期三</span>
+				<p>
+					<p>翻译介绍MMC3 Mapper的IRQ机制：四个关键寄存器（计数器、锁存器、禁用器、启动器）的作用与配合方式，以及如何在NMI中设置IRQ实现分屏卷动效果，附nbasic完整示例代码。</p>
+				</p>
+				<a class="read-more" href="mmc3_irqs.html">展开阅读 »</a>
+			</div>
+			<div class="post">
 				<h1 class="post-title" href="https://funcman.me/how_to_configure_gitlab_external_url_in_docker.html">
 					<a href="https://funcman.me/how_to_configure_gitlab_external_url_in_docker.html">如何配置运行在Docker中的GitLab的外部地址</a>
 				</h1>
 				<span class="post-date">2022年06月09日 星期四</span>
 				<p>
-					<p>家里弄了个NAS服务器，在NAS上安装了一个Docker，于是弄了很多内部服务放在Docker上跑。</p>
-<p>但是在设置GitLab时遇到了点问题，经过一番折腾，得到这个很简单的处理方式。</p>
-<p>先说问题。大 …</p>
+					<p>解决Docker中部署GitLab时external_url带端口导致内部监听端口改变、SSH克隆地址错误的坑，给出正确的端口映射方案和gitlab.rb配置方法。</p>
 				</p>
 				<a class="read-more" href="how_to_configure_gitlab_external_url_in_docker.html">展开阅读 »</a>
 			</div>
@@ -86,11 +94,7 @@
 				</h1>
 				<span class="post-date">2021年12月21日 星期二</span>
 				<p>
-					<p>最近在回顾Unity的着色器知识。</p>
-<p>这里主要记录个人在ShaderLab中遇到的一些重点内容。</p>
-<p>这篇会做持续记录，直到完成此遍回顾。</p>
-<h2>ShaderLab的基本结构</h2>
-<p>ShaderLab是基于Cg（HLSL）的，但不等同于Cg。它在此基础上又添 …</p>
+					<p>Unity ShaderLab学习笔记，记录ShaderLab基本结构、Properties属性定义、SubShader与Pass组织方式，以及Cull、ZTest、Blend等常用RenderSetup渲染状态设置。</p>
 				</p>
 				<a class="read-more" href="unity_shader_lab_note.html">展开阅读 »</a>
 			</div>
@@ -100,9 +104,7 @@
 				</h1>
 				<span class="post-date">2021年12月17日 星期五</span>
 				<p>
-					<p>本文翻译自<a href="https://gist.github.com/bkaradzic/2e39896bc7d8c34e042b">https://gist.github.com/bkaradzic/2e39896bc7d8c34e042b</a>，原作者是<a href="https://twitter.com/bkaradzic">Бранимир Караџић</a>。</p>
-<h2>什么是Orthodox C++？</h2>
-<p>Orthodox C++（有时被称为<strong>C+</strong>）是C++的最小子集，它改进了C，但避免了所谓的现 …</p>
+					<p>翻译介绍Orthodox C++理念——一种拒绝RTTI、异常、iostream、STL容器分配器等现代特性的最小C++子集，以C风格编写更简单、更易移植、更老编译器友好的代码。</p>
 				</p>
 				<a class="read-more" href="orthodox_cpp.html">展开阅读 »</a>
 			</div>
@@ -112,8 +114,7 @@
 				</h1>
 				<span class="post-date">2021年09月19日 星期日</span>
 				<p>
-					<p>这里简单发一篇博客，讲一下我在使用了Pelican来重建这个博客。至于回归博客的感言什么的，回头再说了。</p>
-<p>之所以不再使用Jekyll，主要是不想在电 …</p>
+					<p>记录将个人博客从Jekyll迁移到Pelican的过程，包括静态资源路径配置、Markdown图片引用语法、extra目录（favicon/robots.txt/CNAME）的生成规则，以及主题更换方法。</p>
 				</p>
 				<a class="read-more" href="replace_jekyll_with_pelican_for_my_blog.html">展开阅读 »</a>
 			</div>
@@ -123,9 +124,7 @@
 				</h1>
 				<span class="post-date">2019年03月31日 星期日</span>
 				<p>
-					<p>最近准备继续记博客，需要安装Jekyll环境。</p>
-<p>手头既有Mac也有PC，考虑到上班期间带的是PC，所以还是要在Windows下配置一个Jekyll环境。</p>
-<p>按照Jekyll官网的方法，是去安装RubyInstaller。但是，RubyInstaller本身是基于MSYS2的，我的 …</p>
+					<p>不安装RubyInstaller，直接在已有MSYS2环境下通过pacman安装mingw-w64 Ruby工具链，再用Gem安装Bundler和Jekyll的完整步骤，适合已配置MSYS2开发环境的Windows用户。</p>
 				</p>
 				<a class="read-more" href="another_way_to_use_jekyll_on_windows_10.html">展开阅读 »</a>
 			</div>
@@ -135,8 +134,7 @@
 				</h1>
 				<span class="post-date">2016年07月22日 星期五</span>
 				<p>
-					<p>还没找到工作，面了几家，都没下文。我脸皮厚，写点总结发博客。</p>
-<p>像标题这样的面试问题，这些天遇到不止一两次。第一次我略 …</p>
+					<p>面试题复盘笔记，系统梳理C/C++内存管理策略：内存池分配、内存泄漏跟踪器、树状父子结构自动释放、引用计数、智能指针，以及何时该用简单方法、何时才需特殊手段。</p>
 				</p>
 				<a class="read-more" href="how_do_you_manage_memory.html">展开阅读 »</a>
 			</div>
@@ -146,8 +144,7 @@
 				</h1>
 				<span class="post-date">2016年07月12日 星期二</span>
 				<p>
-					<p>最近辞职了，准备回游戏业，在找工作。</p>
-<p>其实游戏业给我的，是一种失败感，尤其最近。比如斧子的惨状。再如手游审批这事，其实 …</p>
+					<p>辞职准备回归游戏行业的随感。面对行业困境和外部环境的无力感，决定少想多做，专注于程序员的手艺本身，Just Do It。</p>
 				</p>
 				<a class="read-more" href="just_do_it.html">展开阅读 »</a>
 			</div>
@@ -157,8 +154,7 @@
 				</h1>
 				<span class="post-date">2015年12月10日 星期四</span>
 				<p>
-					<p>淘宝上有很多廉价的USB转串口的适配线，这其中不少使用的是南京的沁恒公司的CH34x芯片。</p>
-<p>我们可以在“关于本机”-“系统报告”-“硬件”-“USB”里查看适配线 …</p>
+					<p>解决基于CH34x芯片的廉价USB转串口线在OSX El Capitan及更新版本中因SIP安全机制无法安装驱动的办法：进入恢复模式，用csrutil放宽内核扩展保护后再安装官方驱动。</p>
 				</p>
 				<a class="read-more" href="how_to_use_ch34x_usb_to_serial_adapter_on_osx_el_capitan.html">展开阅读 »</a>
 			</div>
@@ -168,20 +164,9 @@
 				</h1>
 				<span class="post-date">2015年11月25日 星期三</span>
 				<p>
-					<p>我是个英语很烂的人，所有关于英语的能力，都来自于技术工作中对英文的不得不进行的接触。因为英语太烂，也失去了一 …</p>
+					<p>背单词屡屡放弃的症结在于贪婪——求多求全导致没有正面反馈。降低预期到"看到英文能想起中文意思"即可，用渐进式成就感建立持续学习的动力。</p>
 				</p>
 				<a class="read-more" href="how_to_remember_english_words.html">展开阅读 »</a>
-			</div>
-			<div class="post">
-				<h1 class="post-title" href="https://funcman.me/how_to_save_data_to_apple_health_correctly.html">
-					<a href="https://funcman.me/how_to_save_data_to_apple_health_correctly.html">如何正确编写苹果健康程序</a>
-				</h1>
-				<span class="post-date">2015年10月27日 星期二</span>
-				<p>
-					<p>苹果健康使用HealthKit接收数据的提交和读取，很多时候，我们从程序编写的角度，把两者看做同一个东西，下文简称HK。</p>
-<p>HK在权限管理方面，有个很特（guai）别（yi）的地方，也是一 …</p>
-				</p>
-				<a class="read-more" href="how_to_save_data_to_apple_health_correctly.html">展开阅读 »</a>
 			</div>
 	</div>
 	<div class="pagination">

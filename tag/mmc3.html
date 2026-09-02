@@ -74,7 +74,7 @@
 				</h1>
 				<span class="post-date">2023年01月13日 星期五</span>
 				<p>
-					<p>FC游戏《地球冒险》是红白机上的知名作品。作为一个RPG，它有大量的文字。这样的游戏理应出现汉化版，毕竟中文游戏圈已经做了 …</p>
+					<p>通过Mesen模拟器PPU调试，分析FC游戏《地球冒险》利用MMC3 IRQ在单扫描线内切换CHR-ROM映射实现分区域绘制的技术机制，解释为何这种精密时序导致中文字模无法适配，并探讨CHR-RAM扩容汉化方案的可行性。</p>
 				</p>
 				<a class="read-more" href="why_is_it_difficult_to_chineseize_fc_mother.html">展开阅读 »</a>
 			</div>
@@ -84,8 +84,7 @@
 				</h1>
 				<span class="post-date">2023年01月11日 星期三</span>
 				<p>
-					<p><a href="http://bobrost.com/nes/files/mmc3irqs.txt">原文</a>作者：Allan Blomquist</p>
-<p>iNES Mapper #4 (MMC3)提供了一种方便的方法，来对PPU进行帧间改变，以实现NES游戏中的<strong>分屏卷动</strong>等“特殊效果”。与其使用<code>Sprite-0 Hits</code>去择机写入PPU硬件，不如 …</p>
+					<p>翻译介绍MMC3 Mapper的IRQ机制：四个关键寄存器（计数器、锁存器、禁用器、启动器）的作用与配合方式，以及如何在NMI中设置IRQ实现分屏卷动效果，附nbasic完整示例代码。</p>
 				</p>
 				<a class="read-more" href="mmc3_irqs.html">展开阅读 »</a>
 			</div>

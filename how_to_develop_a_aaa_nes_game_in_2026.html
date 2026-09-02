@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="zh_cn" prefix="og: http://ogp.me/ns#">
+	<head>
+		<link href="http://gmpg.org/xfn/11" rel="profile">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta http-equiv="content-type" content="text/html; charset=utf-8">
+
+		<!-- Metadata -->
+	<meta name="description" content="一个游戏程序员。曾经参与开发过<a href='https://www.bing.com/search?q=%E4%BB%99%E4%BE%A3%E5%A5%87%E7%BC%983'>仙侣奇缘3</a>、<a href='http://sh.70yx.com'>水浒传</a>、<a href='https://itunes.apple.com/cn/app/id938688461'>小米运动</a>、<a href='https://itunes.apple.com/cn/app/id1034182617'>米动</a>和<a href='https://www.taptap.com/app/143658'>无限激战</a>">
+	<meta property="og:description" content="一个游戏程序员。曾经参与开发过<a href='https://www.bing.com/search?q=%E4%BB%99%E4%BE%A3%E5%A5%87%E7%BC%983'>仙侣奇缘3</a>、<a href='http://sh.70yx.com'>水浒传</a>、<a href='https://itunes.apple.com/cn/app/id938688461'>小米运动</a>、<a href='https://itunes.apple.com/cn/app/id1034182617'>米动</a>和<a href='https://www.taptap.com/app/143658'>无限激战</a>">
+	<meta property="og:title" content="如何开发一款2026年的3A级红白机游戏" />
+	<meta property="og:type" content="article" />
+	<meta property="og:url" content="https://funcman.me/how_to_develop_a_aaa_nes_game_in_2026.html" />
+		<meta property="og:image" content="https://funcman.me/images/avatar.png" />
+
+		<!-- Enable responsiveness on mobile devices-->
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+
+		<title>funcman's blog</title>
+
+		<!-- CSS -->
+		<link href="//fonts.googleapis.com/" rel="dns-prefetch">
+		<link href="//fonts.googleapis.com/css?family=Droid+Serif:400,700,400italic|Abril+Fatface|PT+Sans:400,400italic,700&amp;subset=latin,latin-ext" rel="stylesheet">
+
+		<link rel="stylesheet" href="https://funcman.me/theme/css/poole.css" />
+		<link rel="stylesheet" href="https://funcman.me/theme/css/hyde.css" />
+		<link rel="stylesheet" href="https://funcman.me/theme/css/syntax.css" />
+			<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css" crossorigin="anonymous">
+
+		<!-- Feeds -->
+<link href="https://funcman.me/rss.xml" type="application/atom+xml" rel="alternate" title="funcman's blog Full Atom Feed" />
+
+		<!-- Analytics -->
+	</head>
+
+	<body class="theme-base-0e">
+<div class="sidebar">
+	<div class="container sidebar-sticky">
+		<div class="sidebar-about">
+
+			<h1>
+				<a href="/">
+					<img class="profile-picture" src="https://funcman.me/images/avatar.png">
+					funcman's blog
+				</a>
+			</h1>
+			<p class="lead"></p>
+			<p class="lead">一个游戏程序员。曾经参与开发过<a href='https://www.bing.com/search?q=%E4%BB%99%E4%BE%A3%E5%A5%87%E7%BC%983'>仙侣奇缘3</a>、<a href='http://sh.70yx.com'>水浒传</a>、<a href='https://itunes.apple.com/cn/app/id938688461'>小米运动</a>、<a href='https://itunes.apple.com/cn/app/id1034182617'>米动</a>和<a href='https://www.taptap.com/app/143658'>无限激战</a> </p>
+			<p></p>
+		</div>
+		<nav class="sidebar-social">
+					<a class="sidebar-social-item" href="mailto:hyq1986@gmail.com">
+						<i class="fa-solid fa-envelope"></i>
+					</a>
+					<a class="sidebar-social-item" href="https://twitter.com/funcman" target="_blank">
+						<i class="fa-brands fa-twitter"></i>
+					</a>
+					<a class="sidebar-social-item" href="https://github.com/funcman" target="_blank">
+						<i class="fa-brands fa-github"></i>
+					</a>
+					<a class="sidebar-social-item" href="https://funcman.itch.io" target="_blank">
+						<i class="fa-brands fa-itch-io"></i>
+					</a>
+			<a class="sidebar-social-item" href="https://funcman.me/rss.xml">
+				<i class="fa-solid fa-rss"></i>
+			</a>
+		</nav>
+	</div>
+</div>		<div class="content container">
+<div class="post">
+	<h1 class="post-title">如何开发一款2026年的3A级红白机游戏</h1>
+	<span class="post-date">2026年09月02日 星期三</span>
+	<p>最近又关注起红白机开发这个圈子。我以前写过<a href="./mmc3_irqs.html">MMC3的IRQ中断</a>，还分析过<a href="./why_is_it_difficult_to_chineseize_fc_mother.html">《地球冒险》为什么难以汉化</a>，算是对这块有点兴趣但一直没真做过游戏。</p>
+<p>然后我就想了一个问题：2026年了，如果想做一款"3A级"的FC游戏，现在是个什么玩法？</p>
+<p>这里的"3A"当然是打引号的。PS5 Pro都普及了，虚幻5的画面已经逼近电影，在40年前的8位机上谈3A，听起来像个玩笑。但《Former Dawn》这个游戏真的把这件事做出来了——Something Nerdy Studios开发的NES平台JRPG，号称"不可能完成的NES RPG"：960图块/屏的背景、8×1粒度的属性表、64个精灵同屏不闪烁、接近SFC水准的配乐。而它的载体，是一张普普通通的72Pin NES卡带。</p>
+<p>先看一张它的战斗画面，体会一下"这真的是FC？"的感觉：</p>
+<p><img alt="《Former Dawn》的BOSS战" src="./images/former-dawn-crab-boss.png"></p>
+<p><img alt="2026年的红白机开发" src="./images/nes-aaa-2026-hero.png"></p>
+<p>这篇算是我调研的一个整理：从写代码到做出实体卡带，2026年这条路大概是怎么走的。</p>
+<h2>开发工具链</h2>
+<h3>用C语言写，别死磕汇编</h3>
+<p>现在写FC游戏已经不需要纯手写6502汇编了。主流方案是<strong>cc65</strong>，一个把C编译成6502机器码的开源工具链，配合Shiru写的<strong>neslib</strong>库。neslib把常用的事都封装好了：</p>
+<ul>
+<li>精灵管理（OAM更新、8×8和8×16模式）</li>
+<li>背景滚动（Nametable切换、分屏IRQ）</li>
+<li>手柄输入</li>
+<li>音乐引擎（FamiTone2，作曲用FamiStudio）</li>
+</ul>
+<p><code>main.c</code>大概长这样：</p>
+<div class="highlight"><pre><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;neslib.h&gt;</span>
+
+<span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">ppu_off</span><span class="p">();</span>
+<span class="w">    </span><span class="n">pal_bg</span><span class="p">(</span><span class="n">palette</span><span class="p">);</span>
+<span class="w">    </span><span class="n">vram_adr</span><span class="p">(</span><span class="n">NTADR_A</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">));</span>
+<span class="w">    </span><span class="n">vram_write</span><span class="p">(</span><span class="s">&quot;HELLO 2026&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">10</span><span class="p">);</span>
+<span class="w">    </span><span class="n">ppu_on_all</span><span class="p">();</span>
+<span class="w">    </span><span class="k">while</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>编译、链接、出<code>.nes</code>文件，全程命令行，很舒服。</p>
+<h3>调试器用Mesen</h3>
+<p>调试器这块没什么悬念，就是<strong>Mesen</strong>。我之前分析《地球冒险》的PPU时序就是靠它，当时就觉得这个模拟器的调试功能强得离谱：</p>
+<ul>
+<li>逐帧调试，CPU、PPU、APU周期都能单步</li>
+<li>实时查看任意内存地址</li>
+<li>条件断点，比如"向<span class="math">\(8000写入且值为\)</span>05时中断"</li>
+<li>PPU查看器，Pattern Table、Nametable、Palette实时可见</li>
+<li>还能录像回放，把Bug现场录下来反复看</li>
+</ul>
+<p>开发的日常循环就是：写代码 → <code>make</code> → Mesen里跑 → 调试 → 改代码。绝大部分时间都在模拟器里度过。</p>
+<h3>Linux下完全没问题</h3>
+<p>这套工具链在Linux下都是原生支持的：cc65包管理器直接装，Mesen有社区维护的版本，FamiStudio跨平台。一套VS Code + Terminal就能干活，不用开Windows虚拟机。</p>
+<h2>Mapper的选择</h2>
+<p>Mapper是FC开发里最关键的技术决策之一，直接决定你的游戏能做成什么样、实体化要花多少钱。</p>
+<h3>新手别一上来就MMC5</h3>
+<p>很多人听说MMC5是"任天堂官方最强Mapper"，就想直接上。但MMC5有几个硬伤：</p>
+<ol>
+<li>实体化非常麻烦，没有兼容芯片，必须用FPGA实现，单张卡带成本直接¥100+</li>
+<li>8×8属性和硬件滚动有冲突，《Just Breed》的滚动glitch就是例子</li>
+<li>PCM通道要CPU逐字节喂数据，对游戏引擎来说是灾难</li>
+</ol>
+<p>所以建议是：第一张卡带老老实实从<strong>UNROM（Mapper 2）</strong>或者<strong>MMC3（Mapper 4）</strong>做起。</p>
+<h3>UNROM：最便宜的实体化方案</h3>
+<p>如果目标只是"把游戏做成实体卡带送朋友"，UNROM是最划算的：</p>
+<ul>
+<li>PRG：256KB（16个Bank切换）</li>
+<li>CHR：8KB固定</li>
+<li>Mapper芯片只要1片74HC161（¥0.5），就是拿通用逻辑芯片做Bank切换</li>
+<li>总成本约¥25~35一张</li>
+</ul>
+<p>BOM清单大概是：SST39SF040两片（PRG和CHR，电擦除可以反复烧）、74HC161一片、空白卡壳加定制标签、嘉立创打的4层PCB（1.6mm沉金、30°倒角）。烧录用CH341A编程器（¥15）夹住Flash芯片烧就行。</p>
+<p>对，用74芯片做Mapper这事是真的可以，以前D商卡带就是这么干的，我在《地球冒险》那篇里也提过。</p>
+<h3>MMC3：RPG的标配</h3>
+<p>需要IRQ扫描线中断、存档、CHR动态切换的话，就上MMC3。我之前专门写过<a href="./mmc3_irqs.html">它的IRQ机制</a>，这里不展开了。实体化方面的要点：</p>
+<ul>
+<li>台湾兼容MMC3芯片很好买，¥5~10一颗</li>
+<li>存档别再用6264 SRAM加电池了，直接用<strong>FM18W08（FRAM）</strong>：断电永久保存，不需要电池、二极管、电池座，焊上去终身免维护</li>
+<li>总成本约¥50~70一张</li>
+</ul>
+<h3>自定义Mapper：Former Dawn走的路</h3>
+<p>如果目标是Former Dawn那种级别——960图块/屏、8×1属性、无glitch的8向滚动、扩展音频——现有Mapper都不够用，只能自己做。</p>
+<p>Former Dawn的MXM-0开发流程值得抄作业，分三个阶段：</p>
+<div class="highlight"><pre><span></span><code>第1阶段：C++原型（Mesen fork）
+  └─ 在Mesen源码里新建MXM0.cpp，用C++把Mapper逻辑全验证一遍
+  └─ 好处是编译只要5秒，能打断点，能逐周期调试
+
+第2阶段：Verilog实现（FPGA）
+  └─ 把C++逻辑翻译成Verilog
+  └─ 用testbench验证输出和C++原型一致
+
+第3阶段：硬件验证
+  └─ 在EverDrive N8 Pro上加载自定义Mapper的bitstream
+  └─ 或者拿逻辑分析仪抓真机时序
+</code></pre></div>
+
+<p>这个流程的核心思路是：<strong>模拟器才是主战场，FPGA只是最终部署</strong>。C++原型里调对的逻辑，翻译成Verilog才有意义，直接在FPGA上调是找死。</p>
+<h2>FPGA的国产替代</h2>
+<p>做自定义Mapper需要FPGA。以前这事很贵，Altera原装芯片不便宜。2026年的情况是，国产FPGA已经完全够用了。</p>
+<h3>安路科技（最推荐）</h3>
+<ul>
+<li>Linux原生支持，官方有GUI和命令行两种模式</li>
+<li>综合、布局布线、时序分析、位流生成，工具链是全套的</li>
+<li>推荐型号EF2L45LG，性能比Cyclone IV EP4CE6强，接近Cyclone V</li>
+<li>¥20~40一颗</li>
+</ul>
+<p>Linux下命令行编译：</p>
+<div class="highlight"><pre><span></span><code><span class="nb">export</span><span class="w"> </span><span class="nv">LD_LIBRARY_PATH</span><span class="o">=</span>/path/to/td/lib
+td<span class="w"> </span>-mode<span class="w"> </span>batch<span class="w"> </span>-script<span class="w"> </span>build.tcl
+</code></pre></div>
+
+<h3>AGM（遨格芯）</h3>
+<ul>
+<li>Pin-to-Pin兼容Altera，原来用EP4CE6的板子可以直接换芯片</li>
+<li>能直接导入Quartus工程编译</li>
+<li>纯命令行批处理支持得很好</li>
+<li>¥15~30一颗，批量更便宜</li>
+</ul>
+<p>适合已经有Quartus工程、想无缝切到国产芯片的人。</p>
+<h3>高云 Gowin</h3>
+<ul>
+<li>教育版免费，逻辑资源覆盖EP4CE6级别</li>
+<li>烧录可以用<strong>openFPGALoader</strong>，开源跨平台，Linux下<code>apt install</code>就完事，完全绕过官方那个Windows-only的Programmer</li>
+<li>注意官方IDE在Debian/Ubuntu上依赖问题比较多，要手动折腾</li>
+</ul>
+<h3>怎么选</h3>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">场景</th>
+<th style="text-align: left;">推荐</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">从零开始，Linux原生</td>
+<td style="text-align: left;">安路EF2L45LG + TangDynasty</td>
+</tr>
+<tr>
+<td style="text-align: left;">已有Quartus工程想直接替换</td>
+<td style="text-align: left;">AGM兼容系列</td>
+</tr>
+<tr>
+<td style="text-align: left;">追求极致低价，愿意折腾</td>
+<td style="text-align: left;">高云 + openFPGALoader</td>
+</tr>
+</tbody>
+</table>
+<h2>做成实体卡带</h2>
+<p>从原型到手里能盘的卡带，分三步走：</p>
+<p><strong>第一步：模拟器验证（0成本）。</strong> cc65 + neslib开发，Mesen里调到完美运行，产出就是一个<code>.nes</code>文件。</p>
+<p><strong>第二步：EverDrive N8 Pro验证（¥400左右）。</strong> 做自定义Mapper的话，N8 Pro是最好的验证平台：它的FPGA（Cyclone IV）支持加载自定义Mapper的bitstream，而且Krikzz把所有Mapper的SystemVerilog代码都开源了（github.com/krikzz/EDN8-PRO），可以直接拿来做对照。</p>
+<p><strong>第三步：自制卡带。</strong> 按方案复杂度和成本排一下：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">方案</th>
+<th style="text-align: left;">成本</th>
+<th style="text-align: left;">复杂度</th>
+<th style="text-align: left;">适合</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">UNROM卡带</td>
+<td style="text-align: left;">¥25~35</td>
+<td style="text-align: left;">有手就行</td>
+<td style="text-align: left;">简单游戏，送朋友</td>
+</tr>
+<tr>
+<td style="text-align: left;">MMC3+FRAM卡带</td>
+<td style="text-align: left;">¥50~70</td>
+<td style="text-align: left;">中等</td>
+<td style="text-align: left;">RPG，要存档</td>
+</tr>
+<tr>
+<td style="text-align: left;">FPGA自定义Mapper卡带</td>
+<td style="text-align: left;">¥150~300</td>
+<td style="text-align: left;">复杂</td>
+<td style="text-align: left;">Former Dawn级别</td>
+</tr>
+</tbody>
+</table>
+<p><img alt="自制的FC卡带PCB" src="./images/nes-aaa-2026-cartridge-pcb.png"></p>
+<p>PCB打样走嘉立创，4层板1.6mm沉金30°倒角，5张¥5（每月有免费额度）。烧录就是前面说的CH341A。</p>
+<h2>Former Dawn的启示和现实的边界</h2>
+<p>Something Nerdy Studios花了<strong>6年</strong>、众筹了<strong>$216,679</strong>，才把NES的极限推到那个程度。他们自己说得很清醒：</p>
+<blockquote>
+<p>没有任何现有的NES Mapper能提供足够的空间，去支撑一个充满高级关卡设计、丰富配乐音效、高帧率精灵动画、复杂背景动画、以及SNES/PS1级别对话量的广阔游戏。</p>
+</blockquote>
+<p>看看它的场景画面，就知道这话不是谦虚——这种背景精度在FC上是从来没有过的：</p>
+<p><img alt="《Former Dawn》雪沼场景" src="./images/former-dawn-snowy-swamp.png"></p>
+<p><img alt="《Former Dawn》森林场景" src="./images/former-dawn-durple-forest.png"> <img alt="《Former Dawn》熔岩湖场景" src="./images/former-dawn-lava-lake.png"></p>
+<p>所以他们最后自己设计了MXM-0/MXM-1 FPGA Mapper。而且这个Mapper是专有的，没开源。</p>
+<p>所以别想着一步到位做出MXM-0。比较现实的路线是：</p>
+<div class="highlight"><pre><span></span><code>第1步：用NROM/MMC3做一个完整游戏（3~6个月）
+       └─ 能在Mesen里完美运行，做出UNROM实体卡带
+
+第2步：在Mesen里fork并扩展Mapper（2~3个月）
+       └─ 实现4屏Nametable、更精确的IRQ
+
+第3步：上FPGA验证（2~3个月）
+       └─ 在安路/AGM开发板上跑通自定义逻辑
+
+第4步：设计实体卡带（1~2个月）
+       └─ 5张带精美标签的成品卡带
+</code></pre></div>
+
+<p>成本总览：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">项目</th>
+<th style="text-align: left;">成本</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">开发工具链</td>
+<td style="text-align: left;">¥0（全开源）</td>
+</tr>
+<tr>
+<td style="text-align: left;">CH341A烧录器</td>
+<td style="text-align: left;">¥15</td>
+</tr>
+<tr>
+<td style="text-align: left;">5张UNROM卡带（PCB+壳+芯片）</td>
+<td style="text-align: left;">¥125~175</td>
+</tr>
+<tr>
+<td style="text-align: left;">安路FPGA开发板</td>
+<td style="text-align: left;">¥80~150</td>
+</tr>
+<tr>
+<td style="text-align: left;">EverDrive N8 Pro（可选）</td>
+<td style="text-align: left;">¥400~500</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>从零到5张实体卡带</strong></td>
+<td style="text-align: left;"><strong>约¥200~350</strong></td>
+</tr>
+</tbody>
+</table>
+<h2>最后</h2>
+<p>2026年做FC游戏，最大的误区是觉得"硬件越强越好"。但《Micro Mages》用Mapper 0（NROM）就做出了商业级品质的游戏，《Former Dawn》把自定义FPGA推到了硬件极限——它们真正厉害的地方，说到底还是游戏设计本身。</p>
+<p>256×240的分辨率、64个精灵、25色的调色板，这些限制不是缺陷，是框架。而在这个框架里，cc65、Mesen、国产FPGA、嘉立创PCB，组成了一套2026年相当完整的8位机开发流水线。</p>
+<p>你的游戏不需要变成SFC游戏，它只需要成为最好的FC游戏。</p>
+<p>这篇主要是调研整理，我自己还没真做出一张卡带，有说错的地方欢迎指教。</p>
+<blockquote>
+<p>本文中《Former Dawn》的游戏画面来自其<a href="https://somethingnerdy.com/former-dawn-press-kit/">官方Press Kit</a>，官方明确授权媒体使用。另有两张场景插图是AI生成的示意图，不是真实游戏画面。</p>
+</blockquote>
+<p><strong>参考资料</strong></p>
+<ul>
+<li>NESdev Wiki：nesdev.org/wiki（硬件圣经）</li>
+<li>Mesen源码：github.com/SourMesen/Mesen</li>
+<li>EDN8-PRO Mapper代码：github.com/krikzz/EDN8-PRO</li>
+<li>Former Dawn开发博客：somethingnerdy.com/unlocking-the-nes-for-former-dawn</li>
+<li>Former Dawn官方Press Kit：somethingnerdy.com/former-dawn-press-kit</li>
+<li>安路科技：anlogic.com</li>
+<li>AGM（遨格芯）：agm-micro.com</li>
+</ul>
+<script type="text/javascript">if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+    var align = "left",
+        indent = "0em",
+        linebreak = "false";
+
+    if (true) {
+        align = (screen.width < 768) ? "left" : align;
+        indent = (screen.width < 768) ? "0em" : indent;
+        linebreak = (screen.width < 768) ? 'true' : linebreak;
+    }
+
+    var mathjaxscript = document.createElement('script');
+    mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
+    mathjaxscript.type = 'text/javascript';
+    mathjaxscript.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.3/latest.js?config=TeX-AMS-MML_HTMLorMML';
+
+    var configscript = document.createElement('script');
+    configscript.type = 'text/x-mathjax-config';
+    configscript[(window.opera ? "innerHTML" : "text")] =
+        "MathJax.Hub.Config({" +
+        "    config: ['MMLorHTML.js']," +
+        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'none' } }," +
+        "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
+        "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
+        "    displayAlign: '"+ align +"'," +
+        "    displayIndent: '"+ indent +"'," +
+        "    showMathMenu: true," +
+        "    messageStyle: 'normal'," +
+        "    tex2jax: { " +
+        "        inlineMath: [ ['\\\\(','\\\\)'] ], " +
+        "        displayMath: [ ['$$','$$'] ]," +
+        "        processEscapes: true," +
+        "        preview: 'TeX'," +
+        "    }, " +
+        "    'HTML-CSS': { " +
+        "        availableFonts: ['STIX', 'TeX']," +
+        "        preferredFont: 'STIX'," +
+        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'inherit ! important'} }," +
+        "        linebreaks: { automatic: "+ linebreak +", width: '90% container' }," +
+        "    }, " +
+        "}); " +
+        "if ('default' !== 'default') {" +
+            "MathJax.Hub.Register.StartupHook('HTML-CSS Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax['HTML-CSS'].FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+            "MathJax.Hub.Register.StartupHook('SVG Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax.SVG.FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+        "}";
+
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(configscript);
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
+}
+</script>
+</div>
+		</div>
+	</body>
+</html>

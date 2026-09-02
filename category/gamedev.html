@@ -69,12 +69,22 @@
 </div>		<div class="content container">
 	<div class="posts">
 			<div class="post">
+				<h1 class="post-title" href="https://funcman.me/how_to_develop_a_aaa_nes_game_in_2026.html">
+					<a href="https://funcman.me/how_to_develop_a_aaa_nes_game_in_2026.html">如何开发一款2026年的3A级红白机游戏</a>
+				</h1>
+				<span class="post-date">2026年09月02日 星期三</span>
+				<p>
+					<p>调研了一下2026年的FC/NES开发：cc65+neslib写代码、Mesen调试、Mapper怎么选（UNROM/MMC3/自定义FPGA方案）、国产FPGA替代，以及把游戏做成实体卡带的成本和流程。</p>
+				</p>
+				<a class="read-more" href="how_to_develop_a_aaa_nes_game_in_2026.html">展开阅读 »</a>
+			</div>
+			<div class="post">
 				<h1 class="post-title" href="https://funcman.me/about_some_oldschool_gpus.html">
 					<a href="https://funcman.me/about_some_oldschool_gpus.html">收集了一些前期的图像视频芯片的信息</a>
 				</h1>
 				<span class="post-date">2023年01月16日 星期一</span>
 				<p>
-					<p>现代的计算机系统，无论是台式电脑、笔记本、手机、游戏机，基本上都有专门的图形芯片，用于图像的输出。今天，我们一般将这 …</p>
+					<p>收集整理早期家用电脑与游戏机中的图像视频芯片信息（CRTC、PPU、VDP、VIC、GDC等），列举MOS、德州仪器、摩托罗拉、雅马哈、NEC等厂商的代表芯片型号，为自制复古家用电脑做准备。</p>
 				</p>
 				<a class="read-more" href="about_some_oldschool_gpus.html">展开阅读 »</a>
 			</div>
@@ -84,7 +94,7 @@
 				</h1>
 				<span class="post-date">2023年01月13日 星期五</span>
 				<p>
-					<p>FC游戏《地球冒险》是红白机上的知名作品。作为一个RPG，它有大量的文字。这样的游戏理应出现汉化版，毕竟中文游戏圈已经做了 …</p>
+					<p>通过Mesen模拟器PPU调试，分析FC游戏《地球冒险》利用MMC3 IRQ在单扫描线内切换CHR-ROM映射实现分区域绘制的技术机制，解释为何这种精密时序导致中文字模无法适配，并探讨CHR-RAM扩容汉化方案的可行性。</p>
 				</p>
 				<a class="read-more" href="why_is_it_difficult_to_chineseize_fc_mother.html">展开阅读 »</a>
 			</div>
@@ -94,8 +104,7 @@
 				</h1>
 				<span class="post-date">2023年01月11日 星期三</span>
 				<p>
-					<p><a href="http://bobrost.com/nes/files/mmc3irqs.txt">原文</a>作者：Allan Blomquist</p>
-<p>iNES Mapper #4 (MMC3)提供了一种方便的方法，来对PPU进行帧间改变，以实现NES游戏中的<strong>分屏卷动</strong>等“特殊效果”。与其使用<code>Sprite-0 Hits</code>去择机写入PPU硬件，不如 …</p>
+					<p>翻译介绍MMC3 Mapper的IRQ机制：四个关键寄存器（计数器、锁存器、禁用器、启动器）的作用与配合方式，以及如何在NMI中设置IRQ实现分屏卷动效果，附nbasic完整示例代码。</p>
 				</p>
 				<a class="read-more" href="mmc3_irqs.html">展开阅读 »</a>
 			</div>
@@ -105,11 +114,7 @@
 				</h1>
 				<span class="post-date">2021年12月21日 星期二</span>
 				<p>
-					<p>最近在回顾Unity的着色器知识。</p>
-<p>这里主要记录个人在ShaderLab中遇到的一些重点内容。</p>
-<p>这篇会做持续记录，直到完成此遍回顾。</p>
-<h2>ShaderLab的基本结构</h2>
-<p>ShaderLab是基于Cg（HLSL）的，但不等同于Cg。它在此基础上又添 …</p>
+					<p>Unity ShaderLab学习笔记，记录ShaderLab基本结构、Properties属性定义、SubShader与Pass组织方式，以及Cull、ZTest、Blend等常用RenderSetup渲染状态设置。</p>
 				</p>
 				<a class="read-more" href="unity_shader_lab_note.html">展开阅读 »</a>
 			</div>
@@ -119,8 +124,7 @@
 				</h1>
 				<span class="post-date">2016年07月12日 星期二</span>
 				<p>
-					<p>最近辞职了，准备回游戏业，在找工作。</p>
-<p>其实游戏业给我的，是一种失败感，尤其最近。比如斧子的惨状。再如手游审批这事，其实 …</p>
+					<p>辞职准备回归游戏行业的随感。面对行业困境和外部环境的无力感，决定少想多做，专注于程序员的手艺本身，Just Do It。</p>
 				</p>
 				<a class="read-more" href="just_do_it.html">展开阅读 »</a>
 			</div>
@@ -130,7 +134,7 @@
 				</h1>
 				<span class="post-date">2015年01月08日 星期四</span>
 				<p>
-					<p>我对目前火爆的手游和之前火爆的端游、页游通通不感兴趣。除非项目非常nice，或者团队的人非常有趣，否则我不太会积极 …</p>
+					<p>计划未来几年攒技术做一款个人2D引擎：用Flash+JSFL做动画/粒子编辑器，借鉴Unity Component系统，深度使用Lua作为脚本层，并探索Go/skynet服务端技术。</p>
 				</p>
 				<a class="read-more" href="talk_about_my_next_interests_in_game_technologys.html">展开阅读 »</a>
 			</div>

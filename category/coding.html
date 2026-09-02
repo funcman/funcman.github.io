@@ -104,9 +104,7 @@
 				</h1>
 				<span class="post-date">2021年12月17日 星期五</span>
 				<p>
-					<p>本文翻译自<a href="https://gist.github.com/bkaradzic/2e39896bc7d8c34e042b">https://gist.github.com/bkaradzic/2e39896bc7d8c34e042b</a>，原作者是<a href="https://twitter.com/bkaradzic">Бранимир Караџић</a>。</p>
-<h2>什么是Orthodox C++？</h2>
-<p>Orthodox C++（有时被称为<strong>C+</strong>）是C++的最小子集，它改进了C，但避免了所谓的现 …</p>
+					<p>翻译介绍Orthodox C++理念——一种拒绝RTTI、异常、iostream、STL容器分配器等现代特性的最小C++子集，以C风格编写更简单、更易移植、更老编译器友好的代码。</p>
 				</p>
 				<a class="read-more" href="orthodox_cpp.html">展开阅读 »</a>
 			</div>
@@ -116,8 +114,7 @@
 				</h1>
 				<span class="post-date">2016年07月22日 星期五</span>
 				<p>
-					<p>还没找到工作，面了几家，都没下文。我脸皮厚，写点总结发博客。</p>
-<p>像标题这样的面试问题，这些天遇到不止一两次。第一次我略 …</p>
+					<p>面试题复盘笔记，系统梳理C/C++内存管理策略：内存池分配、内存泄漏跟踪器、树状父子结构自动释放、引用计数、智能指针，以及何时该用简单方法、何时才需特殊手段。</p>
 				</p>
 				<a class="read-more" href="how_do_you_manage_memory.html">展开阅读 »</a>
 			</div>
@@ -127,8 +124,7 @@
 				</h1>
 				<span class="post-date">2015年12月10日 星期四</span>
 				<p>
-					<p>淘宝上有很多廉价的USB转串口的适配线，这其中不少使用的是南京的沁恒公司的CH34x芯片。</p>
-<p>我们可以在“关于本机”-“系统报告”-“硬件”-“USB”里查看适配线 …</p>
+					<p>解决基于CH34x芯片的廉价USB转串口线在OSX El Capitan及更新版本中因SIP安全机制无法安装驱动的办法：进入恢复模式，用csrutil放宽内核扩展保护后再安装官方驱动。</p>
 				</p>
 				<a class="read-more" href="how_to_use_ch34x_usb_to_serial_adapter_on_osx_el_capitan.html">展开阅读 »</a>
 			</div>
@@ -138,8 +134,7 @@
 				</h1>
 				<span class="post-date">2015年10月27日 星期二</span>
 				<p>
-					<p>苹果健康使用HealthKit接收数据的提交和读取，很多时候，我们从程序编写的角度，把两者看做同一个东西，下文简称HK。</p>
-<p>HK在权限管理方面，有个很特（guai）别（yi）的地方，也是一 …</p>
+					<p>HealthKit的读写权限完全分离且由用户控制，可能导致重复写入。本文指出在APP端或云端对同步数据做标记是避免重复的最佳实践，并讨论了HK数据融合机制的局限。</p>
 				</p>
 				<a class="read-more" href="how_to_save_data_to_apple_health_correctly.html">展开阅读 »</a>
 			</div>
@@ -149,24 +144,7 @@
 				</h1>
 				<span class="post-date">2010年09月04日 星期六</span>
 				<p>
-					<p>std::list和std::vector不同，无法使用STL算法库里的sort()，因为std::list不支持随机访问（random access）。</p>
-<div class="highlight"><pre><span></span><code><span class="c1">// std::list排序示例</span>
-
-<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;stdio.h&gt;</span>
-<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;stdlib.h&gt;</span>
-<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;time.h&gt;</span>
-<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;list&gt;</span>
-
-<span class="c1">// 它是个仿函数</span>
-<span class="k">struct</span><span class="w"> </span><span class="nc">mycmp</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="kt">bool</span><span class="w"> </span><span class="nf">operator</span><span class="p">()(</span><span class="kt">int</span><span class="o">*</span><span class="w"> </span><span class="n">a</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="o">*</span><span class="w"> </span><span class="n">b</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="o">*</span><span class="n">a</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="o">*</span><span class="n">b</span><span class="p">;</span>
-<span class="w">    </span><span class="p">}</span>
-<span class="p">};</span>
-
-<span class="kt">int</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">list</span><span class="w"> </span><span class="n">il</span><span class="p">;</span>
-<span class="w">    </span><span class="kt">int …</span></code></pre></div>
+					<p>std::list不支持随机访问，因此无法使用STL算法库的sort()，必须使用list容器自身的sort()成员函数进行排序。附示例代码。</p>
 				</p>
 				<a class="read-more" href="about_sqrt_of_std_list.html">展开阅读 »</a>
 			</div>
@@ -176,7 +154,7 @@
 				</h1>
 				<span class="post-date">2010年06月06日 星期日</span>
 				<p>
-					<p>对于编写Win32程序，尤其是游戏这种实时性高的程序来说，断点调试未必是最合适的调试方法。很多时候，我们更渴望看到实时打 …</p>
+					<p>为Win32程序（尤其是游戏）提供一个DbgCon类，利用AllocConsole在运行时动态创建控制台窗口，支持显示、隐藏、置顶，方便输出实时调试日志而无需依赖VC调试器。</p>
 				</p>
 				<a class="read-more" href="win32_console_class.html">展开阅读 »</a>
 			</div>
@@ -186,7 +164,7 @@
 				</h1>
 				<span class="post-date">2010年05月16日 星期日</span>
 				<p>
-					<p>在C++中，如果我们想把数据结构隐藏起来，只为用户提供接口，可以通过实现继承接口类的方式到达目的。那C中，可以采用什 …</p>
+					<p>展示C语言中利用不完整类型（typedef struct Demo* Demo）实现数据隐藏与接口封装的技巧，头文件仅暴露指针类型和函数接口，实现细节完全隐藏在编译单元中。</p>
 				</p>
 				<a class="read-more" href="data_hiding_in_c.html">展开阅读 »</a>
 			</div>
