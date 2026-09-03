@@ -69,7 +69,7 @@
 </div>		<div class="content container">
 <div class="post">
 	<h1 class="post-title">友尽游戏的设计与技术选型：以网络架构为中心的一次解剖</h1>
-	<span class="post-date">2026年09月03日 星期四</span>
+	<span class="post-date">2026年09月04日 星期五</span>
 	<p>2025年下半年开始，独立游戏圈出现了一个半开玩笑的新词：<strong>Friendslop</strong>——"朋友垃圾游戏"，或者按国内玩家的叫法，<strong>友尽游戏</strong>。它指的是这样一类作品：2到12人合作、物理引擎驱动、画面廉价但荒诞、内置近距离语音、专为"和朋友一起玩"设计。这个词条甚至已经被Wikipedia收录，而行业分析报告则用了更体面的名字："怪咖独立合作"（weirdo indie co-op）——带有古怪机制、物理互动和近距离语音的游戏被证明特别成功，因为它们产生可分享的瞬间，在社交媒体上自然传播，省掉了昂贵的买量成本<a href="https://vibecode.game/blog/aaa-is-not-dead-its-irrelevant/" title="AAA Is Not Dead, It's Irrelevant — 关于Friendslop趋势、Yapyap首周50万、Evil Landfall发行品牌与PEAK联合创作者喊话的分析">1</a>。</p>
 <p>这个品类的成绩单是吓人的：《Lethal Company》单人开发，2023年12月Steam同时在线峰值超过23.9万<a href="https://www.pingaim.net/games/lethal-company/" title="Lethal Company Network Guide — NGO + Facepunch.Steamworks + Dissonance VOIP技术栈与23.9万峰值在线记录">2</a>；《R.E.P.O.》2025年2月上线后长期霸榜；PEAK由Aggro Crab和Landfall两个小组合作完成，成为2025年最大的黑马之一<a href="https://aggrocrab.com/" title="Aggro Crab官网 — PEAK为Aggro Crab与Landfall合作开发">3</a>；2026年2月，被形容为"反向R.E.P.O."的Yapyap首周卖出50万份<a href="https://vibecode.game/blog/aaa-is-not-dead-its-irrelevant/" title="AAA Is Not Dead, It's Irrelevant — 关于Friendslop趋势、Yapyap首周50万、Evil Landfall发行品牌与PEAK联合创作者喊话的分析">1</a>；Landfall甚至专门成立了发行品牌Evil Landfall来投资友尽游戏，其CEO已经在每天回复"这游戏很像PEAK，请投资我"式的邮件<a href="https://vibecode.game/blog/aaa-is-not-dead-its-irrelevant/" title="AAA Is Not Dead, It's Irrelevant — 关于Friendslop趋势、Yapyap首周50万、Evil Landfall发行品牌与PEAK联合创作者喊话的分析">1</a>。PEAK的联合创作者在2026年3月对独立开发者喊话："求求你们，趁这个潮流没死，快做友尽游戏。"<a href="https://vibecode.game/blog/aaa-is-not-dead-its-irrelevant/" title="AAA Is Not Dead, It's Irrelevant — 关于Friendslop趋势、Yapyap首周50万、Evil Landfall发行品牌与PEAK联合创作者喊话的分析">1</a></p>
 <p>本文不打算再复述一遍"为什么这个品类火了"——这方面的分析已经够多了。我想做的是反方向的事：<strong>假设你已经决定做一款友尽游戏，技术选型应该怎么做？</strong>重点放在网络架构上，因为这个品类有一个非常反直觉的特性：它是联机游戏里最不挑网络技术的品类，但却是最挑网络<strong>成本结构</strong>的品类。客户端引擎和美术管线也会各用一章讲透，因为这两个决策和网络架构是强耦合的。</p>
@@ -125,11 +125,13 @@
 <p>排除法做完，剩下的问题就很集中了：玩家之间怎么连上、状态怎么同步、语音怎么走。这就是网络架构的主线。</p>
 <h2>三、网络架构的三条主流路线</h2>
 <p>纵观近几年所有爆款友尽游戏，网络架构收敛到了三条路线上。没有第四条——任何试图发明第四条路线的独立团队，最后都会绕回来。</p>
+<p><img alt="友尽游戏网络架构三条主流路线拓扑对比：P2P Host + 平台免费中继 / 托管云 Relay / 平台服务混合，以及与自建权威服务端的对照" src="images/friendslop-network-topology.png"></p>
 <h3>3.1 路线A：P2P Host-based + 平台免费中继</h3>
 <p>这是<strong>绝大多数友尽游戏的实际选择</strong>，也是新品默认应该选择的路线。</p>
 <p>拓扑结构：一名玩家作为Host（房主），Host的机器既是客户端又是权威服务器，其他玩家直连Host。所有游戏逻辑（AI、物理仲裁、阶段推进）跑在Host端，Client发输入、收状态、做插值。</p>
 <p>《渔力全开》是这个路线的标准样本：游戏没有部署任何中央游戏服务器，联机完全依赖Steam好友邀请，由房主创建房间，设计上限4人。这个选择让Dazed Games这家2人工作室的服务器月账单是<strong>零元</strong>。但代价也写在玩家评价里：房主NAT类型过严时队友连不进来、主机掉线全房间解散、跨运营商直连丢包严重导致"开船卡顿、甩狙有拖拽感"、不同网络环境下进房黑屏。国内玩家的标准解法是开加速器，用虚拟局域网绕过公网NAT问题——网络稳定性的风险被完全转嫁给了玩家。</p>
 <p>《Lethal Company》是这条路线的天花板：Unity引擎，网络层用Netcode for GameObjects（NGO）做上层同步，传输层用Facepunch.Steamworks接入Steam的P2P网络，语音用Dissonance VOIP做距离衰减<a href="https://www.pingaim.net/games/lethal-company/" title="Lethal Company Network Guide — NGO + Facepunch.Steamworks + Dissonance VOIP技术栈与23.9万峰值在线记录">2</a>。单人开发者Zeekerss靠这套组合撑起了23.9万的同时在线峰值——而他自己的服务器成本依然是零。</p>
+<p><img alt="Lethal Company — 工业设施内的合作搜刮场景" src="images/friendslop-lethal-company.jpg"></p>
 <p>这条路线的关键技术组件是<strong>Steamworks Networking</strong>。很多人对"Steam P2P"有误解，以为玩家之间是直连的。实际上Valve提供的是一整套托管基础设施：开发者只需要知道对方的SteamID，调用<code>ConnectP2P</code>即可发起连接，完全不需要处理IP地址；Steam底层自动尝试NAT穿透，<strong>穿透失败时自动回退到Steam Datagram Relay（SDR）中继网络</strong>——流量走Valve自建的全球骨干网，玩家IP不会暴露给彼此<a href="https://partner.steamgames.com/doc/features/multiplayer/networking" title="Steamworks官方文档：Steam Networking — 基于SteamID寻址、自动NAT穿透与SDR中继回退">4</a>。这一切对开发者完全免费（有速率限制，但对友尽游戏的带宽量级来说绰绰有余）。</p>
 <p>这里要澄清一个在开发者社区反复引起争论的概念：<strong>经过中继的"P2P"不是真正的P2P</strong>。真实拓扑是 peer→relay→peer，多了一个双向hop，延迟比直连高；而且从游戏架构的角度看，它依然是Host-Client的星型结构，所谓P2P只是指"没有专用服务器"。这个区别很重要，因为它决定了你的延迟预算和故障模型——但它是Steam/PlayFab/EOS所有"P2P"宣传背后的统一真相。</p>
 <p><strong>路线A的适用条件</strong>：Steam独占或Steam首发；玩家数≤8；接受"房主网络=全房间体验"的现实；不想付任何服务器钱。</p>
@@ -167,6 +169,7 @@
 <h3>3.2 路线B：托管云Relay（Photon模式）</h3>
 <p>第二条路线是把"中继"这件事外包给商业云服务，代表是Photon。</p>
 <p>《R.E.P.O.》的技术栈是：Unity + Photon Unity Networking（PUN）做联机 + Photon Voice做近距离语音<a href="https://blog.photonengine.com/tag/pun/" title="Photon官方博客：R.E.P.O.案例 — PUN + Photon Voice + 全球云托管">5</a>。Content Warning同样以Photon为主要网络方案<a href="https://github.com/RugbugRedfern/Mycelium-Networking-For-Content-Warning" title="Mycelium Networking — Landfall要求模组作者不要经Photon发送大量数据（带宽费用由官方承担），社区因此改走Steam通道">6</a>。这条路线里，所有客户端都连接到Photon的云端服务器，由云端转发消息，房间内通常由Master Client承担逻辑权威。本质上是"把SDR换成了Photon的数据中心"，换来的是跨平台能力和更省心的房间管理API。</p>
+<p><img alt="R.E.P.O. — 物理驱动的合作恐怖场景" src="images/friendslop-repo.jpg"></p>
 <p>这条路线的优点是开发速度快——PUN可以在几个小时内跑通一个联机原型，房间创建/加入/玩家列表全是现成API。但代价是一个严肃的商业风险：<strong>按CCU（同时在线）计费，而友尽游戏恰恰是最容易爆量的品类</strong>。</p>
 <p>这里有一个非常能说明问题的真实案例。Content Warning的模组社区流传着一份官方态度：Landfall明确请求模组作者<strong>不要通过Photon发送大量自定义数据，因为这部分带宽费用是Landfall在付</strong>——于是社区专门造了一个叫Mycelium Networking的库，让模组的RPC改走Steam的免费P2P通道，绕开Photon计费<a href="https://github.com/RugbugRedfern/Mycelium-Networking-For-Content-Warning" title="Mycelium Networking — Landfall要求模组作者不要经Photon发送大量数据（带宽费用由官方承担），社区因此改走Steam通道">6</a>。爆款游戏的开发商要替模组作者的流量买单，这件事本身就说明托管云计费模式和病毒式传播品类之间存在结构性摩擦。</p>
 <p>PlayFab的政策变化是另一个警示。微软在2026年3月把PlayFab免费额度从10万终身账户断崖式砍到1000个——做个数学就知道这意味着什么：Discord封闭测试200人一周内就会产生1000~3000个账户，Steam新品节试玩首周轻松破万。也就是说<strong>任何有点水花的游戏都会立刻撞墙进入计费区</strong>，而PlayFab的计费模型复杂到"需要一张电子表格才能算清"。基础设施层面Azure不会崩，崩的是你的账单。</p>
@@ -175,6 +178,7 @@
 <p>2026年8月4日发售的Big Walk展示了第三条路线，也是跨平台友尽游戏目前的最优解：<strong>Host-based逻辑 + Epic Online Services（EOS）做跨平台连接层</strong>。</p>
 <p>从官方FAQ可以还原出完整的架构<a href="https://bigwalk.game/faq/" title="Big Walk官方FAQ — Host保存进度、Join Code、无匹配、跨平台联机、近距离语音设计">7</a>：没有专用服务器，主机玩家本地保存存档、世界状态和游戏进度；主机启动会话后，其他玩家通过平台好友列表（同平台）或Join Code（跨平台）加入；主机关闭会话时全员断开，没有主机迁移——如果原房主不上线，这个进度的旅程就只能等。EOS在其中承担的是：跨平台身份认证（统一Steam/PS5/Switch 2/Mac玩家）、NAT穿透与中继、好友与邀请系统。游戏支持2~12人，主机开局时选择2人/3人/4+人的世界版本来适配谜题难度。</p>
 <p>这个架构对House House这样的4人团队是精明的分工：<strong>EOS免费</strong>，替他们解决了跨平台联机中最脏最累的部分（穿透、中继、身份），而游戏状态托管在玩家主机上，House House自己依然不养服务器。</p>
+<p><img alt="Big Walk — 跨平台合作冒险与沟通解谜" src="images/friendslop-big-walk.jpg"></p>
 <p>不过路线C引入了一个友尽游戏开发者必须提前知道的<strong>玩家侧成本：主机会员墙</strong>。规则是平台层面的，与你的网络架构无关——即使你自建服务器出钱让玩家免费联机也没用：</p>
 <table>
 <thead>
@@ -297,6 +301,7 @@
 <p>最后一个实操建议：<strong>物理对象的同步量级要做减法</strong>。不是每个滚动的苹果都值得10Hz同步。给物体设"睡眠阈值"（速度低于某值停止同步）、给场景物体分级（关键交互物高频同步、背景杂物低频或不同步）、数量上设上限。R.E.P.O.那种一屋子可互动物品的游戏，带宽预算就是这么省出来的。</p>
 <h2>七、语音即玩法：Proximity Voice 的技术栈</h2>
 <p>传统联机游戏里，语音是个加分项；友尽游戏里，<strong>语音是核心玩法的一部分</strong>。Big Walk官方FAQ直接建议玩家不要用Discord——因为它的声音系统有距离衰减、走廊回声、墙壁阻隔、对讲机改声道，用外部语音等于关掉了一半的游戏设计<a href="https://bigwalk.game/faq/" title="Big Walk官方FAQ — Host保存进度、Join Code、无匹配、跨平台联机、近距离语音设计">7</a>。R.E.P.O.里怪物会被玩家的声音吸引，恐慌时的尖叫既是情绪表达也是游戏机制。</p>
+<p><img alt="Content Warning — 近距离语音与恐怖拍摄玩法" src="images/friendslop-content-warning.jpg"></p>
 <p>技术选型上的现成方案：</p>
 <table>
 <thead>
@@ -380,6 +385,9 @@
 <ul>
 <li><strong>无嘴、无手指、无真实骨骼脸</strong>。面部绑定和口型同步是角色管线里最贵的部分，全部砍掉。表情用贴图切换（LCD脸）或两三个骨骼的挤压拉伸解决。</li>
 <li><strong>剪影可读性优先</strong>。直播切片常常是240p的糊画质，观众要在一秒内认出"这是哪个游戏、谁在倒霉"。夸张的剪影（独轮、豆形、潜水服）在缩略图尺寸下依然可辨——这是为传播设计的，不是为美术设定集设计的。</li>
+</ul>
+<p><img alt="PEAK — 远景下依然可辨的豆形人剪影" src="images/friendslop-peak.jpg"></p>
+<ul>
 <li><strong>物理代替动画</strong>。这是Landfall系作品的招牌（从Totally Accurate系列一脉相承）：角色用主动布娃娃（active ragdoll）/程序化动画驱动，走路姿势本身就是笑点。关键收益是——<strong>你不再需要为"被鱼抽飞""从楼梯滚下去""被队友拖拽"各做一套动画，物理引擎自己生产无穷无尽的表演</strong>。动画师的预算从"几百个动作片段"降到"几个基础状态+一堆物理参数"。</li>
 </ul>
 <p>对1~2人团队，角色管线的推荐配置是：Blender建模（免费，且这个品类的模型复杂度完全在Blender舒适区内）→ 简化骨骼绑定（十几根骨头，不碰面部）→ 动作库解决基础位移（Mixamo免费库或者干脆程序化）→ 特殊状态交给物理。<strong>不要做表情系统，不要做毛发，不要做布料模拟</strong>——每一样都是产能黑洞。</p>
