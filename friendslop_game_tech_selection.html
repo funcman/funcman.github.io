@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="zh_cn" prefix="og: http://ogp.me/ns#">
+	<head>
+		<link href="http://gmpg.org/xfn/11" rel="profile">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta http-equiv="content-type" content="text/html; charset=utf-8">
+
+		<!-- Metadata -->
+	<meta name="description" content="一个游戏程序员。曾经参与开发过<a href='https://www.bing.com/search?q=%E4%BB%99%E4%BE%A3%E5%A5%87%E7%BC%983'>仙侣奇缘3</a>、<a href='http://sh.70yx.com'>水浒传</a>、<a href='https://itunes.apple.com/cn/app/id938688461'>小米运动</a>、<a href='https://itunes.apple.com/cn/app/id1034182617'>米动</a>和<a href='https://www.taptap.com/app/143658'>无限激战</a>">
+	<meta property="og:description" content="一个游戏程序员。曾经参与开发过<a href='https://www.bing.com/search?q=%E4%BB%99%E4%BE%A3%E5%A5%87%E7%BC%983'>仙侣奇缘3</a>、<a href='http://sh.70yx.com'>水浒传</a>、<a href='https://itunes.apple.com/cn/app/id938688461'>小米运动</a>、<a href='https://itunes.apple.com/cn/app/id1034182617'>米动</a>和<a href='https://www.taptap.com/app/143658'>无限激战</a>">
+	<meta property="og:title" content="友尽游戏的设计与技术选型：以网络架构为中心的一次解剖" />
+	<meta property="og:type" content="article" />
+	<meta property="og:url" content="https://funcman.me/friendslop_game_tech_selection.html" />
+		<meta property="og:image" content="https://funcman.me/images/avatar.png" />
+
+		<!-- Enable responsiveness on mobile devices-->
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+
+		<title>funcman's blog</title>
+
+		<!-- CSS -->
+		<link href="//fonts.googleapis.com/" rel="dns-prefetch">
+		<link href="//fonts.googleapis.com/css?family=Droid+Serif:400,700,400italic|Abril+Fatface|PT+Sans:400,400italic,700&amp;subset=latin,latin-ext" rel="stylesheet">
+
+		<link rel="stylesheet" href="https://funcman.me/theme/css/poole.css" />
+		<link rel="stylesheet" href="https://funcman.me/theme/css/hyde.css" />
+		<link rel="stylesheet" href="https://funcman.me/theme/css/syntax.css" />
+			<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css" crossorigin="anonymous">
+
+		<!-- Feeds -->
+<link href="https://funcman.me/rss.xml" type="application/atom+xml" rel="alternate" title="funcman's blog Full Atom Feed" />
+
+		<!-- Analytics -->
+	</head>
+
+	<body class="theme-base-0e">
+<div class="sidebar">
+	<div class="container sidebar-sticky">
+		<div class="sidebar-about">
+
+			<h1>
+				<a href="/">
+					<img class="profile-picture" src="https://funcman.me/images/avatar.png">
+					funcman's blog
+				</a>
+			</h1>
+			<p class="lead"></p>
+			<p class="lead">一个游戏程序员。曾经参与开发过<a href='https://www.bing.com/search?q=%E4%BB%99%E4%BE%A3%E5%A5%87%E7%BC%983'>仙侣奇缘3</a>、<a href='http://sh.70yx.com'>水浒传</a>、<a href='https://itunes.apple.com/cn/app/id938688461'>小米运动</a>、<a href='https://itunes.apple.com/cn/app/id1034182617'>米动</a>和<a href='https://www.taptap.com/app/143658'>无限激战</a> </p>
+			<p></p>
+		</div>
+		<nav class="sidebar-social">
+					<a class="sidebar-social-item" href="mailto:hyq1986@gmail.com">
+						<i class="fa-solid fa-envelope"></i>
+					</a>
+					<a class="sidebar-social-item" href="https://twitter.com/funcman" target="_blank">
+						<i class="fa-brands fa-twitter"></i>
+					</a>
+					<a class="sidebar-social-item" href="https://github.com/funcman" target="_blank">
+						<i class="fa-brands fa-github"></i>
+					</a>
+					<a class="sidebar-social-item" href="https://funcman.itch.io" target="_blank">
+						<i class="fa-brands fa-itch-io"></i>
+					</a>
+			<a class="sidebar-social-item" href="https://funcman.me/rss.xml">
+				<i class="fa-solid fa-rss"></i>
+			</a>
+		</nav>
+	</div>
+</div>		<div class="content container">
+<div class="post">
+	<h1 class="post-title">友尽游戏的设计与技术选型：以网络架构为中心的一次解剖</h1>
+	<span class="post-date">2026年09月03日 星期四</span>
+	<p>2025年下半年开始，独立游戏圈出现了一个半开玩笑的新词：<strong>Friendslop</strong>——"朋友垃圾游戏"，或者按国内玩家的叫法，<strong>友尽游戏</strong>。它指的是这样一类作品：2到12人合作、物理引擎驱动、画面廉价但荒诞、内置近距离语音、专为"和朋友一起玩"设计。这个词条甚至已经被Wikipedia收录，而行业分析报告则用了更体面的名字："怪咖独立合作"（weirdo indie co-op）——带有古怪机制、物理互动和近距离语音的游戏被证明特别成功，因为它们产生可分享的瞬间，在社交媒体上自然传播，省掉了昂贵的买量成本<a href="https://vibecode.game/blog/aaa-is-not-dead-its-irrelevant/" title="AAA Is Not Dead, It's Irrelevant — 关于Friendslop趋势、Yapyap首周50万、Evil Landfall发行品牌与PEAK联合创作者喊话的分析">1</a>。</p>
+<p>这个品类的成绩单是吓人的：《Lethal Company》单人开发，2023年12月Steam同时在线峰值超过23.9万<a href="https://www.pingaim.net/games/lethal-company/" title="Lethal Company Network Guide — NGO + Facepunch.Steamworks + Dissonance VOIP技术栈与23.9万峰值在线记录">2</a>；《R.E.P.O.》2025年2月上线后长期霸榜；PEAK由Aggro Crab和Landfall两个小组合作完成，成为2025年最大的黑马之一<a href="https://aggrocrab.com/" title="Aggro Crab官网 — PEAK为Aggro Crab与Landfall合作开发">3</a>；2026年2月，被形容为"反向R.E.P.O."的Yapyap首周卖出50万份<a href="https://vibecode.game/blog/aaa-is-not-dead-its-irrelevant/" title="AAA Is Not Dead, It's Irrelevant — 关于Friendslop趋势、Yapyap首周50万、Evil Landfall发行品牌与PEAK联合创作者喊话的分析">1</a>；Landfall甚至专门成立了发行品牌Evil Landfall来投资友尽游戏，其CEO已经在每天回复"这游戏很像PEAK，请投资我"式的邮件<a href="https://vibecode.game/blog/aaa-is-not-dead-its-irrelevant/" title="AAA Is Not Dead, It's Irrelevant — 关于Friendslop趋势、Yapyap首周50万、Evil Landfall发行品牌与PEAK联合创作者喊话的分析">1</a>。PEAK的联合创作者在2026年3月对独立开发者喊话："求求你们，趁这个潮流没死，快做友尽游戏。"<a href="https://vibecode.game/blog/aaa-is-not-dead-its-irrelevant/" title="AAA Is Not Dead, It's Irrelevant — 关于Friendslop趋势、Yapyap首周50万、Evil Landfall发行品牌与PEAK联合创作者喊话的分析">1</a></p>
+<p>本文不打算再复述一遍"为什么这个品类火了"——这方面的分析已经够多了。我想做的是反方向的事：<strong>假设你已经决定做一款友尽游戏，技术选型应该怎么做？</strong>重点放在网络架构上，因为这个品类有一个非常反直觉的特性：它是联机游戏里最不挑网络技术的品类，但却是最挑网络<strong>成本结构</strong>的品类。客户端引擎和美术管线也会各用一章讲透，因为这两个决策和网络架构是强耦合的。</p>
+<p>案例材料主要来自这几款游戏：《Lethal Company》（单人开发）、《R.E.P.O.》（瑞典小团队semiwork）、《渔力全开》（Dazed Games，2人）、《午夜轮班》（Bun Muen，1人）、Content Warning与PEAK（Landfall系）、以及2026年8月发售的Big Walk（House House，《捣蛋鹅》原班人马，4人团队磨了6年）。</p>
+<h2>一、品类画像：设计特征如何决定技术需求</h2>
+<p>技术选型的第一步永远不是看技术，而是看设计。友尽游戏有一套高度趋同的设计配方，而每一项设计特征都会精确地投射成一条技术约束：</p>
+<table>
+<thead>
+<tr>
+<th>设计特征</th>
+<th>技术后果</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>2~8人房间制，好友局为主，无陌生人匹配</td>
+<td>不需要匹配系统，大厅可以极简；"拉朋友入坑"意味着<strong>联机成功率是第一指标</strong></td>
+</tr>
+<tr>
+<td>单局20~60分钟，有明确开始和结束</td>
+<td>不需要持久化世界，房间即一切</td>
+</tr>
+<tr>
+<td>物理引擎驱动"涌现式喜剧"</td>
+<td>物理同步是最大的技术难点，确定性同步不可行</td>
+</tr>
+<tr>
+<td>近距离语音即玩法本体</td>
+<td>语音不是附属功能，是必须自建或集成的核心系统</td>
+</tr>
+<tr>
+<td>为直播/短视频设计，靠传播获客</td>
+<td>画面要在240p的切片里也清晰可读；游戏要能承受<strong>突发爆量</strong></td>
+</tr>
+<tr>
+<td>极小团队（1~4人），咖啡钱定价</td>
+<td><strong>运维成本必须趋近于零</strong>；一切"需要养一个服务器团队"的方案直接出局</td>
+</tr>
+<tr>
+<td>慢节奏、非竞技、纯PVE合作</td>
+<td>延迟容忍度高；反作弊几乎不重要；不需要回滚/帧同步</td>
+</tr>
+</tbody>
+</table>
+<p>把这张表压缩成一句话：<strong>友尽游戏的网络架构，本质上是"用最少的服务器钱，换取最高的联机成功率和可接受的体验下限"的优化问题。</strong>注意这里没有"最低的延迟"——延迟在这个品类里排不进前三。</p>
+<p>这也解释了为什么这些游戏的技术栈看起来"很土"：没有专用服务器集群、没有自研网络协议、没有ECS。因为正确的选择恰好就是土的。下面逐层展开。</p>
+<h2>二、先立规矩：这个品类不需要什么</h2>
+<p>在讨论"选什么"之前，先排除掉几个行业内习惯性的过度设计。这几条每一条都有团队踩过坑。</p>
+<p><strong>不需要回滚（Rollback）和帧同步（Lockstep）。</strong>回滚网络代码是格斗游戏和FPS的解决方案，代价是游戏逻辑必须完全确定性、可快进快退重放。友尽游戏的核心是物理混沌——而基于浮点的物理引擎在跨机器、跨帧率下根本无法保证确定性。更重要的是没有必要：你的玩家不是在格斗游戏里拼2帧的目押，而是在试图把一台冰箱搬下楼梯。状态同步完全够用。</p>
+<p><strong>不需要权威服务器级别的反作弊。</strong>好友局PVE里，作弊破坏的是作弊者自己的体验。市面上存在大量针对《渔力全开》这类游戏的修改器，但这并没有伤害它的销量。只有当排行榜、交易、陌生人匹配出现时，反作弊才升级为需求——而这些功能友尽游戏恰恰没有。</p>
+<p><strong>不需要MMO级的服务器框架。</strong>这是我最想强调的一条，因为它是一个真实的选型陷阱。有人会想："既然要写服务端，不如上个成熟的框架，比如KBEngine Nex——它有实体同步、AOI、热更新，社区版连KCP都内置了。"这个思路对MMO是对的，对友尽游戏是灾难。KBEngine系架构是为无缝大世界设计的：LoginApp、BaseApp、CellApp、DbMgr一整套多进程分布式组件，你部署完之后会发现大部分进程在为一个3人房间空转。用KBEngine做《午夜轮班》，就像用Kubernetes集群部署个人博客——能跑，但你在为一堆你用不上的能力支付学习、部署和运维成本。这类框架真正的用武之地在第三章末尾再谈。</p>
+<p><strong>不需要自建语音服务器集群。</strong>语音有成熟的第三方方案，见第七章。</p>
+<p>排除法做完，剩下的问题就很集中了：玩家之间怎么连上、状态怎么同步、语音怎么走。这就是网络架构的主线。</p>
+<h2>三、网络架构的三条主流路线</h2>
+<p>纵观近几年所有爆款友尽游戏，网络架构收敛到了三条路线上。没有第四条——任何试图发明第四条路线的独立团队，最后都会绕回来。</p>
+<h3>3.1 路线A：P2P Host-based + 平台免费中继</h3>
+<p>这是<strong>绝大多数友尽游戏的实际选择</strong>，也是新品默认应该选择的路线。</p>
+<p>拓扑结构：一名玩家作为Host（房主），Host的机器既是客户端又是权威服务器，其他玩家直连Host。所有游戏逻辑（AI、物理仲裁、阶段推进）跑在Host端，Client发输入、收状态、做插值。</p>
+<p>《渔力全开》是这个路线的标准样本：游戏没有部署任何中央游戏服务器，联机完全依赖Steam好友邀请，由房主创建房间，设计上限4人。这个选择让Dazed Games这家2人工作室的服务器月账单是<strong>零元</strong>。但代价也写在玩家评价里：房主NAT类型过严时队友连不进来、主机掉线全房间解散、跨运营商直连丢包严重导致"开船卡顿、甩狙有拖拽感"、不同网络环境下进房黑屏。国内玩家的标准解法是开加速器，用虚拟局域网绕过公网NAT问题——网络稳定性的风险被完全转嫁给了玩家。</p>
+<p>《Lethal Company》是这条路线的天花板：Unity引擎，网络层用Netcode for GameObjects（NGO）做上层同步，传输层用Facepunch.Steamworks接入Steam的P2P网络，语音用Dissonance VOIP做距离衰减<a href="https://www.pingaim.net/games/lethal-company/" title="Lethal Company Network Guide — NGO + Facepunch.Steamworks + Dissonance VOIP技术栈与23.9万峰值在线记录">2</a>。单人开发者Zeekerss靠这套组合撑起了23.9万的同时在线峰值——而他自己的服务器成本依然是零。</p>
+<p>这条路线的关键技术组件是<strong>Steamworks Networking</strong>。很多人对"Steam P2P"有误解，以为玩家之间是直连的。实际上Valve提供的是一整套托管基础设施：开发者只需要知道对方的SteamID，调用<code>ConnectP2P</code>即可发起连接，完全不需要处理IP地址；Steam底层自动尝试NAT穿透，<strong>穿透失败时自动回退到Steam Datagram Relay（SDR）中继网络</strong>——流量走Valve自建的全球骨干网，玩家IP不会暴露给彼此<a href="https://partner.steamgames.com/doc/features/multiplayer/networking" title="Steamworks官方文档：Steam Networking — 基于SteamID寻址、自动NAT穿透与SDR中继回退">4</a>。这一切对开发者完全免费（有速率限制，但对友尽游戏的带宽量级来说绰绰有余）。</p>
+<p>这里要澄清一个在开发者社区反复引起争论的概念：<strong>经过中继的"P2P"不是真正的P2P</strong>。真实拓扑是 peer→relay→peer，多了一个双向hop，延迟比直连高；而且从游戏架构的角度看，它依然是Host-Client的星型结构，所谓P2P只是指"没有专用服务器"。这个区别很重要，因为它决定了你的延迟预算和故障模型——但它是Steam/PlayFab/EOS所有"P2P"宣传背后的统一真相。</p>
+<p><strong>路线A的适用条件</strong>：Steam独占或Steam首发；玩家数≤8；接受"房主网络=全房间体验"的现实；不想付任何服务器钱。</p>
+<p><strong>路线A的固有风险</strong>（写进设计文档，不要假装不存在）：</p>
+<table>
+<thead>
+<tr>
+<th>风险</th>
+<th>缓解手段</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Host Advantage（房主零延迟）</td>
+<td>PVE游戏里影响小；关键判定（命中、抓取）统一由Host仲裁</td>
+</tr>
+<tr>
+<td>房主掉线=全房间解散</td>
+<td>局内自动存档+允许原房主重开房间续局；Host迁移成本高，通常不做</td>
+</tr>
+<tr>
+<td>NAT穿透失败率（无中继兜底时）</td>
+<td>必须用带中继回退的方案（SDR），不要裸写UDP打洞</td>
+</tr>
+<tr>
+<td>房主上行带宽随人数线性增长</td>
+<td>人数上限设计保守（4~6人），同步量做减法</td>
+</tr>
+<tr>
+<td>国内跨运营商/校园网环境恶劣</td>
+<td>这是无解的，加速器是玩家的标准配置，官方文档里写清楚即可</td>
+</tr>
+</tbody>
+</table>
+<h3>3.2 路线B：托管云Relay（Photon模式）</h3>
+<p>第二条路线是把"中继"这件事外包给商业云服务，代表是Photon。</p>
+<p>《R.E.P.O.》的技术栈是：Unity + Photon Unity Networking（PUN）做联机 + Photon Voice做近距离语音<a href="https://blog.photonengine.com/tag/pun/" title="Photon官方博客：R.E.P.O.案例 — PUN + Photon Voice + 全球云托管">5</a>。Content Warning同样以Photon为主要网络方案<a href="https://github.com/RugbugRedfern/Mycelium-Networking-For-Content-Warning" title="Mycelium Networking — Landfall要求模组作者不要经Photon发送大量数据（带宽费用由官方承担），社区因此改走Steam通道">6</a>。这条路线里，所有客户端都连接到Photon的云端服务器，由云端转发消息，房间内通常由Master Client承担逻辑权威。本质上是"把SDR换成了Photon的数据中心"，换来的是跨平台能力和更省心的房间管理API。</p>
+<p>这条路线的优点是开发速度快——PUN可以在几个小时内跑通一个联机原型，房间创建/加入/玩家列表全是现成API。但代价是一个严肃的商业风险：<strong>按CCU（同时在线）计费，而友尽游戏恰恰是最容易爆量的品类</strong>。</p>
+<p>这里有一个非常能说明问题的真实案例。Content Warning的模组社区流传着一份官方态度：Landfall明确请求模组作者<strong>不要通过Photon发送大量自定义数据，因为这部分带宽费用是Landfall在付</strong>——于是社区专门造了一个叫Mycelium Networking的库，让模组的RPC改走Steam的免费P2P通道，绕开Photon计费<a href="https://github.com/RugbugRedfern/Mycelium-Networking-For-Content-Warning" title="Mycelium Networking — Landfall要求模组作者不要经Photon发送大量数据（带宽费用由官方承担），社区因此改走Steam通道">6</a>。爆款游戏的开发商要替模组作者的流量买单，这件事本身就说明托管云计费模式和病毒式传播品类之间存在结构性摩擦。</p>
+<p>PlayFab的政策变化是另一个警示。微软在2026年3月把PlayFab免费额度从10万终身账户断崖式砍到1000个——做个数学就知道这意味着什么：Discord封闭测试200人一周内就会产生1000~3000个账户，Steam新品节试玩首周轻松破万。也就是说<strong>任何有点水花的游戏都会立刻撞墙进入计费区</strong>，而PlayFab的计费模型复杂到"需要一张电子表格才能算清"。基础设施层面Azure不会崩，崩的是你的账单。</p>
+<p><strong>路线B的适用条件</strong>：需要跨平台（Steam之外的生态没有SDR这种免费午餐）；团队不想碰任何服务器运维；并且已经做过爆量场景的成本测算——用官方计费计算器按"10万CCU"这种悲观情形算一遍，看这个数你能不能接受。</p>
+<h3>3.3 路线C：平台服务混合（Big Walk模式）</h3>
+<p>2026年8月4日发售的Big Walk展示了第三条路线，也是跨平台友尽游戏目前的最优解：<strong>Host-based逻辑 + Epic Online Services（EOS）做跨平台连接层</strong>。</p>
+<p>从官方FAQ可以还原出完整的架构<a href="https://bigwalk.game/faq/" title="Big Walk官方FAQ — Host保存进度、Join Code、无匹配、跨平台联机、近距离语音设计">7</a>：没有专用服务器，主机玩家本地保存存档、世界状态和游戏进度；主机启动会话后，其他玩家通过平台好友列表（同平台）或Join Code（跨平台）加入；主机关闭会话时全员断开，没有主机迁移——如果原房主不上线，这个进度的旅程就只能等。EOS在其中承担的是：跨平台身份认证（统一Steam/PS5/Switch 2/Mac玩家）、NAT穿透与中继、好友与邀请系统。游戏支持2~12人，主机开局时选择2人/3人/4+人的世界版本来适配谜题难度。</p>
+<p>这个架构对House House这样的4人团队是精明的分工：<strong>EOS免费</strong>，替他们解决了跨平台联机中最脏最累的部分（穿透、中继、身份），而游戏状态托管在玩家主机上，House House自己依然不养服务器。</p>
+<p>不过路线C引入了一个友尽游戏开发者必须提前知道的<strong>玩家侧成本：主机会员墙</strong>。规则是平台层面的，与你的网络架构无关——即使你自建服务器出钱让玩家免费联机也没用：</p>
+<table>
+<thead>
+<tr>
+<th>平台</th>
+<th>玩家在线门槛</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Steam（PC/Mac）</td>
+<td>免费，无会员概念</td>
+</tr>
+<tr>
+<td>Xbox主机</td>
+<td>付费游戏需Game Pass Core（约$74.99/年），F2P豁免</td>
+</tr>
+<tr>
+<td>PlayStation</td>
+<td>付费游戏需PS Plus，F2P豁免</td>
+</tr>
+<tr>
+<td>Switch / Switch 2</td>
+<td>付费游戏需Nintendo Switch Online（约$19.99/年），F2P豁免</td>
+</tr>
+</tbody>
+</table>
+<p>Big Walk的实际执行就是这个规则：PS5玩家要PS Plus，Switch 2玩家要NSO，Steam玩家免费<a href="https://www.g2a.com/news/features/big-walk-platforms-and-crossplay-explained/" title="Big Walk平台与跨平台联机说明 — 2~12人、PS Plus/NSO会员要求、$19.99定价">8</a>。主机平台收的是"在线功能准入费"而不是服务器租金——你修路，他们收高速通行费。这直接影响了你的平台策略：<strong>友尽游戏优先上Steam不是没有原因的</strong>，无会员墙意味着"拉朋友入坑"的转化链路最短。主机版要么接受用户被会员墙过滤一遍，要么把游戏改成F2P绕过（但那需要重做商业模式）。</p>
+<p>平台侧的P2P能力现状也值得记一笔：Steamworks完全公开免费且带SDR兜底；Xbox Live原生P2P需ID@Xbox审核，生态正被PlayFab Party吸收；PSN有原生NAT穿透/中继基础设施但SDK受NDA保护；Switch是Pia库（P2P/本地无线/局域网三模式）+ NPLN后端（建在Google Cloud上），注册免费但文档同样封闭，且因为跨平台刚需，Switch是四大平台中开发者自建/用第三方网络比例最高的——任天堂自己也把Nakama、Edgegap、Photon请进了官方开发者门户。</p>
+<h3>3.4 什么时候才轮得到自建服务端</h3>
+<p>三条路线之外，确实存在第四种选择：自建后端（Nakama、Colyseus、KBEngine Nex等）。但对友尽游戏，它的触发条件非常明确，满足任意一条才考虑：</p>
+<ol>
+<li><strong>需要服务器权威的排行榜/经济系统</strong>。注意是"排行榜校验"而不是"排行榜"——Colyseus、Nakama都内置排行榜，但客户端直接报分的排行榜等于没有排行榜。至少要有一个服务端RPC做成绩合理性校验。</li>
+<li><strong>需要跨平台且不依赖单一平台生态</strong>。比如你想做手游+PC+主机通吃，EOS不覆盖你的目标平台组合。</li>
+<li><strong>长线运营</strong>：账号体系、好友、公会、云存档、赛季——这些是Nakama开箱即用的东西，自己造轮子要几个月。</li>
+<li><strong>房间数和并发大到P2P/托管云不划算</strong>。Photon按CCU计费，Nakama自托管按机器计费，存在一个交叉点——但友尽游戏的房间制意味着这个交叉点比你想象的远得多。</li>
+</ol>
+<p>如果触发了，选型的梯度是这样的：<strong>Colyseus</strong>（Node.js房间框架，纯实时同步，账号社交全没有）&lt; <strong>Nakama</strong>（Go，账号/聊天/好友/排行榜/钱包/匹配全套，200万CCU集群压测背书，64核128G单机跑真实MMO逻辑大约1~3万在线）&lt; <strong>KBEngine Nex</strong>（MMO级分布式，内置KCP，Python热更——杀鸡用牛刀，除非你的友尽游戏规划里藏着个MMO）。</p>
+<p>对Nakama有两个常见误判要修正。一是"Nakama能不能做P2P"——不能，官方立场明确，它是服务器架构；它的Relayed Multiplayer本身就是服务端中继，所有流量过服务器，所以不存在NAT穿透问题，代价是多一个hop的延迟。二是"不用Nakama是不是因为缺KCP"——对友尽游戏这个担忧是多余的，详见下一章。</p>
+<h2>四、传输层：KCP是伪需求，Relay不是P2P</h2>
+<p>传输层是独立开发者最容易过度设计的环节。先给结论：<strong>友尽游戏用TCP/WebSocket都够，KCP（以及一切可靠UDP方案）在这个品类里是伪需求。</strong></p>
+<p>理由要分两层说。第一层是玩法节奏：KCP的核心收益场景是FPS/MOBA那种高频、不可预测输入的快节奏对抗——丢包时TCP的队头阻塞会让后续数据等重传，表现为"卡一下再跳一大段"。友尽游戏的操作密度比MOBA低一个数量级以上，10Hz的状态同步加客户端插值就能抹平绝大部分网络抖动。官方用纯TCP在Nakama上跑过Zynga的30人吃鸡Tiny Royale，你的4人合作游戏没理由更娇贵。</p>
+<p>第二层是工程成本账。很多人觉得"加个KCP不难"——做出能跑的demo确实不难，Go生态里kcp-go现成，Nakama的客户端SDK甚至留了传输层接口。难的是生产可用和之后几年背着fork走：服务端socket层是核心代码不是插件点；KCP本身是可靠有序流，你想要的"丢了就丢了"还得再叠一层裸UDP双通道；上游每次发版你都要合并冲突（写fork三周，养fork三年）；UDP的负载均衡、DDoS防护、运营商封禁降级全是新坑。正确的策略顺序是：先用现成方案把游戏做出来实测弱网表现，KCP属于"实测证明TCP不够之后再上"的优化项，不要预防性过度设计。</p>
+<p>顺带把一个概念钉死，因为社区里太多争论源于混淆：<strong>网络拓扑的P2P和游戏架构的P2P是两回事。</strong>前者指连接形态（直连还是过中继），后者指权威分布（每个客户端各自模拟还是Host统一仲裁）。2026年的现实是：几乎所有自称"P2P"的商业方案（SDR、PlayFab Party、EOS Relay）默认拓扑都是peer→relay→peer，架构上全是星型Host-Client。真正的全连接P2P网格架构因为作弊、延迟由最差玩家决定、desync全局毁灭、无法中途加入这四大绝症，早在二十年前就死透了。你在设计文档里写"P2P架构"时，最好明确自己指的是哪一层。</p>
+<p>关于国内网络环境还有一句实话：跨运营商、多层NAT、校园网这三个debuff叠加，使得任何穿透方案在国内的失败率都显著高于欧美。这不是你的技术能解决的问题——把"推荐使用加速器"写进FAQ，是国内发行这类游戏的行业惯例，《渔力全开》的玩家们早就自己形成了这个共识。</p>
+<h2>五、网络库横评：爆款们实际用了什么</h2>
+<p>确定架构路线之后，网络库的选择空间其实很小。以Unity生态为主战场（为什么是Unity见第八章），主要候选的全景如下：</p>
+<table>
+<thead>
+<tr>
+<th>方案</th>
+<th>架构支持</th>
+<th>成本</th>
+<th>特点</th>
+<th>爆款采用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Netcode for GameObjects (NGO)</td>
+<td>Host/Dedicated均可</td>
+<td>免费（传输另计）</td>
+<td>Unity官方，生态标准答案</td>
+<td>Lethal Company</td>
+</tr>
+<tr>
+<td>Photon PUN</td>
+<td>Client-hosted（Master权威）</td>
+<td>按CCU计费</td>
+<td>上手最快，房间API最全</td>
+<td>R.E.P.O.、Content Warning</td>
+</tr>
+<tr>
+<td>Fish-Net</td>
+<td>Host/Dedicated均可</td>
+<td>免费开源（MIT）</td>
+<td>性能最强，带宽比Mirror低90%+，有LTS承诺</td>
+<td>社区新贵</td>
+</tr>
+<tr>
+<td>Mirror</td>
+<td>Host/Dedicated均可</td>
+<td>免费开源（MIT）</td>
+<td>社区最大、文档最全、无LTS</td>
+<td>大量中小项目</td>
+</tr>
+<tr>
+<td>Photon Fusion</td>
+<td>服务器权威/tick-based</td>
+<td>按CCU计费</td>
+<td>性能强，学习曲线陡</td>
+<td>偏竞技向</td>
+</tr>
+<tr>
+<td>Steamworks（裸用）</td>
+<td>P2P传输层</td>
+<td>免费</td>
+<td>只是传输层，上层同步自己写</td>
+<td>通常配合上层框架</td>
+</tr>
+</tbody>
+</table>
+<p>几个值得展开的判断：</p>
+<p><strong>NGO + Facepunch.Steamworks是Steam独占新品的默认答案。</strong>Lethal Company证明了这套组合的天花板足够高。NGO提供NetworkBehaviour、RPC、NetworkVariable这一套引擎内嵌同步抽象，Facepunch.Steamworks把传输层换成Steam的免费P2P+SDR。缺点也明显：NGO长期被社区诟病迭代慢、坑多（官方论坛里"断线流程到底怎么走"这类基础问题常年有人问），而且官方教程越来越倾向于把开发者导向收费的Unity Relay服务——NAT穿透这种本该开箱即用的能力在NGO里至今不是开箱的，这是Unity商业策略在网络层的投射。</p>
+<p><strong>Fish-Net是当下技术口碑最好的开源选项。</strong>它的组件体系是这个品类最需要的：NetworkObject管生命周期和所有权、NetworkTransform/NetworkAnimator做状态同步、NetworkObserver做可见性裁剪（AOI）、PlayerSpawner管进房生成，还有一整套客户端预测支持（OfflineRigidbody防止预测重放时物理被重复模拟，NetworkTrigger/Collision号称是唯一能正确模拟预测中Enter/Exit事件的框架）。SyncVar/SyncList一套数据同步类型齐全。第三方实测里，200 CCU时Fish-Net服务器性能仅下降7.4%，Mirror同场景下降83%<a href="https://oceanviewgames.co.uk/blog/posts/cross-platform-multiplayer-networking-unity" title="FishNet、Mirror、Photon跨平台联机实测对比 — 200 CCU性能数据">9</a>。唯一的短板是社区规模小于Mirror，高级功能偶尔要读源码。</p>
+<p><strong>Photon PUN的正确打开方式是"为跨平台和省心付费"。</strong>它的隐藏成本前面已经讲过（Content Warning模组事件），但它依然是把"联机原型"压缩到以小时计的最短路径。</p>
+<p><strong>自研引擎的出路。</strong>如果你的客户端是自研引擎（in-house engine），上述Unity系方案全部失效——Fish-Net深度绑定Unity组件系统，代码根本编译不出来。此时分层选：传输层用ENet或Valve开源的GameNetworkingSockets（C/C++，可移植到主机）；需要后端能力就用Nakama的官方C++ SDK（注意它是回调驱动+手动tick模型，必须在引擎主循环里定期调<code>tick()</code>，回调在调用线程执行，JSON库要自己带）；实体同步想白嫖现成的，KBEngine Nex支持生成C++客户端SDK——但再次提醒，那是MMO框架，想清楚再碰。</p>
+<p><strong>验证"某游戏用了什么网络库"的方法论</strong>也值得一说：看游戏安装目录下的DLL名单（FishNet.<em>.dll、Mirror.</em>.dll一目了然）、看模组社区的patch工具（Lethal Company模组要用Unity Netcode Patcher，直接证明它是NGO）、看崩溃报告里的引擎版本号（《渔力全开》的Unity 6000.4.4f1就是这么被确认的）。独立厂商大多不发技术博客，逆向线索比官方声明可靠。</p>
+<h2>六、物理同步：这个品类独有的技术难点</h2>
+<p>友尽游戏的灵魂是物理引擎制造的意外——鱼钓到一半开始追杀你、搬冰箱的人脚滑滚下楼梯、队友被海鸥叼走。这些"名场面"全部是涌现出来的，不是脚本写的。但<strong>物理 + 联机是一个固有矛盾</strong>，处理不好，名场面就会变成不同步灾难现场。</p>
+<p>矛盾的本质：物理模拟是混沌系统，初始条件的微小差异会被指数放大；而浮点运算在不同机器上存在精度差异，帧率也不一致。所以<strong>确定性物理同步（只同步输入，各端各自模拟）在跨平台联机中不可行</strong>——这是物理引擎的数学性质决定的，不是工程能力问题。帧同步那套"锁步+确定性"的路线对物理沙盒直接封死。</p>
+<p>行业里沉淀下来的可行方案是<strong>基于所有权的物理同步（owner-based physics）</strong>，规则体系大致是：</p>
+<ol>
+<li><strong>每个物理对象有且只有一个模拟权威端</strong>。没被交互的物体由Host模拟；被某玩家抓起的物体，所有权转移给该玩家客户端模拟——因为持有者对"手感"最敏感，本地模拟零延迟。</li>
+<li><strong>权威端同步结果，其他端只做渲染端跟随</strong>。同步的是位置/旋转/速度快照，接收端插值平滑，非权威端的物理体设为kinematic（不参与本地碰撞求解）。</li>
+<li><strong>所有权转移要有握手协议</strong>。抓取时发"请求所有权"，Host仲裁（防止两人同时抓住一个箱子各说各话），确认后转移。这是PUN的Ownership Transfer、Fish-Net的NetworkObject所有权都在解决的问题，不要自己发明。</li>
+<li><strong>关键事件由Host统一仲裁</strong>。死亡、掉落、金额结算、阶段切换——这些"不可调和"的状态只能有一个裁决者，就是Host。客户端本地可以预测表现（音效、动画先播），但结果以Host广播为准。</li>
+</ol>
+<p>在这个框架下，<strong>插值（Interpolation）和预测（Prediction）的取舍</strong>很清晰：友尽游戏以插值为主、预测为辅。远端玩家和世界物体全部插值（100ms左右的缓冲延迟在慢节奏合作中无感）；只有本地玩家的角色控制器值得做预测+Host校正——而且就算不做，纯Host权威的移动在很多爆款里也活得很好，代价是Host Advantage，PVE里可以接受。Fish-Net把客户端预测做成了一等公民（代价是你要处理预测重放期间的物理隔离，OfflineRigidbody这类组件就是干这个的），NGO/Mirror则基本只有插值——这个差异选型时要知道，但对友尽游戏它很少成为决定因素。</p>
+<p>最后一个实操建议：<strong>物理对象的同步量级要做减法</strong>。不是每个滚动的苹果都值得10Hz同步。给物体设"睡眠阈值"（速度低于某值停止同步）、给场景物体分级（关键交互物高频同步、背景杂物低频或不同步）、数量上设上限。R.E.P.O.那种一屋子可互动物品的游戏，带宽预算就是这么省出来的。</p>
+<h2>七、语音即玩法：Proximity Voice 的技术栈</h2>
+<p>传统联机游戏里，语音是个加分项；友尽游戏里，<strong>语音是核心玩法的一部分</strong>。Big Walk官方FAQ直接建议玩家不要用Discord——因为它的声音系统有距离衰减、走廊回声、墙壁阻隔、对讲机改声道，用外部语音等于关掉了一半的游戏设计<a href="https://bigwalk.game/faq/" title="Big Walk官方FAQ — Host保存进度、Join Code、无匹配、跨平台联机、近距离语音设计">7</a>。R.E.P.O.里怪物会被玩家的声音吸引，恐慌时的尖叫既是情绪表达也是游戏机制。</p>
+<p>技术选型上的现成方案：</p>
+<table>
+<thead>
+<tr>
+<th>方案</th>
+<th>模式</th>
+<th>成本</th>
+<th>适配场景</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Dissonance VOIP</td>
+<td>接底层网络栈（NGO/Mirror/Fish-Net都有集成）</td>
+<td>一次性买断（Asset Store付费插件）</td>
+<td>Unity + 自建网络层，Lethal Company同款<a href="https://www.pingaim.net/games/lethal-company/" title="Lethal Company Network Guide — NGO + Facepunch.Steamworks + Dissonance VOIP技术栈与23.9万峰值在线记录">2</a></td>
+</tr>
+<tr>
+<td>Photon Voice</td>
+<td>走Photon云</td>
+<td>按CCU计费（与PUN分开计费）</td>
+<td>已用PUN的项目，R.E.P.O.同款<a href="https://blog.photonengine.com/tag/pun/" title="Photon官方博客：R.E.P.O.案例 — PUN + Photon Voice + 全球云托管">5</a></td>
+</tr>
+<tr>
+<td>Vivox（Unity官方语音）</td>
+<td>云中继</td>
+<td>免费额度+按量</td>
+<td>需要文字过滤、跨平台的项目</td>
+</tr>
+<tr>
+<td>EOS Voice</td>
+<td>Epic云</td>
+<td>免费</td>
+<td>已接EOS的跨平台项目（Big Walk路线）</td>
+</tr>
+<tr>
+<td>WebRTC自建</td>
+<td>P2P直连</td>
+<td>免费但自研</td>
+<td>极小房间+有自己的信令层时</td>
+</tr>
+<tr>
+<td>Steam语音</td>
+<td>Steam生态</td>
+<td>免费</td>
+<td>粗粒度，无空间衰减，通常不够用</td>
+</tr>
+</tbody>
+</table>
+<p>三个设计要点决定了语音系统不能当插件随便糊上去：<strong>空间化</strong>（距离衰减只是底线，遮挡、混响、介质转换是氛围的来源）；<strong>与游戏机制联动</strong>（声音招怪、对讲机频道、死亡后变鬼魂频道）；<strong>音量与恐慌的动态范围</strong>（安静潜行时耳语可闻，混乱时全员尖叫不糊成一团——这考验的是混音和压缩器策略，不是网络）。</p>
+<p>成本上语音是友尽游戏带宽的最大头：一路语音流的码率远超全部游戏状态同步之和。这也是为什么语音方案的选择要和网络架构联动决策——选PUN就顺手Photon Voice打包计费，选EOS就用它的免费语音，选NGO就配Dissonance走Steam免费通道。语音独立选型、各付各的钱是最蠢的组合。</p>
+<h2>八、客户端引擎：为什么是Unity，以及Unity的风险</h2>
+<p>这一章要先说事实，再说风险。</p>
+<p><strong>事实层面</strong>，这个品类几乎被Unity垄断：Lethal Company、R.E.P.O.、Content Warning、PEAK、《渔力全开》（Unity 6000.4.4f1）、《午夜轮班》全是Unity。原因是结构性的：</p>
+<ol>
+<li><strong>PhysX + 成熟的刚体/布娃娃封装</strong>。物理沙盒玩法的开发成本在Unity里最低——不是Unity的物理最强，而是"物理+动画+网络+编辑器"的闭环最完整。</li>
+<li><strong>网络库生态</strong>。第五章那张表就是答案：NGO/Fish-Net/Mirror/PUN全在Unity生态里，还有现成的Steamworks封装。</li>
+<li><strong>Asset Store</strong>。语音（Dissonance）、动画、特效、临时占位资产，单人团队的钱能直接换成开发时间。</li>
+<li><strong>单人可维护性</strong>。编辑器即生产力，一个人在Unity里能同时干程序、关卡、TA的活。</li>
+</ol>
+<p>但只讲事实不讲风险，就是给读者挖坑。<strong>Unity这家公司过去三年的商业行为，要求每个选型者把"引擎供应商风险"写进决策表里。</strong></p>
+<p>完整的时间线值得每个开发者记住<a href="https://www.cgchannel.com/2024/09/unity-scraps-controversial-runtime-fee-but-raises-prices/" title="Unity取消Runtime Fee但涨价 — 千人联名抗议、Riccitiello去职、Pro涨8%/Enterprise涨25%">10</a><a href="https://unity.com/blog/unity-is-canceling-the-runtime-fee" title="Unity官方公告：取消Runtime Fee，恢复按席位订阅制（2024-09-12）">12</a>：</p>
+<ul>
+<li><strong>2023年9月12日</strong>，Unity突然宣布Runtime Fee：从2024年1月起，超过收入/安装量阈值的游戏要按<strong>每次安装</strong>付费（Personal档<span class="math">\(0.20/次，Pro档\)</span>0.15递减至$0.02）。最恶劣的是它最初打算追溯适用于已发售游戏，而且"安装量"这个数据由Unity自己统计——开发者社区立刻指出了install bombing（恶意刷安装量让你破产）、慈善包、XGP入库、盗版安装全要计费这些荒诞场景。超过1000名开发者联名抗议，多家工作室公开威胁迁移引擎。</li>
+<li>10天内Unity缩水方案，但费用本身没撤，挂着又拖了一年。CEO John Riccitiello"退休"，Create部门负责人Marc Whitten离职。</li>
+<li><strong>2024年9月12日</strong>，新CEO Matt Bromberg宣布彻底取消Runtime Fee，承认"不能与客户为敌"。费用从未真正收取——但它证明了<strong>这个公司有能力、有意愿单方面改写已发售游戏的商业条款</strong>。</li>
+<li>取消的代价立刻转嫁：2025年1月起Pro涨价8%（<span class="math">\(2,040→\)</span>2,200/席/年）、Enterprise涨价25%；<strong>2026年1月起再涨5%（Pro $2,310/席/年）</strong>，官方话术是"可预测的年度调价"<a href="https://80.lv/articles/unity-announces-its-upcoming-2026-price-changes" title="Unity 2026年调价公告 — Pro涨至$2,310/席/年，6.3起Havok物理不再随附">13</a>。同时Unity 6.3起Havok物理不再随Pro赠送，Personal版强制联网登录（离线最多3天）。</li>
+<li>大背景是2022年与广告技术公司ironSource的合并、2024年1月裁掉1800人（25%员工）——Unity的营收压力是结构性的，订阅费逐年上涨是这个结构的直接表达。</li>
+</ul>
+<p>把这些翻译成选型语言：<strong>Unity的技术生态依然是这个品类的最优解，但你租的是一块地主随时可能涨租的地。</strong>务实的对冲策略：</p>
+<ul>
+<li><strong>把游戏逻辑与引擎API之间垫一层自己的抽象</strong>。不是要你真的能一周内迁移引擎，而是让"迁移"从"重写"降级为"重写适配层"。物理参数、网络协议、存档格式设计成引擎无关的。</li>
+<li><strong>关注替代品的成熟度曲线</strong>。Godot 4.x的3D能力和C#支持每年都在爬坡，MIT协议意味着它永远没有Runtime Fee这类问题；Unreal的5%版税模式（百万美元门槛后）对高价游戏不划算，对$10的友尽游戏反而值得算一遍账——Unreal的复制系统（Replication）是引擎原生网络层，不用像Unity那样外挂网络库。</li>
+<li><strong>版本钉死</strong>。选定一个LTS版本后，除非有安全补丁，整个项目周期不升级引擎。条款可以变，但你已接受的那版Editor条款对你钉住的版本持续有效——这是2024年10月条款更新里官方自己确认的规则<a href="https://unity.com/blog/unity-is-canceling-the-runtime-fee" title="Unity官方公告：取消Runtime Fee，恢复按席位订阅制（2024-09-12）">12</a>。</li>
+</ul>
+<p>如果你是从零开始、对3D要求不高的团队，认真评估Godot的时间点已经到了；如果目标是主机平台或需要最厚的中间件生态，Unity仍然是对的，只是签合同前把上一节的时间线再读一遍。</p>
+<h2>九、美术制作管线：廉价感是精心设计的产能策略</h2>
+<p>友尽游戏的美术常被外行概括为"画面糙"，这是彻底的误读。Low-poly + 布娃娃物理不是美术风格的选择题，而是<strong>极小团队产能约束下的生产管线决策</strong>——它同时解决了资产产能、动画成本、性能预算和传播可读性四个问题。逐个拆开看。</p>
+<h3>9.1 角色：为剪影和物理而生</h3>
+<p>看这个品类的角色设计谱系，会发现惊人的一致性：R.E.P.O.的Semibot是独轮小机器人，表情只靠眼部液晶屏和头部伸缩完成；Content Warning的角色是顶着一张ASCII脸的软体小人；PEAK的童子军是圆滚滚的豆形人；Lethal Company干脆全员穿制服，个体差异只剩体型。这些设计共享一套工程逻辑：</p>
+<ul>
+<li><strong>无嘴、无手指、无真实骨骼脸</strong>。面部绑定和口型同步是角色管线里最贵的部分，全部砍掉。表情用贴图切换（LCD脸）或两三个骨骼的挤压拉伸解决。</li>
+<li><strong>剪影可读性优先</strong>。直播切片常常是240p的糊画质，观众要在一秒内认出"这是哪个游戏、谁在倒霉"。夸张的剪影（独轮、豆形、潜水服）在缩略图尺寸下依然可辨——这是为传播设计的，不是为美术设定集设计的。</li>
+<li><strong>物理代替动画</strong>。这是Landfall系作品的招牌（从Totally Accurate系列一脉相承）：角色用主动布娃娃（active ragdoll）/程序化动画驱动，走路姿势本身就是笑点。关键收益是——<strong>你不再需要为"被鱼抽飞""从楼梯滚下去""被队友拖拽"各做一套动画，物理引擎自己生产无穷无尽的表演</strong>。动画师的预算从"几百个动作片段"降到"几个基础状态+一堆物理参数"。</li>
+</ul>
+<p>对1~2人团队，角色管线的推荐配置是：Blender建模（免费，且这个品类的模型复杂度完全在Blender舒适区内）→ 简化骨骼绑定（十几根骨头，不碰面部）→ 动作库解决基础位移（Mixamo免费库或者干脆程序化）→ 特殊状态交给物理。<strong>不要做表情系统，不要做毛发，不要做布料模拟</strong>——每一样都是产能黑洞。</p>
+<h3>9.2 场景与道具：模块化套件 + 单图集</h3>
+<p>友尽游戏的场景有两个硬需求：<strong>能物理交互的东西要多</strong>（满屋子能抓起来扔的东西），<strong>同屏物件要多但帧率不能塌</strong>（物理+语音+网络都在吃CPU）。对应的美术策略：</p>
+<ul>
+<li><strong>模块化套件（Modular Kit）</strong>。场景不是"做一张地图"，而是做一套可拼装的积木：墙段、门段、地板、转角，几十种模块拼出无限组合。这也直接服务程序化生成——Lethal Company的卫星表面是手工做的，但室内设施是程序拼装的；R.E.P.O.的地图同样是程序生成。模块接口尺寸必须严格网格化（2m/4m模数），美术规范写死，否则程序拼装时缝隙百出。</li>
+<li><strong>调色板图集（Palette Atlas）代替逐物贴图</strong>。Low-poly风格的标准操作：所有道具共用一张256×256的色块图集，UV直接指到纯色块上，不画贴图、不展复杂UV、不走PBR流程（金属度/粗糙度贴图全省）。一个道具的美术工时从"天"降到"小时"。光照氛围靠后处理（AO、Bloom、雾效）统一拉起来，而不是靠单件资产的精度。</li>
+<li><strong>顶点色做变化</strong>。植被、岩石这类自然物用顶点色+一张渐变纹理出变化，零额外贴图内存。</li>
+<li><strong>可交互物视觉分级</strong>。能抓的、能碎的、纯背景的三类物件要有稳定的视觉语言（描边、配色、体积暗示），玩家才能一眼读出"这屋里什么能玩"。这不只是体验问题——它同时是同步预算的标注系统：背景杂物从一开始就不进网络同步名单。</li>
+</ul>
+<h3>9.3 资产来源：Asset Store的正确用法</h3>
+<p>独立圈对"素材拼接"（asset flip）有病耻感，但这个品类的成功者用得很坦然——Lethal Company大量使用了Asset Store素材，玩家不在乎，因为最终体验是独特的。正确的姿势是：<strong>占位期大胆用，发售前做风格化统一</strong>。所有外购资产过一遍统一的调色板和后处理，把"拼凑感"洗成"风格感"。绝对不能省的是角色和核心交互道具——这两个是辨识度所在，必须原创。</p>
+<h3>9.4 音频：比美术更便宜的氛围杠杆</h3>
+<p>这个品类的恐怖/喜剧氛围一半靠音频。好消息是音频的投入产出比极高：失真的无线电音效、低采样率的怪物叫声、lo-fi的环境底噪——<strong>低保真在这里是风格而不是缺陷</strong>，和手机麦克风+免费音效库+基础混音器的配置完美匹配。唯一的硬性投入是前面说的语音系统的空间化处理。音乐可以极简甚至缺席（Lethal Company几乎没有配乐，寂静本身就是配乐）。</p>
+<h3>9.5 AI工具的位置</h3>
+<p>2026年了这个问题绕不开。在友尽游戏管线里，AI辅助的实际位置是：<strong>概念图发散（前期风格探索）和贴图/图标初稿</strong>可以用，角色和核心道具的最终资产不要直接用AI成品——版权风险（Steam已要求披露AI生成内容）和风格一致性问题都会在后端反噬。程序化生成（关卡拼装、战利品词条）是另一个赛道，和AI无关，照常使用。</p>
+<h3>9.6 工程化杂项</h3>
+<ul>
+<li><strong>版本控制</strong>：美术资产上Git LFS或Unity Version Control（2026年起后者云席位已取消按人头收费）。仓库规范比工具选择重要：模型源文件（.blend）和导出文件（.fbx）分目录，命名规范写死在CONTRIBUTING里——2人团队也需要，因为半年后你自己就是"另一个人"。</li>
+<li><strong>性能预算表先行</strong>：开做之前就定死单场景三角面数上限、物理体上限、同屏同步对象上限，美术在预算内自由发挥。这个品类的美术自由度恰恰来自预算表画得早。</li>
+</ul>
+<h2>十、决策树：把所有章节收拢成一页</h2>
+<p>看到这里，全部结论可以压缩成一棵决策树：</p>
+<div class="highlight"><pre><span></span><code>Q1: 首发平台只有Steam吗？
+ ├─ 是 → 网络: NGO或Fish-Net + Facepunch.Steamworks（SDR免费兜底）
+ │       语音: Dissonance走Steam通道
+ │       后端: 无。排行榜等爆火之后再说
+ │       → 服务器月成本: ¥0
+ │
+ └─ 否（跨平台）
+    Q2: 能接EOS吗？（PC+主机，且接受绑定Epic生态）
+     ├─ 能 → Big Walk模式: Host-based + EOS（穿透/中继/语音全免费）
+     │       → 服务器月成本: ¥0，代价是跨平台工作量
+     │
+     └─ 不能 → Photon PUN + Photon Voice（按CCU计费）
+              先用官方计算器按10万CCU的悲观情形算一遍账单
+              爆火前写好限流和降级预案
+
+Q3: （任意路线）出现以下任一信号时，引入自建后端:
+    - 排行榜被刷分到不能看 → 加Nakama做成绩校验RPC
+    - 需要账号/好友/云存档长线运营 → Nakama全家桶
+    - 规划里出现持久化大世界/百人同服 → 这才轮到KBEngine Nex
+    （信号没出现时，一行业务后端代码都不要写）
+</code></pre></div>
+
+<p>引擎与美术的结论一并收拢：</p>
+<table>
+<thead>
+<tr>
+<th>决策项</th>
+<th>默认答案</th>
+<th>例外条件</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>引擎</td>
+<td>Unity（钉死LTS版本，逻辑层垫抽象）</td>
+<td>无3D需求评估Godot；目标主机且团队有UE经验评估Unreal</td>
+</tr>
+<tr>
+<td>网络权威</td>
+<td>Host权威 + owner-based物理所有权转移</td>
+<td>有陌生人匹配/竞技元素才考虑专用服务器</td>
+</tr>
+<tr>
+<td>传输</td>
+<td>平台Relay（SDR/EOS）或Photon云</td>
+<td>实测弱网不达标之前，不碰KCP</td>
+</tr>
+<tr>
+<td>语音</td>
+<td>与网络栈绑定选型，空间衰减是刚需</td>
+<td>—</td>
+</tr>
+<tr>
+<td>角色管线</td>
+<td>Blender + 简化骨骼 + 程序化/物理动画</td>
+<td>—</td>
+</tr>
+<tr>
+<td>场景管线</td>
+<td>模块化套件 + 调色板图集 + 程序化拼装</td>
+<td>手工地图留给"招牌关卡"</td>
+</tr>
+<tr>
+<td>反作弊</td>
+<td>不做</td>
+<td>排行榜上线时加服务端校验</td>
+</tr>
+</tbody>
+</table>
+<p>最后留个备忘性质的反面清单，每一条都是真实团队踩过的坑：<strong>不要</strong>为3人合作游戏部署分布式MMO框架；<strong>不要</strong>预防性自研KCP传输层；<strong>不要</strong>在Photon免费层上赌游戏的命运；<strong>不要</strong>给物理沙盒做帧同步；<strong>不要</strong>让Discord替代游戏内语音；<strong>不要</strong>在没有做过10万CCU成本测算的情况下选择按CCU计费的方案。</p>
+<p>友尽游戏这个品类的迷人之处，在于它把"技术服务于欢乐"这句话变得极其具体：技术决策的每一条最终都能在玩家的笑声里被检验——联机失败的成本是朋友流失，同步灾难的代价是名场面变成事故，服务器账单的重量直接压在两个人的小团队身上。选型的目标从来不是技术的先进性，而是<strong>让四个人能顺利连进同一个房间，然后在语音频道里同时尖叫或狂笑</strong>。所有不能服务于这个目标的技术，都是多余的技术。</p>
+<script type="text/javascript">if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+    var align = "left",
+        indent = "0em",
+        linebreak = "false";
+
+    if (true) {
+        align = (screen.width < 768) ? "left" : align;
+        indent = (screen.width < 768) ? "0em" : indent;
+        linebreak = (screen.width < 768) ? 'true' : linebreak;
+    }
+
+    var mathjaxscript = document.createElement('script');
+    mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
+    mathjaxscript.type = 'text/javascript';
+    mathjaxscript.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.3/latest.js?config=TeX-AMS-MML_HTMLorMML';
+
+    var configscript = document.createElement('script');
+    configscript.type = 'text/x-mathjax-config';
+    configscript[(window.opera ? "innerHTML" : "text")] =
+        "MathJax.Hub.Config({" +
+        "    config: ['MMLorHTML.js']," +
+        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'none' } }," +
+        "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
+        "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
+        "    displayAlign: '"+ align +"'," +
+        "    displayIndent: '"+ indent +"'," +
+        "    showMathMenu: true," +
+        "    messageStyle: 'normal'," +
+        "    tex2jax: { " +
+        "        inlineMath: [ ['\\\\(','\\\\)'] ], " +
+        "        displayMath: [ ['$$','$$'] ]," +
+        "        processEscapes: true," +
+        "        preview: 'TeX'," +
+        "    }, " +
+        "    'HTML-CSS': { " +
+        "        availableFonts: ['STIX', 'TeX']," +
+        "        preferredFont: 'STIX'," +
+        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'inherit ! important'} }," +
+        "        linebreaks: { automatic: "+ linebreak +", width: '90% container' }," +
+        "    }, " +
+        "}); " +
+        "if ('default' !== 'default') {" +
+            "MathJax.Hub.Register.StartupHook('HTML-CSS Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax['HTML-CSS'].FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+            "MathJax.Hub.Register.StartupHook('SVG Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax.SVG.FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+        "}";
+
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(configscript);
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
+}
+</script>
+</div>
+		</div>
+	</body>
+</html>
