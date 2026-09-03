@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="zh_cn" prefix="og: http://ogp.me/ns#">
+	<head>
+		<link href="http://gmpg.org/xfn/11" rel="profile">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta http-equiv="content-type" content="text/html; charset=utf-8">
+
+		<!-- Metadata -->
+	<meta name="description" content="一个游戏程序员。曾经参与开发过<a href='https://www.bing.com/search?q=%E4%BB%99%E4%BE%A3%E5%A5%87%E7%BC%983'>仙侣奇缘3</a>、<a href='http://sh.70yx.com'>水浒传</a>、<a href='https://itunes.apple.com/cn/app/id938688461'>小米运动</a>、<a href='https://itunes.apple.com/cn/app/id1034182617'>米动</a>和<a href='https://www.taptap.com/app/143658'>无限激战</a>">
+	<meta property="og:description" content="一个游戏程序员。曾经参与开发过<a href='https://www.bing.com/search?q=%E4%BB%99%E4%BE%A3%E5%A5%87%E7%BC%983'>仙侣奇缘3</a>、<a href='http://sh.70yx.com'>水浒传</a>、<a href='https://itunes.apple.com/cn/app/id938688461'>小米运动</a>、<a href='https://itunes.apple.com/cn/app/id1034182617'>米动</a>和<a href='https://www.taptap.com/app/143658'>无限激战</a>">
+	<meta property="og:title" content="自制复古主机的图形方案：PPU的现代出路" />
+	<meta property="og:type" content="article" />
+	<meta property="og:url" content="https://funcman.me/ways_to_build_retro_graphics.html" />
+		<meta property="og:image" content="https://funcman.me/images/avatar.png" />
+
+		<!-- Enable responsiveness on mobile devices-->
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+
+		<title>funcman's blog</title>
+
+		<!-- CSS -->
+		<link href="//fonts.googleapis.com/" rel="dns-prefetch">
+		<link href="//fonts.googleapis.com/css?family=Droid+Serif:400,700,400italic|Abril+Fatface|PT+Sans:400,400italic,700&amp;subset=latin,latin-ext" rel="stylesheet">
+
+		<link rel="stylesheet" href="https://funcman.me/theme/css/poole.css" />
+		<link rel="stylesheet" href="https://funcman.me/theme/css/hyde.css" />
+		<link rel="stylesheet" href="https://funcman.me/theme/css/syntax.css" />
+			<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css" crossorigin="anonymous">
+
+		<!-- Feeds -->
+<link href="https://funcman.me/rss.xml" type="application/atom+xml" rel="alternate" title="funcman's blog Full Atom Feed" />
+
+		<!-- Analytics -->
+	</head>
+
+	<body class="theme-base-0e">
+<div class="sidebar">
+	<div class="container sidebar-sticky">
+		<div class="sidebar-about">
+
+			<h1>
+				<a href="/">
+					<img class="profile-picture" src="https://funcman.me/images/avatar.png">
+					funcman's blog
+				</a>
+			</h1>
+			<p class="lead"></p>
+			<p class="lead">一个游戏程序员。曾经参与开发过<a href='https://www.bing.com/search?q=%E4%BB%99%E4%BE%A3%E5%A5%87%E7%BC%983'>仙侣奇缘3</a>、<a href='http://sh.70yx.com'>水浒传</a>、<a href='https://itunes.apple.com/cn/app/id938688461'>小米运动</a>、<a href='https://itunes.apple.com/cn/app/id1034182617'>米动</a>和<a href='https://www.taptap.com/app/143658'>无限激战</a> </p>
+			<p></p>
+		</div>
+		<nav class="sidebar-social">
+					<a class="sidebar-social-item" href="mailto:hyq1986@gmail.com">
+						<i class="fa-solid fa-envelope"></i>
+					</a>
+					<a class="sidebar-social-item" href="https://twitter.com/funcman" target="_blank">
+						<i class="fa-brands fa-twitter"></i>
+					</a>
+					<a class="sidebar-social-item" href="https://github.com/funcman" target="_blank">
+						<i class="fa-brands fa-github"></i>
+					</a>
+					<a class="sidebar-social-item" href="https://funcman.itch.io" target="_blank">
+						<i class="fa-brands fa-itch-io"></i>
+					</a>
+			<a class="sidebar-social-item" href="https://funcman.me/rss.xml">
+				<i class="fa-solid fa-rss"></i>
+			</a>
+		</nav>
+	</div>
+</div>		<div class="content container">
+<div class="post">
+	<h1 class="post-title">自制复古主机的图形方案：PPU的现代出路</h1>
+	<span class="post-date">2026年09月03日 星期四</span>
+	<p><a href="https://funcman.me/about_some_oldschool_gpus.html" title="收集了一些前期的图像视频芯片的信息">上一篇</a>收集整理了早期家用电脑与游戏机中的图像视频芯片，当时的目的是为自制怀旧风格<a href="https://en.wikipedia.org/wiki/Home_computer" title="这里的“家用电脑”，英文是“Home Computer”。特指七十年代末期出现，八十年代大行其道的个人计算机。">家用电脑</a>做准备。这几年继续收集了一些资料，关注点从"历史上有什么芯片"转向了"今天实际动手做，图形部分有哪些可行路线"。本篇是续篇，记录这些方案。</p>
+<h2>一、先想清楚：PPU到底在做什么</h2>
+<p>以<a href="https://en.wikipedia.org/wiki/Nintendo_Entertainment_System" title="任天堂红白机">红白机</a>的PPU（2C02）为例，它的核心工作可以拆成几块：</p>
+<table>
+<thead>
+<tr>
+<th>模块</th>
+<th>职责</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>时序生成器</td>
+<td>341点×262扫描线（NTSC），21.477MHz时钟，产生HBlank/VBlank</td>
+</tr>
+<tr>
+<td>背景渲染器</td>
+<td>每8周期取一次名称表→属性表→图案表，移位寄存器串行出像素</td>
+</tr>
+<tr>
+<td>精灵渲染器</td>
+<td>每扫描线预扫描64个OAM条目，最多取8个，各自维护位移寄存器</td>
+</tr>
+<tr>
+<td>像素合成器</td>
+<td>背景/精灵优先级仲裁，查32字节调色板RAM</td>
+</tr>
+<tr>
+<td>CPU接口</td>
+<td>8个寄存器（<span class="math">\(2000-\)</span>2007），双字节锁存，OAM DMA</td>
+</tr>
+</tbody>
+</table>
+<p>理解了这个职责划分，后面的每条路线都可以看成是"用什么手段重新实现这几块"。</p>
+<p><img alt="一台兼容机（Famiclone）的主板：中间两颗联华电子（UMC）的芯片就是仿制的CPU（UA6527P）和PPU（UA6538）" src="./images/umc-famiclone-chipset.jpg"></p>
+<p>当年PPU的功能简单到可以被整体仿制：联华电子（UMC）的UA6527P（仿2A03 CPU）和UA6538（仿2C02 PPU）就是当年海量红白兼容机的标准芯片组，上图是一块兼容机主板，两颗UMC芯片居中、两颗现代（Hyundai）RAM在侧。后来这些仿制芯片进一步缩成单颗牛屎封装的NES-on-a-Chip。这也从侧面说明，用今天的FPGA复刻PPU是完全现实的。（图：Wikimedia Commons，Socram8888摄，CC BY 3.0）</p>
+<h2>二、路线一：FPGA复刻PPU</h2>
+<p>这是目前最主流的路线。<a href="https://github.com/MiSTer-devel/Main_MiSTer" title="MiSTer FPGA复古计算项目">MiSTer</a>项目上的NES、SNES、Genesis核心，本质上都是用Verilog/VHDL把当年的芯片重写一遍。</p>
+<p>用FPGA实现NES PPU的要点：</p>
+<ul>
+<li>时钟用21.477272MHz（NTSC色副载波的6倍）</li>
+<li>背景渲染是经典的四级流水：名称表字节→属性字节→图案低位→图案高位，每8周期一个Tile</li>
+<li>滚动用Loopy寄存器（15位VRAM地址）实现，精细X滚动单独3位</li>
+<li>精灵分两阶段：扫描线间隙做OAM评估（64选8），可见区逐精灵移位输出</li>
+<li>调色板查表后直接转RGB输出VGA/HDMI，不必模拟NTSC复合视频</li>
+</ul>
+<p>常见的坑：精灵0命中的周期级时机、调色板镜像（<span class="math">\(3F10镜像到\)</span>3F00）、非VBlank期间读$2007返回缓冲值。NES游戏对PPU的周期级行为非常敏感，粗糙的实现能亮屏但跑不对游戏。</p>
+<p>FPGA路线的天花板远不止复刻老芯片，后面第九节会专门讲一个把FPGA GPU做到现代水平的项目。</p>
+<h2>三、路线二：离散逻辑+Blitter——GameTank的答案</h2>
+<p><a href="https://gametank.zone/" title="GameTank：用74系列逻辑芯片搭建的开源8位游戏机">GameTank</a>提供了一个完全不同的思路：<strong>不做PPU，做帧缓冲加Blitter</strong>。</p>
+<p><img alt="GameTank主机插着卡带，接手柄，通过RCA接CRT电视显示开机画面" src="./images/gametank-with-crt.jpg"></p>
+<table>
+<thead>
+<tr>
+<th>项目</th>
+<th>配置</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>CPU</td>
+<td>W65C02S @ 3.5MHz</td>
+</tr>
+<tr>
+<td>帧缓冲</td>
+<td>128×128，每像素1字节，双缓冲，共用一片32KB双口SRAM</td>
+</tr>
+<tr>
+<td>图形加速</td>
+<td>Blitter硬件拷贝引擎，3.5MB/s，支持透明色与翻转</td>
+</tr>
+<tr>
+<td>图形源</td>
+<td>512KB RAM存放Sprite/Tile数据</td>
+</tr>
+<tr>
+<td>输出</td>
+<td>NTSC复合视频，硬编码200色调色板</td>
+</tr>
+<tr>
+<td>音频</td>
+<td>第二颗W65C02S @ 14MHz + 4KB RAM + DAC</td>
+</tr>
+<tr>
+<td>逻辑实现</td>
+<td>全部74系列通孔芯片，无FPGA、无MCU</td>
+</tr>
+</tbody>
+</table>
+<p>它的设计哲学是：分辨率足够小时（128×128只有16KB），每帧完全重绘背景的成本很低，一颗高速Blitter就能替代传统PPU的背景Tile解码器和精灵评估器。硬件大幅简化，代价是CPU要主动组织重绘，不像NES那样配置好寄存器就不管了。</p>
+<p>这个架构更接近Atari Lynx而非NES。好处是所有芯片都能在Digi-Key、Mouser买到全新的通孔件，整机可以纯手工焊出来。</p>
+<h2>四、路线三：现代"现成PPU"——Bridgetek EVE</h2>
+<p>如果想要"芯片在售、功能类似PPU但强得多"的方案，目前唯一对口的商品芯片是Bridgetek（FTDI）的EVE系列（Embedded Video Engine）。</p>
+<table>
+<thead>
+<tr>
+<th>型号</th>
+<th>代际</th>
+<th>分辨率</th>
+<th>备注</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>FT810-FT813</td>
+<td>EVE2</td>
+<td>800×600</td>
+<td>立创/贸泽有售</td>
+</tr>
+<tr>
+<td>BT815/BT816</td>
+<td>EVE3</td>
+<td>800×600</td>
+<td>增加ASTC纹理压缩、外部NOR Flash</td>
+</tr>
+<tr>
+<td>BT817/BT818</td>
+<td>EVE4</td>
+<td>1280×800</td>
+<td>有AEC-Q100车规级</td>
+</tr>
+</tbody>
+</table>
+<p>EVE是<strong>显示列表（Display List）架构</strong>：MCU通过SPI发送高级命令（"在X,Y绘制句柄3的位图"），芯片内部自动完成渲染、合成、时序生成和输出，主控完全不碰像素。理念上和"CPU写OAM、PPU自动渲染"高度相似，只是规模大了数十倍，还附带音频PWM输出和触摸屏控制。要注意的几点实际约束：显示列表有2048项的上限（FT81x），裸片是QFP封装不好手工焊，一般人买的是带屏模块（Riverdi、New Haven等，$30-80），且EVE是3.3V器件，接5V的6502系统需要电平转换。</p>
+<p>这个"弱主控+SPI+专用图形引擎"的模式并非纸面设想，它有量产级的先例：James Bowman的<a href="https://excamera.com/sphinx/gameduino2/" title="Gameduino 2：FT800图形扩展板，James Bowman">Gameduino 2/3</a>就是FT800/FT810配Arduino（ATmega328 @ 16MHz），Kickstarter量产了三代，主控算力和W65C02S是同一量级。Bowman还写了本<a href="http://excamera.com/files/gd2book_v0.pdf" title="The Gameduino 2: Tutorial, Reference and Cookbook，作者官网免费PDF">《The Gameduino 2: Tutorial, Reference and Cookbook》</a>，系统讲解EVE的显示列表编程，作者官网有免费PDF。</p>
+<p><img alt="Gameduino 2：FT800显示扩展板叠在Arduino上，运行示例程序" src="./images/gameduino2-shield.jpg"></p>
+<p><img alt="《The Gameduino 2: Tutorial, Reference and Cookbook》封面，四块Gameduino屏幕拼出书名" src="./images/gameduino2-book-cover.jpg"></p>
+<p>公平地说，6502和EVE这两个圈子目前没什么交集：EVE的生态几乎全在Arduino/ESP32/STM32这些现代MCU上，我没找到6502+EVE的公开完成项目。但6502这边用65C22 VIA软件模拟SPI（接SD卡）是自制机社区的标准操作，两个半边各自都成熟，拼起来没有原理性障碍。</p>
+<p>用它配W65C02S做游戏机的唯一门槛是6502没有SPI控制器，三种解法：</p>
+<ol>
+<li>65C22 VIA软件模拟SPI：约50-200Kbps，原型可用，一帧几百字节的显示列表勉强够30fps</li>
+<li>一颗廉价CPLD做SPI桥映射到6502的I/O空间：1-4Mbps，CPU几乎零负担，<strong>推荐</strong></li>
+<li>W65C816S或FPGA总线桥做QSPI：过度设计</li>
+</ol>
+<p>一个典型复古游戏场景（背景层+20个精灵+UI文字）每帧显示列表约500字节，SPI到1Mbps以上就毫无压力。这条路线的开发难度远低于FPGA和离散逻辑——虽然6502+EVE还没什么人踩过，但有Gameduino三代量产产品垫底的架构模式，我认为是新人最值得尝试的组合。</p>
+<h2>五、路线四：拆机VDP</h2>
+<p>坚持要用"真·VDP"的话，只能淘拆机件。综合性能、文档和可获得性，排序如下：</p>
+<table>
+<thead>
+<tr>
+<th>芯片</th>
+<th>用于</th>
+<th>评价</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Yamaha V9958</td>
+<td><a href="https://en.wikipedia.org/wiki/MSX" title="MSX电脑">MSX</a>2+/Turbo R</td>
+<td><strong>首选</strong>。8位时代最强量产VDP之一，512×424、硬件滚动、19268色YJK模式、无每线精灵闪烁限制；有官方数据手册</td>
+</tr>
+<tr>
+<td>Yamaha V9938</td>
+<td>MSX2</td>
+<td>V9958的前代，拆机件更多更便宜，无YJK和水平滚动</td>
+</tr>
+<tr>
+<td>TI TMS9918A</td>
+<td>TI-99/4A、ColecoVision、MSX1</td>
+<td>VDP鼻祖，但几乎所有指标弱于NES PPU（16色、每线4精灵），只适合教学</td>
+</tr>
+<tr>
+<td>Sega 315-5313</td>
+<td><a href="https://en.wikipedia.org/wiki/Sega_Genesis" title="世嘉MD">MD</a></td>
+<td>性能强，但无官方文档、QFP难拆焊、期待68000级总线时序，DIY风险高</td>
+</tr>
+</tbody>
+</table>
+<p><img alt="Yamaha V9938芯片（©1984，ASCII/MSX丝印）" src="./images/yamaha-v9938.png"></p>
+<p><img alt="Yamaha V9958芯片（©1988）" src="./images/yamaha-v9958.png"></p>
+<p>V9958/V9938是标准并行总线外设，6502可以直接读写寄存器，不需要SPI桥。注意它们不集成显存，需外接44256/41464等DRAM。买的时候建议买仍焊在子板上的拆机件，比裸片好处理。这条路的可行性也有实物先例：有人给C64做过完整的<a href="https://github.com/vossi1/c64-v9958-card" title="c64-v9958-card：给C64做的Yamaha V9958开源显卡">V9958显卡</a>（开源硬件，插扩展槽直接用），RC2014社区也有现成的V99x8视频模块套件。</p>
+<h2>六、为什么街机芯片不要碰</h2>
+<p>街机走的是另一条路：<strong>没有通用VDP，全是定制ASIC</strong>。</p>
+<ul>
+<li>Capcom CPS1的Ricoh CPS-A-01：无文档，故障率高，社区至今还在用FPGA逆向重建</li>
+<li>Sega System 16的YM7101：本质上是MD VDP的街机增强版，但拆机件几乎绝迹</li>
+<li>SNK Neo Geo的LSPC2-A2+PRO-B0芯片组：最激进的设计——<strong>没有硬件背景层，一切画面（包括背景）全部由垂直精灵条带拼成</strong>，配4个行缓冲实现无闪烁高密度输出，380个精灵、4096色同屏。理念惊人，但整套芯片组依赖专属的VRAM/ROM体系，无法拆出来单用</li>
+</ul>
+<p>定制ASIC没有数据手册、时序复杂、引脚多，死了还没处买替换件，个人DIY不要碰。</p>
+<h2>七、岔路：把2D精灵掰成四边形——世嘉土星的3D</h2>
+<p>提到"用2D硬件凑3D"，<a href="https://en.wikipedia.org/wiki/Sega_Saturn" title="世嘉土星">土星</a>是最值得单说的案例。它的VDP1<strong>根本不画三角形</strong>：它画的是"变形精灵"（Distorted Sprite）——把一张纹理贴图的2D精灵扭曲成任意四点围成的四边形。土星游戏里所有的"多边形"都是这种四边形精灵。几何部分（变换、光照、排序）全部靠双SH-2软件完成，VDP1只负责填充。</p>
+<p><img alt="《VR战士Remix》角色的线框模型，可以清楚看到模型完全由四边形拼成" src="./images/saturn-vf-quads.png"></p>
+<p><img alt="同一场景的最终渲染效果：四边形贴上纹理后就是正常的3D画面" src="./images/saturn-vf-final.png"></p>
+<p>上面两张图是同一个例子（《VR战士Remix》，1995）：去掉纹理后，角色模型完全由四边形拼成；VDP1把纹理分别扭曲贴进每个四边形，再加上VDP2绘制的2D背景层，就成了下面的最终画面。（截图来自<a href="https://www.copetti.org/writings/consoles/sega-saturn/" title="Sega Saturn Architecture - A Practical Analysis，Rodrigo Copetti">copetti.org的土星架构分析</a>）</p>
+<p>这个架构带来一串连锁反应：</p>
+<ul>
+<li><strong>没有Z缓冲</strong>，遮挡关系靠CPU排序（画家算法），复杂场景容易出错</li>
+<li><strong>四边形不共面会扭曲</strong>，所以建模师得刻意把模型拆得规整</li>
+<li><strong>没有硬件裁剪</strong>，顶点跑出屏幕外精灵会被错误拉伸，需要软件预裁剪</li>
+<li><strong>半透明做不好</strong>，大量游戏用棋盘格网纹（Mesh）假装半透明</li>
+</ul>
+<p>有讽刺意味的是：世嘉自家街机（Model 1/2）用的是真多边形硬件，到了家用机反而退回精灵变形路线——这也是土星3D表现力输给PS1的结构性原因之一。</p>
+<p>走类似"2D硬件凑3D"路线的还有这些：</p>
+<table>
+<thead>
+<tr>
+<th>平台</th>
+<th>手法</th>
+<th>备注</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3DO</td>
+<td>CEL引擎画四边形Cel，同样无三角形、无Z缓冲</td>
+<td>与土星思路最接近</td>
+</tr>
+<tr>
+<td>Sega 32X</td>
+<td>帧缓冲+双SH-2软件渲染</td>
+<td>硬件只管出图，3D全靠CPU</td>
+</tr>
+<tr>
+<td>Super Scaler街机</td>
+<td>硬件缩放/旋转大量精灵模拟纵深</td>
+<td>《太空哈利》《Out Run》，伪3D先声</td>
+</tr>
+<tr>
+<td>SNES Mode 7</td>
+<td>单层背景仿射变换（旋转缩放透视）</td>
+<td>《F-Zero》《马力欧赛车》的地面</td>
+</tr>
+<tr>
+<td>GBA仿射层</td>
+<td>Mode 7的正统传人，且每扫描线可改矩阵</td>
+<td>见后文第十节</td>
+</tr>
+<tr>
+<td>Neo Geo</td>
+<td>全精灵拼背景</td>
+<td>见上一节，虽不做3D但理念同源</td>
+</tr>
+</tbody>
+</table>
+<p>它们的共同点是：<strong>硬件只提供2D原语（精灵、背景层），第三维靠软件或玩家脑补</strong>。这条岔路在PS1的"GTE算几何+GPU画三角形"组合出现后就被终结了——真多边形光栅器一旦廉价到能进家用机，变形精灵就失去了存在的理由。</p>
+<h2>八、CPU搭配：6502、68000与SuperH</h2>
+<p>图形方案定了，主控CPU的选择也有几条有趣的线索。</p>
+<p><strong>6502与68000是师出同门的两个极端。</strong> 6502之父Chuck Peddle正是Motorola 6800项目的核心成员，因主张低价路线未果而出走MOS，用更少的晶体管做出了便宜一个数量级的6502。68000则是Motorola对高端市场的回应：16个32位寄存器、正交指令集，被戏称为"最像RISC的CISC"——但它确实是CISC（变长指令、微码、内存-内存操作一应俱全）。两者很少竞争，反而常在同一台机器里搭档：Commodore 64用6510，Amiga用68000配6502系列做键盘控制。</p>
+<p><strong>SuperH是纯日本血统。</strong> 日立1992年自研的32位RISC，最大特色是16位定长指令换来的高代码密度。SH-2（<a href="https://en.wikipedia.org/wiki/Sega_Saturn" title="世嘉土星">土星</a>双核28.6MHz）、SH-4（<a href="https://en.wikipedia.org/wiki/Dreamcast" title="世嘉Dreamcast">Dreamcast</a> 200MHz，128位FPU 1.4GFLOPS）两度登上游戏机巅峰；SH-5的64位尝试失败后，由瑞萨收编为汽车MCU主力，近年又以开源软核J-Core的形式获得新生。Dreamcast的SH-4浮点足够强，所以SEGA让CPU软做T&amp;L、PowerVR2只管Tile光栅化——这再次印证了那个规律：<strong>几何处理（T&amp;L）可以交给CPU，但像素填充必须有专门硬件</strong>。土星和DC如此，Voodoo如此，GBA的仿射层也如此。</p>
+<p><strong>68k今天还活着，但已是遗产状态。</strong> 桌面线68020→68060在90年代中输给PowerPC；嵌入式线却活了下来：Palm Pilot的DragonBall、至今仍在NXP供货的ColdFire（新客户已基本不推荐）。更活跃的是FPGA软核（TG68、FX68K，MiSTer的Amiga/Genesis核心底层就是它们）和Apollo Team的68080——Amiga的Vampire加速器卡上那颗超标量、带AMMX SIMD扩展的"现代68k"，算是"如果Motorola没放弃"的平行世界答案。</p>
+<h2>九、现代FPGA GPU的标杆：FuryGpu</h2>
+<p>FPGA路线的天花板案例是<a href="https://furygpu.com/" title="FuryGpu：个人开发的FPGA PCIe独立显卡">FuryGpu</a>：一个人用近4年时间，在Xilinx Zynq UltraScale+（Kria SoM）上从零做了一块PCIe独立显卡，能跑Quake。</p>
+<p><img alt="FuryGpu实体显卡，中央是带风扇的Kria SoM，金手指为PCIe接口，挡板上有HDMI与DP输出口" src="./images/furygpu-card.jpg"></p>
+<table>
+<thead>
+<tr>
+<th>项目</th>
+<th>规格</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>架构</td>
+<td>固定功能Tile-Based光栅器，无可编程着色器</td>
+</tr>
+<tr>
+<td>时钟</td>
+<td>480MHz</td>
+</tr>
+<tr>
+<td>光栅器</td>
+<td>4个并行Rasterizer，2×2 Quad</td>
+</tr>
+<tr>
+<td>纹理</td>
+<td>每Rasterizer一个纹理单元，双线性、Mipmap；4路组相联512KB纹理缓存</td>
+</tr>
+<tr>
+<td>主机接口</td>
+<td>PCIe + 自写Windows WDDM内核驱动</td>
+</tr>
+<tr>
+<td>API</td>
+<td>私有FuryGL，显式命令缓冲/队列提交，类Vulkan外壳+固定功能内核</td>
+</tr>
+</tbody>
+</table>
+<p>几点值得记录的判断：</p>
+<p><img alt="Diamond Monster 3D，即3dfx Voodoo Graphics（Voodoo 1）加速卡，左上方是标志性的VGA直通线" src="./images/voodoo1-diamond-monster3d.jpg"></p>
+<ul>
+<li><strong>它是"超级Voodoo 1"的精神续作。</strong> 都是固定功能、无Shader、CPU软T&amp;L+GPU硬光栅的分工；FuryGpu用fp32前端、Tile-Based架构和现代缓存设计弥补了FPGA效率劣势，Quake帧率与Voodoo 1在同一数量级。</li>
+<li><strong>它有WDDM驱动却显示不了Windows桌面。</strong> DWM桌面合成依赖Direct3D可编程管线，固定功能GPU满足不了；WDDM驱动只是给硬件一个"合法身份"。有趣的是在Linux下反而容易：写一个最小DRM/KMS驱动暴露dumb buffer，GNOME会自动回退llvmpipe软渲染桌面，FuryGpu只当扫描输出用。</li>
+<li><strong>加硬件T&amp;L很难且没必要。</strong> 硬件T&amp;L直到1999年GeForce 256才出现（顺带一提，3dfx全系和Glide都从未有过硬件T&amp;L；OpenGL规范也从不强制硬件T&amp;L，软硬实现对应用透明）。FuryGpu的DSP资源已吃紧，目标游戏又是CPU软T&amp;L时代的作品，加了纯属浪费。</li>
+<li><strong>真要用现代工艺造芯片也不是不行。</strong> Voodoo 1是500nm/约100万晶体管，用SkyWater 130nm开源PDK走MPW，面积不到2mm²，赞助渠道下现金成本可低至几百美元——真正的门槛是RTL设计与验证，不是流片费。我个人出于好奇也询过国内MPW的价：IC教学渠道附带的MPW服务报价在十几、二十万人民币的样子，其他一些濒临淘汰制程的流片报价在8-10万，比SkyWater的赞助渠道贵不少，但和先进制程动辄百万级的掩膜费相比仍是小数目。这也是FuryGpu将来开源后最有趣的社区方向之一。</li>
+</ul>
+<p><img alt="FuryGpu实机运行Quake的画面，左下角显示帧耗时16.54ms（约60fps），右上角是硬件内部的调试计数器" src="./images/furygpu-quake.jpg"></p>
+<h2>十、另一条参照系：集成化</h2>
+<p>掌机给了"没有独立VDP但功能更强"的范例。<a href="https://en.wikipedia.org/wiki/Game_Boy_Advance" title="Game Boy Advance">GBA</a>把LCD控制器直接做进SoC，与ARM7共享内存总线：六种显示模式（Mode 0-2是Tile模式，最多4层背景且两层带仿射变换；Mode 3-5是帧缓冲位图模式）、128个硬件精灵、Alpha混合/亮度增减/窗口裁剪特效，再加上HBlank DMA逐扫描线改寄存器，能做出Mode 7式的伪3D。像素合成仍是纯硬件电路，DMA只负责搬运和更新寄存器。</p>
+<p>PC那边则是"2D加速没有止步，而是被吞并"：DirectDraw时代的硬件Blitter（BitBLT、颜色键控、页翻转）在2000年后被统一着色器架构吸收——今天的2D界面全是"两个三角形贴纹理"交给3D管线零开销完成，再叠上DWM桌面合成、独立的视频编解码引擎和异步Copy Engine。当年独立的2D硬件能力并没有消失，只是藏进了看不见的地方。</p>
+<h2>十一、总结：怎么选</h2>
+<table>
+<thead>
+<tr>
+<th>路线</th>
+<th>硬件复杂度</th>
+<th>开发难度</th>
+<th>情怀分</th>
+<th>适合谁</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>FPGA复刻PPU</td>
+<td>中</td>
+<td>高（周期级时序）</td>
+<td>★★★★★</td>
+<td>想精确复现某台老机器</td>
+</tr>
+<tr>
+<td>离散逻辑+Blitter（GameTank式）</td>
+<td>高（几十颗74芯片）</td>
+<td>中</td>
+<td>★★★★★</td>
+<td>想纯手工焊一台出来</td>
+</tr>
+<tr>
+<td>W65C02S + Bridgetek EVE</td>
+<td>低</td>
+<td>低</td>
+<td>★★★</td>
+<td>想快速做出能玩的机器</td>
+</tr>
+<tr>
+<td>6502 + 拆机V9958</td>
+<td>中</td>
+<td>中高（DRAM时序）</td>
+<td>★★★★</td>
+<td>想要真VDP的味道</td>
+</tr>
+<tr>
+<td>FPGA自研GPU（FuryGpu式）</td>
+<td>低（一块Kria）</td>
+<td>极高（年计）</td>
+<td>★★★★★</td>
+<td>想挑战个人项目天花板</td>
+</tr>
+</tbody>
+</table>
+<script type="text/javascript">if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+    var align = "left",
+        indent = "0em",
+        linebreak = "false";
+
+    if (true) {
+        align = (screen.width < 768) ? "left" : align;
+        indent = (screen.width < 768) ? "0em" : indent;
+        linebreak = (screen.width < 768) ? 'true' : linebreak;
+    }
+
+    var mathjaxscript = document.createElement('script');
+    mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
+    mathjaxscript.type = 'text/javascript';
+    mathjaxscript.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.3/latest.js?config=TeX-AMS-MML_HTMLorMML';
+
+    var configscript = document.createElement('script');
+    configscript.type = 'text/x-mathjax-config';
+    configscript[(window.opera ? "innerHTML" : "text")] =
+        "MathJax.Hub.Config({" +
+        "    config: ['MMLorHTML.js']," +
+        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'none' } }," +
+        "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
+        "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
+        "    displayAlign: '"+ align +"'," +
+        "    displayIndent: '"+ indent +"'," +
+        "    showMathMenu: true," +
+        "    messageStyle: 'normal'," +
+        "    tex2jax: { " +
+        "        inlineMath: [ ['\\\\(','\\\\)'] ], " +
+        "        displayMath: [ ['$$','$$'] ]," +
+        "        processEscapes: true," +
+        "        preview: 'TeX'," +
+        "    }, " +
+        "    'HTML-CSS': { " +
+        "        availableFonts: ['STIX', 'TeX']," +
+        "        preferredFont: 'STIX'," +
+        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'inherit ! important'} }," +
+        "        linebreaks: { automatic: "+ linebreak +", width: '90% container' }," +
+        "    }, " +
+        "}); " +
+        "if ('default' !== 'default') {" +
+            "MathJax.Hub.Register.StartupHook('HTML-CSS Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax['HTML-CSS'].FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+            "MathJax.Hub.Register.StartupHook('SVG Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax.SVG.FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+        "}";
+
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(configscript);
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
+}
+</script>
+</div>
+		</div>
+	</body>
+</html>

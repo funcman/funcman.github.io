@@ -1,5 +1,404 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>funcman's blog</title><link href="https://funcman.me/" rel="alternate"/><link href="https://funcman.me/rss.xml" rel="self"/><id>https://funcman.me/</id><updated>2026-09-02T17:30:00+08:00</updated><entry><title>聊聊感知机</title><link href="https://funcman.me/about_perceptron.html" rel="alternate"/><published>2026-09-02T17:30:00+08:00</published><updated>2026-09-02T17:30:00+08:00</updated><author><name>funcman</name></author><id>tag:funcman.me,2026-09-02:/about_perceptron.html</id><summary type="html">&lt;p&gt;感知机的结构和学习规则、偏置的数学意义、超平面在不同维度下的形态、"找一个超平面"和"找最优超平面"的区别、高维空间为什么只能切片观察，最后用一个 30 行的 C++ 实现在真实数据上验证它的能力和局限。&lt;/p&gt;</summary><content type="html">&lt;p&gt;最近在入门机器学习，从感知机学起。本来以为这个 1958 年的老模型结构那么简单，半小时就能翻篇，结果真看进去，卡住我的地方一个接一个：偏置到底为什么必须存在、超平面在二维以外长什么样、"训练就是找分割线"这个说法对不对、高维空间的数据凭什么能画在二维图上。最后干脆用 C++ 把它实现了一遍，还拿到真实数据上跑了跑。&lt;/p&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>funcman's blog</title><link href="https://funcman.me/" rel="alternate"/><link href="https://funcman.me/rss.xml" rel="self"/><id>https://funcman.me/</id><updated>2026-09-03T10:58:00+08:00</updated><entry><title>自制复古主机的图形方案：PPU的现代出路</title><link href="https://funcman.me/ways_to_build_retro_graphics.html" rel="alternate"/><published>2026-09-03T10:58:00+08:00</published><updated>2026-09-03T10:58:00+08:00</updated><author><name>funcman</name></author><id>tag:funcman.me,2026-09-03:/ways_to_build_retro_graphics.html</id><summary type="html">&lt;p&gt;《收集了一些前期的图像视频芯片的信息》的续篇。探讨今天要自制一台怀旧风格家用电脑或游戏机，图形子系统的几条可行路线：FPGA复刻PPU、离散逻辑Blitter（GameTank）、现代显示引擎芯片（Bridgetek EVE）、拆机VDP（V9958），以及街机定制ASIC为何不可行；附带CPU搭配（6502与68000的血缘、SuperH沿革）与现代FPGA GPU项目FuryGpu的观察。&lt;/p&gt;</summary><content type="html">&lt;p&gt;&lt;a href="https://funcman.me/about_some_oldschool_gpus.html" title="收集了一些前期的图像视频芯片的信息"&gt;上一篇&lt;/a&gt;收集整理了早期家用电脑与游戏机中的图像视频芯片，当时的目的是为自制怀旧风格&lt;a href="https://en.wikipedia.org/wiki/Home_computer" title="这里的“家用电脑”，英文是“Home Computer”。特指七十年代末期出现，八十年代大行其道的个人计算机。"&gt;家用电脑&lt;/a&gt;做准备。这几年继续收集了一些资料，关注点从"历史上有什么芯片"转向了"今天实际动手做，图形部分有哪些可行路线"。本篇是续篇，记录这些方案。&lt;/p&gt;
+&lt;h2&gt;一、先想清楚：PPU到底在做什么&lt;/h2&gt;
+&lt;p&gt;以&lt;a href="https://en.wikipedia.org/wiki/Nintendo_Entertainment_System" title="任天堂红白机"&gt;红白机&lt;/a&gt;的PPU（2C02）为例，它的核心工作可以拆成几块：&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;模块&lt;/th&gt;
+&lt;th&gt;职责&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;时序生成器&lt;/td&gt;
+&lt;td&gt;341点×262扫描线（NTSC），21.477MHz时钟，产生HBlank/VBlank&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;背景渲染器&lt;/td&gt;
+&lt;td&gt;每8周期取一次名称表→属性表→图案表，移位寄存器串行出像素&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;精灵渲染器&lt;/td&gt;
+&lt;td&gt;每扫描线预扫描64个OAM条目，最多取8个，各自维护位移寄存器&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;像素合成器&lt;/td&gt;
+&lt;td&gt;背景/精灵优先级仲裁，查32字节调色板RAM&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;CPU接口&lt;/td&gt;
+&lt;td&gt;8个寄存器（&lt;span class="math"&gt;\(2000-\)&lt;/span&gt;2007），双字节锁存，OAM DMA&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;理解了这个职责划分，后面的每条路线都可以看成是"用什么手段重新实现这几块"。&lt;/p&gt;
+&lt;p&gt;&lt;img alt="一台兼容机（Famiclone）的主板：中间两颗联华电子（UMC）的芯片就是仿制的CPU（UA6527P）和PPU（UA6538）" src="./images/umc-famiclone-chipset.jpg"&gt;&lt;/p&gt;
+&lt;p&gt;当年PPU的功能简单到可以被整体仿制：联华电子（UMC）的UA6527P（仿2A03 CPU）和UA6538（仿2C02 PPU）就是当年海量红白兼容机的标准芯片组，上图是一块兼容机主板，两颗UMC芯片居中、两颗现代（Hyundai）RAM在侧。后来这些仿制芯片进一步缩成单颗牛屎封装的NES-on-a-Chip。这也从侧面说明，用今天的FPGA复刻PPU是完全现实的。（图：Wikimedia Commons，Socram8888摄，CC BY 3.0）&lt;/p&gt;
+&lt;h2&gt;二、路线一：FPGA复刻PPU&lt;/h2&gt;
+&lt;p&gt;这是目前最主流的路线。&lt;a href="https://github.com/MiSTer-devel/Main_MiSTer" title="MiSTer FPGA复古计算项目"&gt;MiSTer&lt;/a&gt;项目上的NES、SNES、Genesis核心，本质上都是用Verilog/VHDL把当年的芯片重写一遍。&lt;/p&gt;
+&lt;p&gt;用FPGA实现NES PPU的要点：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;时钟用21.477272MHz（NTSC色副载波的6倍）&lt;/li&gt;
+&lt;li&gt;背景渲染是经典的四级流水：名称表字节→属性字节→图案低位→图案高位，每8周期一个Tile&lt;/li&gt;
+&lt;li&gt;滚动用Loopy寄存器（15位VRAM地址）实现，精细X滚动单独3位&lt;/li&gt;
+&lt;li&gt;精灵分两阶段：扫描线间隙做OAM评估（64选8），可见区逐精灵移位输出&lt;/li&gt;
+&lt;li&gt;调色板查表后直接转RGB输出VGA/HDMI，不必模拟NTSC复合视频&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;常见的坑：精灵0命中的周期级时机、调色板镜像（&lt;span class="math"&gt;\(3F10镜像到\)&lt;/span&gt;3F00）、非VBlank期间读$2007返回缓冲值。NES游戏对PPU的周期级行为非常敏感，粗糙的实现能亮屏但跑不对游戏。&lt;/p&gt;
+&lt;p&gt;FPGA路线的天花板远不止复刻老芯片，后面第九节会专门讲一个把FPGA GPU做到现代水平的项目。&lt;/p&gt;
+&lt;h2&gt;三、路线二：离散逻辑+Blitter——GameTank的答案&lt;/h2&gt;
+&lt;p&gt;&lt;a href="https://gametank.zone/" title="GameTank：用74系列逻辑芯片搭建的开源8位游戏机"&gt;GameTank&lt;/a&gt;提供了一个完全不同的思路：&lt;strong&gt;不做PPU，做帧缓冲加Blitter&lt;/strong&gt;。&lt;/p&gt;
+&lt;p&gt;&lt;img alt="GameTank主机插着卡带，接手柄，通过RCA接CRT电视显示开机画面" src="./images/gametank-with-crt.jpg"&gt;&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;项目&lt;/th&gt;
+&lt;th&gt;配置&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;CPU&lt;/td&gt;
+&lt;td&gt;W65C02S @ 3.5MHz&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;帧缓冲&lt;/td&gt;
+&lt;td&gt;128×128，每像素1字节，双缓冲，共用一片32KB双口SRAM&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;图形加速&lt;/td&gt;
+&lt;td&gt;Blitter硬件拷贝引擎，3.5MB/s，支持透明色与翻转&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;图形源&lt;/td&gt;
+&lt;td&gt;512KB RAM存放Sprite/Tile数据&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;输出&lt;/td&gt;
+&lt;td&gt;NTSC复合视频，硬编码200色调色板&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;音频&lt;/td&gt;
+&lt;td&gt;第二颗W65C02S @ 14MHz + 4KB RAM + DAC&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;逻辑实现&lt;/td&gt;
+&lt;td&gt;全部74系列通孔芯片，无FPGA、无MCU&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;它的设计哲学是：分辨率足够小时（128×128只有16KB），每帧完全重绘背景的成本很低，一颗高速Blitter就能替代传统PPU的背景Tile解码器和精灵评估器。硬件大幅简化，代价是CPU要主动组织重绘，不像NES那样配置好寄存器就不管了。&lt;/p&gt;
+&lt;p&gt;这个架构更接近Atari Lynx而非NES。好处是所有芯片都能在Digi-Key、Mouser买到全新的通孔件，整机可以纯手工焊出来。&lt;/p&gt;
+&lt;h2&gt;四、路线三：现代"现成PPU"——Bridgetek EVE&lt;/h2&gt;
+&lt;p&gt;如果想要"芯片在售、功能类似PPU但强得多"的方案，目前唯一对口的商品芯片是Bridgetek（FTDI）的EVE系列（Embedded Video Engine）。&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;型号&lt;/th&gt;
+&lt;th&gt;代际&lt;/th&gt;
+&lt;th&gt;分辨率&lt;/th&gt;
+&lt;th&gt;备注&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;FT810-FT813&lt;/td&gt;
+&lt;td&gt;EVE2&lt;/td&gt;
+&lt;td&gt;800×600&lt;/td&gt;
+&lt;td&gt;立创/贸泽有售&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;BT815/BT816&lt;/td&gt;
+&lt;td&gt;EVE3&lt;/td&gt;
+&lt;td&gt;800×600&lt;/td&gt;
+&lt;td&gt;增加ASTC纹理压缩、外部NOR Flash&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;BT817/BT818&lt;/td&gt;
+&lt;td&gt;EVE4&lt;/td&gt;
+&lt;td&gt;1280×800&lt;/td&gt;
+&lt;td&gt;有AEC-Q100车规级&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;EVE是&lt;strong&gt;显示列表（Display List）架构&lt;/strong&gt;：MCU通过SPI发送高级命令（"在X,Y绘制句柄3的位图"），芯片内部自动完成渲染、合成、时序生成和输出，主控完全不碰像素。理念上和"CPU写OAM、PPU自动渲染"高度相似，只是规模大了数十倍，还附带音频PWM输出和触摸屏控制。要注意的几点实际约束：显示列表有2048项的上限（FT81x），裸片是QFP封装不好手工焊，一般人买的是带屏模块（Riverdi、New Haven等，$30-80），且EVE是3.3V器件，接5V的6502系统需要电平转换。&lt;/p&gt;
+&lt;p&gt;这个"弱主控+SPI+专用图形引擎"的模式并非纸面设想，它有量产级的先例：James Bowman的&lt;a href="https://excamera.com/sphinx/gameduino2/" title="Gameduino 2：FT800图形扩展板，James Bowman"&gt;Gameduino 2/3&lt;/a&gt;就是FT800/FT810配Arduino（ATmega328 @ 16MHz），Kickstarter量产了三代，主控算力和W65C02S是同一量级。Bowman还写了本&lt;a href="http://excamera.com/files/gd2book_v0.pdf" title="The Gameduino 2: Tutorial, Reference and Cookbook，作者官网免费PDF"&gt;《The Gameduino 2: Tutorial, Reference and Cookbook》&lt;/a&gt;，系统讲解EVE的显示列表编程，作者官网有免费PDF。&lt;/p&gt;
+&lt;p&gt;&lt;img alt="Gameduino 2：FT800显示扩展板叠在Arduino上，运行示例程序" src="./images/gameduino2-shield.jpg"&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img alt="《The Gameduino 2: Tutorial, Reference and Cookbook》封面，四块Gameduino屏幕拼出书名" src="./images/gameduino2-book-cover.jpg"&gt;&lt;/p&gt;
+&lt;p&gt;公平地说，6502和EVE这两个圈子目前没什么交集：EVE的生态几乎全在Arduino/ESP32/STM32这些现代MCU上，我没找到6502+EVE的公开完成项目。但6502这边用65C22 VIA软件模拟SPI（接SD卡）是自制机社区的标准操作，两个半边各自都成熟，拼起来没有原理性障碍。&lt;/p&gt;
+&lt;p&gt;用它配W65C02S做游戏机的唯一门槛是6502没有SPI控制器，三种解法：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;65C22 VIA软件模拟SPI：约50-200Kbps，原型可用，一帧几百字节的显示列表勉强够30fps&lt;/li&gt;
+&lt;li&gt;一颗廉价CPLD做SPI桥映射到6502的I/O空间：1-4Mbps，CPU几乎零负担，&lt;strong&gt;推荐&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;W65C816S或FPGA总线桥做QSPI：过度设计&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;一个典型复古游戏场景（背景层+20个精灵+UI文字）每帧显示列表约500字节，SPI到1Mbps以上就毫无压力。这条路线的开发难度远低于FPGA和离散逻辑——虽然6502+EVE还没什么人踩过，但有Gameduino三代量产产品垫底的架构模式，我认为是新人最值得尝试的组合。&lt;/p&gt;
+&lt;h2&gt;五、路线四：拆机VDP&lt;/h2&gt;
+&lt;p&gt;坚持要用"真·VDP"的话，只能淘拆机件。综合性能、文档和可获得性，排序如下：&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;芯片&lt;/th&gt;
+&lt;th&gt;用于&lt;/th&gt;
+&lt;th&gt;评价&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;Yamaha V9958&lt;/td&gt;
+&lt;td&gt;&lt;a href="https://en.wikipedia.org/wiki/MSX" title="MSX电脑"&gt;MSX&lt;/a&gt;2+/Turbo R&lt;/td&gt;
+&lt;td&gt;&lt;strong&gt;首选&lt;/strong&gt;。8位时代最强量产VDP之一，512×424、硬件滚动、19268色YJK模式、无每线精灵闪烁限制；有官方数据手册&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;Yamaha V9938&lt;/td&gt;
+&lt;td&gt;MSX2&lt;/td&gt;
+&lt;td&gt;V9958的前代，拆机件更多更便宜，无YJK和水平滚动&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;TI TMS9918A&lt;/td&gt;
+&lt;td&gt;TI-99/4A、ColecoVision、MSX1&lt;/td&gt;
+&lt;td&gt;VDP鼻祖，但几乎所有指标弱于NES PPU（16色、每线4精灵），只适合教学&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;Sega 315-5313&lt;/td&gt;
+&lt;td&gt;&lt;a href="https://en.wikipedia.org/wiki/Sega_Genesis" title="世嘉MD"&gt;MD&lt;/a&gt;&lt;/td&gt;
+&lt;td&gt;性能强，但无官方文档、QFP难拆焊、期待68000级总线时序，DIY风险高&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;&lt;img alt="Yamaha V9938芯片（©1984，ASCII/MSX丝印）" src="./images/yamaha-v9938.png"&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img alt="Yamaha V9958芯片（©1988）" src="./images/yamaha-v9958.png"&gt;&lt;/p&gt;
+&lt;p&gt;V9958/V9938是标准并行总线外设，6502可以直接读写寄存器，不需要SPI桥。注意它们不集成显存，需外接44256/41464等DRAM。买的时候建议买仍焊在子板上的拆机件，比裸片好处理。这条路的可行性也有实物先例：有人给C64做过完整的&lt;a href="https://github.com/vossi1/c64-v9958-card" title="c64-v9958-card：给C64做的Yamaha V9958开源显卡"&gt;V9958显卡&lt;/a&gt;（开源硬件，插扩展槽直接用），RC2014社区也有现成的V99x8视频模块套件。&lt;/p&gt;
+&lt;h2&gt;六、为什么街机芯片不要碰&lt;/h2&gt;
+&lt;p&gt;街机走的是另一条路：&lt;strong&gt;没有通用VDP，全是定制ASIC&lt;/strong&gt;。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Capcom CPS1的Ricoh CPS-A-01：无文档，故障率高，社区至今还在用FPGA逆向重建&lt;/li&gt;
+&lt;li&gt;Sega System 16的YM7101：本质上是MD VDP的街机增强版，但拆机件几乎绝迹&lt;/li&gt;
+&lt;li&gt;SNK Neo Geo的LSPC2-A2+PRO-B0芯片组：最激进的设计——&lt;strong&gt;没有硬件背景层，一切画面（包括背景）全部由垂直精灵条带拼成&lt;/strong&gt;，配4个行缓冲实现无闪烁高密度输出，380个精灵、4096色同屏。理念惊人，但整套芯片组依赖专属的VRAM/ROM体系，无法拆出来单用&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;定制ASIC没有数据手册、时序复杂、引脚多，死了还没处买替换件，个人DIY不要碰。&lt;/p&gt;
+&lt;h2&gt;七、岔路：把2D精灵掰成四边形——世嘉土星的3D&lt;/h2&gt;
+&lt;p&gt;提到"用2D硬件凑3D"，&lt;a href="https://en.wikipedia.org/wiki/Sega_Saturn" title="世嘉土星"&gt;土星&lt;/a&gt;是最值得单说的案例。它的VDP1&lt;strong&gt;根本不画三角形&lt;/strong&gt;：它画的是"变形精灵"（Distorted Sprite）——把一张纹理贴图的2D精灵扭曲成任意四点围成的四边形。土星游戏里所有的"多边形"都是这种四边形精灵。几何部分（变换、光照、排序）全部靠双SH-2软件完成，VDP1只负责填充。&lt;/p&gt;
+&lt;p&gt;&lt;img alt="《VR战士Remix》角色的线框模型，可以清楚看到模型完全由四边形拼成" src="./images/saturn-vf-quads.png"&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img alt="同一场景的最终渲染效果：四边形贴上纹理后就是正常的3D画面" src="./images/saturn-vf-final.png"&gt;&lt;/p&gt;
+&lt;p&gt;上面两张图是同一个例子（《VR战士Remix》，1995）：去掉纹理后，角色模型完全由四边形拼成；VDP1把纹理分别扭曲贴进每个四边形，再加上VDP2绘制的2D背景层，就成了下面的最终画面。（截图来自&lt;a href="https://www.copetti.org/writings/consoles/sega-saturn/" title="Sega Saturn Architecture - A Practical Analysis，Rodrigo Copetti"&gt;copetti.org的土星架构分析&lt;/a&gt;）&lt;/p&gt;
+&lt;p&gt;这个架构带来一串连锁反应：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;没有Z缓冲&lt;/strong&gt;，遮挡关系靠CPU排序（画家算法），复杂场景容易出错&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;四边形不共面会扭曲&lt;/strong&gt;，所以建模师得刻意把模型拆得规整&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;没有硬件裁剪&lt;/strong&gt;，顶点跑出屏幕外精灵会被错误拉伸，需要软件预裁剪&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;半透明做不好&lt;/strong&gt;，大量游戏用棋盘格网纹（Mesh）假装半透明&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;有讽刺意味的是：世嘉自家街机（Model 1/2）用的是真多边形硬件，到了家用机反而退回精灵变形路线——这也是土星3D表现力输给PS1的结构性原因之一。&lt;/p&gt;
+&lt;p&gt;走类似"2D硬件凑3D"路线的还有这些：&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;平台&lt;/th&gt;
+&lt;th&gt;手法&lt;/th&gt;
+&lt;th&gt;备注&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;3DO&lt;/td&gt;
+&lt;td&gt;CEL引擎画四边形Cel，同样无三角形、无Z缓冲&lt;/td&gt;
+&lt;td&gt;与土星思路最接近&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;Sega 32X&lt;/td&gt;
+&lt;td&gt;帧缓冲+双SH-2软件渲染&lt;/td&gt;
+&lt;td&gt;硬件只管出图，3D全靠CPU&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;Super Scaler街机&lt;/td&gt;
+&lt;td&gt;硬件缩放/旋转大量精灵模拟纵深&lt;/td&gt;
+&lt;td&gt;《太空哈利》《Out Run》，伪3D先声&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;SNES Mode 7&lt;/td&gt;
+&lt;td&gt;单层背景仿射变换（旋转缩放透视）&lt;/td&gt;
+&lt;td&gt;《F-Zero》《马力欧赛车》的地面&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;GBA仿射层&lt;/td&gt;
+&lt;td&gt;Mode 7的正统传人，且每扫描线可改矩阵&lt;/td&gt;
+&lt;td&gt;见后文第十节&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;Neo Geo&lt;/td&gt;
+&lt;td&gt;全精灵拼背景&lt;/td&gt;
+&lt;td&gt;见上一节，虽不做3D但理念同源&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;它们的共同点是：&lt;strong&gt;硬件只提供2D原语（精灵、背景层），第三维靠软件或玩家脑补&lt;/strong&gt;。这条岔路在PS1的"GTE算几何+GPU画三角形"组合出现后就被终结了——真多边形光栅器一旦廉价到能进家用机，变形精灵就失去了存在的理由。&lt;/p&gt;
+&lt;h2&gt;八、CPU搭配：6502、68000与SuperH&lt;/h2&gt;
+&lt;p&gt;图形方案定了，主控CPU的选择也有几条有趣的线索。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;6502与68000是师出同门的两个极端。&lt;/strong&gt; 6502之父Chuck Peddle正是Motorola 6800项目的核心成员，因主张低价路线未果而出走MOS，用更少的晶体管做出了便宜一个数量级的6502。68000则是Motorola对高端市场的回应：16个32位寄存器、正交指令集，被戏称为"最像RISC的CISC"——但它确实是CISC（变长指令、微码、内存-内存操作一应俱全）。两者很少竞争，反而常在同一台机器里搭档：Commodore 64用6510，Amiga用68000配6502系列做键盘控制。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;SuperH是纯日本血统。&lt;/strong&gt; 日立1992年自研的32位RISC，最大特色是16位定长指令换来的高代码密度。SH-2（&lt;a href="https://en.wikipedia.org/wiki/Sega_Saturn" title="世嘉土星"&gt;土星&lt;/a&gt;双核28.6MHz）、SH-4（&lt;a href="https://en.wikipedia.org/wiki/Dreamcast" title="世嘉Dreamcast"&gt;Dreamcast&lt;/a&gt; 200MHz，128位FPU 1.4GFLOPS）两度登上游戏机巅峰；SH-5的64位尝试失败后，由瑞萨收编为汽车MCU主力，近年又以开源软核J-Core的形式获得新生。Dreamcast的SH-4浮点足够强，所以SEGA让CPU软做T&amp;amp;L、PowerVR2只管Tile光栅化——这再次印证了那个规律：&lt;strong&gt;几何处理（T&amp;amp;L）可以交给CPU，但像素填充必须有专门硬件&lt;/strong&gt;。土星和DC如此，Voodoo如此，GBA的仿射层也如此。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;68k今天还活着，但已是遗产状态。&lt;/strong&gt; 桌面线68020→68060在90年代中输给PowerPC；嵌入式线却活了下来：Palm Pilot的DragonBall、至今仍在NXP供货的ColdFire（新客户已基本不推荐）。更活跃的是FPGA软核（TG68、FX68K，MiSTer的Amiga/Genesis核心底层就是它们）和Apollo Team的68080——Amiga的Vampire加速器卡上那颗超标量、带AMMX SIMD扩展的"现代68k"，算是"如果Motorola没放弃"的平行世界答案。&lt;/p&gt;
+&lt;h2&gt;九、现代FPGA GPU的标杆：FuryGpu&lt;/h2&gt;
+&lt;p&gt;FPGA路线的天花板案例是&lt;a href="https://furygpu.com/" title="FuryGpu：个人开发的FPGA PCIe独立显卡"&gt;FuryGpu&lt;/a&gt;：一个人用近4年时间，在Xilinx Zynq UltraScale+（Kria SoM）上从零做了一块PCIe独立显卡，能跑Quake。&lt;/p&gt;
+&lt;p&gt;&lt;img alt="FuryGpu实体显卡，中央是带风扇的Kria SoM，金手指为PCIe接口，挡板上有HDMI与DP输出口" src="./images/furygpu-card.jpg"&gt;&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;项目&lt;/th&gt;
+&lt;th&gt;规格&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;架构&lt;/td&gt;
+&lt;td&gt;固定功能Tile-Based光栅器，无可编程着色器&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;时钟&lt;/td&gt;
+&lt;td&gt;480MHz&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;光栅器&lt;/td&gt;
+&lt;td&gt;4个并行Rasterizer，2×2 Quad&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;纹理&lt;/td&gt;
+&lt;td&gt;每Rasterizer一个纹理单元，双线性、Mipmap；4路组相联512KB纹理缓存&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;主机接口&lt;/td&gt;
+&lt;td&gt;PCIe + 自写Windows WDDM内核驱动&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;API&lt;/td&gt;
+&lt;td&gt;私有FuryGL，显式命令缓冲/队列提交，类Vulkan外壳+固定功能内核&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;几点值得记录的判断：&lt;/p&gt;
+&lt;p&gt;&lt;img alt="Diamond Monster 3D，即3dfx Voodoo Graphics（Voodoo 1）加速卡，左上方是标志性的VGA直通线" src="./images/voodoo1-diamond-monster3d.jpg"&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;它是"超级Voodoo 1"的精神续作。&lt;/strong&gt; 都是固定功能、无Shader、CPU软T&amp;amp;L+GPU硬光栅的分工；FuryGpu用fp32前端、Tile-Based架构和现代缓存设计弥补了FPGA效率劣势，Quake帧率与Voodoo 1在同一数量级。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;它有WDDM驱动却显示不了Windows桌面。&lt;/strong&gt; DWM桌面合成依赖Direct3D可编程管线，固定功能GPU满足不了；WDDM驱动只是给硬件一个"合法身份"。有趣的是在Linux下反而容易：写一个最小DRM/KMS驱动暴露dumb buffer，GNOME会自动回退llvmpipe软渲染桌面，FuryGpu只当扫描输出用。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;加硬件T&amp;amp;L很难且没必要。&lt;/strong&gt; 硬件T&amp;amp;L直到1999年GeForce 256才出现（顺带一提，3dfx全系和Glide都从未有过硬件T&amp;amp;L；OpenGL规范也从不强制硬件T&amp;amp;L，软硬实现对应用透明）。FuryGpu的DSP资源已吃紧，目标游戏又是CPU软T&amp;amp;L时代的作品，加了纯属浪费。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;真要用现代工艺造芯片也不是不行。&lt;/strong&gt; Voodoo 1是500nm/约100万晶体管，用SkyWater 130nm开源PDK走MPW，面积不到2mm²，赞助渠道下现金成本可低至几百美元——真正的门槛是RTL设计与验证，不是流片费。我个人出于好奇也询过国内MPW的价：IC教学渠道附带的MPW服务报价在十几、二十万人民币的样子，其他一些濒临淘汰制程的流片报价在8-10万，比SkyWater的赞助渠道贵不少，但和先进制程动辄百万级的掩膜费相比仍是小数目。这也是FuryGpu将来开源后最有趣的社区方向之一。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;img alt="FuryGpu实机运行Quake的画面，左下角显示帧耗时16.54ms（约60fps），右上角是硬件内部的调试计数器" src="./images/furygpu-quake.jpg"&gt;&lt;/p&gt;
+&lt;h2&gt;十、另一条参照系：集成化&lt;/h2&gt;
+&lt;p&gt;掌机给了"没有独立VDP但功能更强"的范例。&lt;a href="https://en.wikipedia.org/wiki/Game_Boy_Advance" title="Game Boy Advance"&gt;GBA&lt;/a&gt;把LCD控制器直接做进SoC，与ARM7共享内存总线：六种显示模式（Mode 0-2是Tile模式，最多4层背景且两层带仿射变换；Mode 3-5是帧缓冲位图模式）、128个硬件精灵、Alpha混合/亮度增减/窗口裁剪特效，再加上HBlank DMA逐扫描线改寄存器，能做出Mode 7式的伪3D。像素合成仍是纯硬件电路，DMA只负责搬运和更新寄存器。&lt;/p&gt;
+&lt;p&gt;PC那边则是"2D加速没有止步，而是被吞并"：DirectDraw时代的硬件Blitter（BitBLT、颜色键控、页翻转）在2000年后被统一着色器架构吸收——今天的2D界面全是"两个三角形贴纹理"交给3D管线零开销完成，再叠上DWM桌面合成、独立的视频编解码引擎和异步Copy Engine。当年独立的2D硬件能力并没有消失，只是藏进了看不见的地方。&lt;/p&gt;
+&lt;h2&gt;十一、总结：怎么选&lt;/h2&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;路线&lt;/th&gt;
+&lt;th&gt;硬件复杂度&lt;/th&gt;
+&lt;th&gt;开发难度&lt;/th&gt;
+&lt;th&gt;情怀分&lt;/th&gt;
+&lt;th&gt;适合谁&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;FPGA复刻PPU&lt;/td&gt;
+&lt;td&gt;中&lt;/td&gt;
+&lt;td&gt;高（周期级时序）&lt;/td&gt;
+&lt;td&gt;★★★★★&lt;/td&gt;
+&lt;td&gt;想精确复现某台老机器&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;离散逻辑+Blitter（GameTank式）&lt;/td&gt;
+&lt;td&gt;高（几十颗74芯片）&lt;/td&gt;
+&lt;td&gt;中&lt;/td&gt;
+&lt;td&gt;★★★★★&lt;/td&gt;
+&lt;td&gt;想纯手工焊一台出来&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;W65C02S + Bridgetek EVE&lt;/td&gt;
+&lt;td&gt;低&lt;/td&gt;
+&lt;td&gt;低&lt;/td&gt;
+&lt;td&gt;★★★&lt;/td&gt;
+&lt;td&gt;想快速做出能玩的机器&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;6502 + 拆机V9958&lt;/td&gt;
+&lt;td&gt;中&lt;/td&gt;
+&lt;td&gt;中高（DRAM时序）&lt;/td&gt;
+&lt;td&gt;★★★★&lt;/td&gt;
+&lt;td&gt;想要真VDP的味道&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;FPGA自研GPU（FuryGpu式）&lt;/td&gt;
+&lt;td&gt;低（一块Kria）&lt;/td&gt;
+&lt;td&gt;极高（年计）&lt;/td&gt;
+&lt;td&gt;★★★★★&lt;/td&gt;
+&lt;td&gt;想挑战个人项目天花板&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;script type="text/javascript"&gt;if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+    var align = "left",
+        indent = "0em",
+        linebreak = "false";
+
+    if (true) {
+        align = (screen.width &lt; 768) ? "left" : align;
+        indent = (screen.width &lt; 768) ? "0em" : indent;
+        linebreak = (screen.width &lt; 768) ? 'true' : linebreak;
+    }
+
+    var mathjaxscript = document.createElement('script');
+    mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
+    mathjaxscript.type = 'text/javascript';
+    mathjaxscript.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.3/latest.js?config=TeX-AMS-MML_HTMLorMML';
+
+    var configscript = document.createElement('script');
+    configscript.type = 'text/x-mathjax-config';
+    configscript[(window.opera ? "innerHTML" : "text")] =
+        "MathJax.Hub.Config({" +
+        "    config: ['MMLorHTML.js']," +
+        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'none' } }," +
+        "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
+        "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
+        "    displayAlign: '"+ align +"'," +
+        "    displayIndent: '"+ indent +"'," +
+        "    showMathMenu: true," +
+        "    messageStyle: 'normal'," +
+        "    tex2jax: { " +
+        "        inlineMath: [ ['\\\\(','\\\\)'] ], " +
+        "        displayMath: [ ['$$','$$'] ]," +
+        "        processEscapes: true," +
+        "        preview: 'TeX'," +
+        "    }, " +
+        "    'HTML-CSS': { " +
+        "        availableFonts: ['STIX', 'TeX']," +
+        "        preferredFont: 'STIX'," +
+        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'inherit ! important'} }," +
+        "        linebreaks: { automatic: "+ linebreak +", width: '90% container' }," +
+        "    }, " +
+        "}); " +
+        "if ('default' !== 'default') {" +
+            "MathJax.Hub.Register.StartupHook('HTML-CSS Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax['HTML-CSS'].FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+            "MathJax.Hub.Register.StartupHook('SVG Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax.SVG.FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+        "}";
+
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(configscript);
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
+}
+&lt;/script&gt;</content><category term="gamedev"/><category term="FPGA"/><category term="PPU"/><category term="VDP"/><category term="GPU"/><category term="Blitter"/><category term="复古"/><category term="芯片"/></entry><entry><title>聊聊感知机</title><link href="https://funcman.me/about_perceptron.html" rel="alternate"/><published>2026-09-02T17:30:00+08:00</published><updated>2026-09-02T17:30:00+08:00</updated><author><name>funcman</name></author><id>tag:funcman.me,2026-09-02:/about_perceptron.html</id><summary type="html">&lt;p&gt;感知机的结构和学习规则、偏置的数学意义、超平面在不同维度下的形态、"找一个超平面"和"找最优超平面"的区别、高维空间为什么只能切片观察，最后用一个 30 行的 C++ 实现在真实数据上验证它的能力和局限。&lt;/p&gt;</summary><content type="html">&lt;p&gt;最近在入门机器学习，从感知机学起。本来以为这个 1958 年的老模型结构那么简单，半小时就能翻篇，结果真看进去，卡住我的地方一个接一个：偏置到底为什么必须存在、超平面在二维以外长什么样、"训练就是找分割线"这个说法对不对、高维空间的数据凭什么能画在二维图上。最后干脆用 C++ 把它实现了一遍，还拿到真实数据上跑了跑。&lt;/p&gt;
 &lt;p&gt;这篇就是这个学习过程的整理。昨天那篇&lt;a href="./various_notations_for_weighted_sums.html"&gt;《加权求和式子的各种写法》&lt;/a&gt;其实也是这次研究过程中的一个小分支，单独摘出去了。&lt;/p&gt;
 &lt;h2&gt;先摆一条时间线&lt;/h2&gt;
 &lt;p&gt;感知机在神经网络的历史里是什么位置？列一下就清楚了：&lt;/p&gt;
