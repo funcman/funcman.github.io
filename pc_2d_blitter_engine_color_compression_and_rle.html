@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="zh_cn" prefix="og: http://ogp.me/ns#">
+	<head>
+		<link href="http://gmpg.org/xfn/11" rel="profile">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta http-equiv="content-type" content="text/html; charset=utf-8">
+
+		<!-- Metadata -->
+	<meta name="description" content="一个游戏程序员。曾经参与开发过<a href='https://www.bing.com/search?q=%E4%BB%99%E4%BE%A3%E5%A5%87%E7%BC%983'>仙侣奇缘3</a>、<a href='http://sh.70yx.com'>水浒传</a>、<a href='https://itunes.apple.com/cn/app/id938688461'>小米运动</a>、<a href='https://itunes.apple.com/cn/app/id1034182617'>米动</a>和<a href='https://www.taptap.com/app/143658'>无限激战</a>">
+	<meta property="og:description" content="一个游戏程序员。曾经参与开发过<a href='https://www.bing.com/search?q=%E4%BB%99%E4%BE%A3%E5%A5%87%E7%BC%983'>仙侣奇缘3</a>、<a href='http://sh.70yx.com'>水浒传</a>、<a href='https://itunes.apple.com/cn/app/id938688461'>小米运动</a>、<a href='https://itunes.apple.com/cn/app/id1034182617'>米动</a>和<a href='https://www.taptap.com/app/143658'>无限激战</a>">
+	<meta property="og:title" content="千禧年前后的 PC 2D Blitter 引擎：颜色压缩与 RLE 是怎么被硬件逼出来的" />
+	<meta property="og:type" content="article" />
+	<meta property="og:url" content="https://funcman.me/pc_2d_blitter_engine_color_compression_and_rle.html" />
+		<meta property="og:image" content="https://funcman.me/images/avatar.png" />
+
+		<!-- Enable responsiveness on mobile devices-->
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+
+		<title>funcman's blog</title>
+
+		<!-- CSS -->
+		<link href="//fonts.googleapis.com/" rel="dns-prefetch">
+		<link href="//fonts.googleapis.com/css?family=Droid+Serif:400,700,400italic|Abril+Fatface|PT+Sans:400,400italic,700&amp;subset=latin,latin-ext" rel="stylesheet">
+
+		<link rel="stylesheet" href="https://funcman.me/theme/css/poole.css" />
+		<link rel="stylesheet" href="https://funcman.me/theme/css/hyde.css" />
+		<link rel="stylesheet" href="https://funcman.me/theme/css/syntax.css" />
+			<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css" crossorigin="anonymous">
+
+		<!-- Feeds -->
+<link href="https://funcman.me/rss.xml" type="application/atom+xml" rel="alternate" title="funcman's blog Full Atom Feed" />
+
+		<!-- Analytics -->
+	</head>
+
+	<body class="theme-base-0e">
+<div class="sidebar">
+	<div class="container sidebar-sticky">
+		<div class="sidebar-about">
+
+			<h1>
+				<a href="/">
+					<img class="profile-picture" src="https://funcman.me/images/avatar.png">
+					funcman's blog
+				</a>
+			</h1>
+			<p class="lead"></p>
+			<p class="lead">一个游戏程序员。曾经参与开发过<a href='https://www.bing.com/search?q=%E4%BB%99%E4%BE%A3%E5%A5%87%E7%BC%983'>仙侣奇缘3</a>、<a href='http://sh.70yx.com'>水浒传</a>、<a href='https://itunes.apple.com/cn/app/id938688461'>小米运动</a>、<a href='https://itunes.apple.com/cn/app/id1034182617'>米动</a>和<a href='https://www.taptap.com/app/143658'>无限激战</a> </p>
+			<p></p>
+		</div>
+		<nav class="sidebar-social">
+					<a class="sidebar-social-item" href="mailto:hyq1986@gmail.com">
+						<i class="fa-solid fa-envelope"></i>
+					</a>
+					<a class="sidebar-social-item" href="https://twitter.com/funcman" target="_blank">
+						<i class="fa-brands fa-twitter"></i>
+					</a>
+					<a class="sidebar-social-item" href="https://github.com/funcman" target="_blank">
+						<i class="fa-brands fa-github"></i>
+					</a>
+					<a class="sidebar-social-item" href="https://funcman.itch.io" target="_blank">
+						<i class="fa-brands fa-itch-io"></i>
+					</a>
+			<a class="sidebar-social-item" href="https://funcman.me/rss.xml">
+				<i class="fa-solid fa-rss"></i>
+			</a>
+		</nav>
+	</div>
+</div>		<div class="content container">
+<div class="post">
+	<h1 class="post-title">千禧年前后的 PC 2D Blitter 引擎：颜色压缩与 RLE 是怎么被硬件逼出来的</h1>
+	<span class="post-date">2026年09月05日 星期六</span>
+	<p>最近重读了一套 2000 年代初的国产 2D 端游引擎源码（Blitter 架构，DirectDraw 绘制），里面有两个模块让我感慨良久：一套 Octree 颜色量化器，和一套带 Alpha 标记的 RLE 精灵编码。它们都不是什么高深算法，教科书上都找得到，但<strong>为什么偏偏是这两个算法、以这种方式组合在一起</strong>，只有把时钟拨回到那个年代才能想明白。</p>
+<p>这篇文章就从硬件限制讲起，把这两件事的来龙去脉捋一遍。文中的代码全部是我重写的示意性伪代码，重在表达结构。</p>
+<h2>〇、先分岔：游戏机与 PC 的两条 2D 绘图路线</h2>
+<p>在展开之前，值得先把"游戏机"和"PC"做 2D 绘图的根本分歧交代清楚——本文讲的这套引擎，走的是后一条路。</p>
+<p>游戏机（红白机、超任、MD 这一代）的图形芯片（PPU / VDP）<strong>根本没有帧缓冲</strong>。它的工作方式是<strong>扫描线合成器（scanline compositor）</strong>：芯片与 CRT 电子束实时同步，每根扫描线扫出来的瞬间，硬件现场把背景 Tile、精灵、窗口层按优先级合成、上色、输出——画面从不落地成一整帧位图，全程"边扫边画"。这个架构对精灵极其友好：精灵本质上是"属于某一根扫描线的一维对象"，硬件每线只做一次 OAM 检索和叠加，零内存拷贝；但代价也很硬——每线精灵数、同屏精灵数、精灵尺寸全是焊死在芯片里的上限，透明、缩放、旋转这些自由度一概没有。<strong>游戏机是用灵活性换确定性</strong>：刷新率绝对稳，画面结构被硬件规格框死（PPU 这边更细的拆解，我之前写过<a href="https://funcman.me/about_some_oldschool_gpus.html">一篇早期图像视频芯片的盘点</a>和<a href="https://funcman.me/ways_to_build_retro_graphics.html">一篇自制复古主机的图形路线选型</a>，此处不展开）。</p>
+<p>PC 走的是另一条路。IBM PC 从来没给过像样的 2D 加速硬件，VGA 给你的只是一块<strong>可写的线性帧缓冲</strong>——从 Mode 13h 的 64KB 到 DirectDraw 时代的显存 Surface，本质都是"一块你来画、画完我上屏"的内存。没有人帮你合成扫描线，遮挡、裁剪、透明、混合全得<strong>软件自己算</strong>：把精灵当成一个个小矩形，逐块搬进帧缓冲——这就是 Blitter（block transfer）架构。"Blitter"这个词源自 Amiga 的 Blitter 芯片和 Atari ST 的 BLiTTER，那两台机器把块搬运做成了硬件；PC 上它更多指的是一整套<strong>软件块搬运引擎</strong>——本文的主角之一，就是这种引擎里的精灵绘制器。帧缓冲路线的取舍正好反过来：<strong>PC 是用确定性换灵活性</strong>——没有每线精灵上限，精灵想多大就多大、想怎么变换就怎么变换，代价是每一像素的成本都要 CPU 自己扛。</p>
+<p>本文要聊的，正是 PC 这条路线在 2000 年前后的完整答案：当所有像素都要过 CPU 的手时，颜色压缩和 RLE 为什么是省不掉的两板斧。</p>
+<h2>一、引子：我的游戏编程是从 640KB 开始的</h2>
+<p>我入门游戏编程是在 DOS 下。现在的年轻人很难想象当时的内存格局：x86 实模式下，CPU 用"段地址 × 16 + 偏移"寻址，一个段最大 64KB，整个地址空间只有 1MB，而这 1MB 里还要刨掉 BIOS、显存映射和各种上位内存块，<strong>留给程序的常规内存（Conventional Memory）只有 640KB</strong>——这就是那句著名的"640K 对任何人都应该足够了"的出处（不管盖茨说没说过）。</p>
+<p>做游戏第一件事就是跟这 640KB 搏斗。素材稍微多一点就装不下，于是有了两套续命方案：</p>
+<ul>
+<li><strong>XMS / EMS</strong>：扩展内存规范。加载 <code>HIMEM.SYS</code> 和 <code>EMM386.EXE</code> 后，可以把 1MB 以外的内存以"页帧映射"的方式换进换出。读取要付切换开销，但好歹能用上机器里剩下的十几 MB；</li>
+<li><strong>DOS 扩展器（DOS Extender）</strong>：更彻底的方案。程序启动后切到 32 位保护模式，直接平坦寻址全部物理内存。当年几乎是行业标配——《Doom》用的就是 DOS/4GW，启动画面里那行小小的 "DOS/4GW Protected Mode Run-time" 是一代人的共同记忆。</li>
+</ul>
+<p>显存这边同样紧巴巴。图形编程的入门仪式是切 Mode 13h：</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// 切到 320x200、256 色的 VGA Mode 13h</span>
+<span class="kt">void</span><span class="w"> </span><span class="nf">set_mode_13h</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kr">__asm</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">mov</span><span class="w"> </span><span class="n">ax</span><span class="p">,</span><span class="w"> </span><span class="mh">0x13</span>
+<span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="mh">0x10</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+<span class="c1">// 然后直接往 0xA0000 写字节，一个字节就是一个像素</span>
+<span class="kt">unsigned</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="n">far</span><span class="w"> </span><span class="o">*</span><span class="n">vram</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="kt">unsigned</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="n">far</span><span class="w"> </span><span class="o">*</span><span class="p">)</span><span class="mh">0xA0000000L</span><span class="p">;</span>
+<span class="n">vram</span><span class="p">[</span><span class="n">y</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">320</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">x</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">color_index</span><span class="p">;</span><span class="w">   </span><span class="c1">// 写的就是&quot;调色板索引&quot;</span>
+</code></pre></div>
+
+<p>Mode 13h 的美在于简单：64KB 线性显存，一字节一像素，写完立刻上屏。它的"诅咒"也在于此：<strong>一屏只有 256 种颜色</strong>。所有颜色都来自一块 256 项的硬件调色板（VGA DAC，每项 RGB 各 6 bit），你写的每个字节只是这块表的索引。想换颜色？向端口 0x3C8/0x3C9 写表项；想做淡入淡出？整表渐变——那时候满屏的"呼吸感"特效，其实一个像素都没画，全是在玩弄色板。</p>
+<p>后来 Windows 95/98 普及，DirectDraw 接管了这一切，显示模式也推进到 640×480 / 800×600 的 16-bit 高彩。DOS 时代练就的两门手艺——<strong>调色板思维</strong>和<strong>对每一个字节的偏执</strong>——被原封不动地带进了新引擎，恰好构成了本文两大主角的思想基础。</p>
+<p>那个年代国内自研 2D 引擎的氛围也值得一提。云风（吴云洋）从 1999 年起在大学期间开发并开源了 2D 引擎"风魂"，被多家公司和小组拿去用——网易《大话西游》的底层就建立在风魂之上，云风本人也因此被请进网易（2001 年），后来才有了《大话西游 2》和《梦幻西游》的辉煌（见<a href="https://m.36kr.com/p/2765694681725698">云风的访谈报道</a>）。有意思的是，风魂这一系的资源格式恰好把本文的两大主角都用上了：《大话西游 2》《梦幻西游》的 WAS 动画格式就是"256 色调色板 + RLE 行程压缩"，调色板 256 项、每项一个 16-bit 565 颜色（见 <a href="https://blog.csdn.net/u012354020/article/details/12378573">WAS 文件格式分析</a>和 <a href="https://max.book118.com/html/2012/0725/2527377.shtml">Was Tools 使用手册</a>）——和本文第六节要讲的"8-bit 索引 + 16-bit 目标"方案如出一辙。</p>
+<p>把时间再往前拨到 DOS 时代，大宇《仙剑奇侠传》（1995）的资源包也是同一套路：物品图（BALL.MKF）和人物头像（RGM.MKF）都是"调色板编号 + RLE 压缩"，战斗动画则再用一层自家的 YJ_1 压缩（格式细节见<a href="https://chiuinan.github.io/game/game/intro/ch/c11/pal/pal/modify2.htm">仙剑资料站</a>，开源重实现 <a href="https://github.com/sdlpal/sdlpal">SDLPAL</a> 里能读到完整的解码代码）。海外同样如此：Westwood 的《命令与征服》系列（1995 起）用的 SHP 精灵格式，文件里只存 8-bit 调色板索引，颜色全在外部 <code>.PAL</code> 文件里，像素流按扫描线做 RLE（格式细节见 <a href="https://moddingwiki.shikadi.net/wiki/Westwood_SHP_Format_(TD)">ModdingWiki 的 SHP 格式文档</a>）——连"图与表分离"的做法都和后文《星际争霸》的 GRP 殊途同归。可见这套组合拳不是哪个团队的独门秘方，而是那一代 2D 引擎面对同样硬件约束收敛出的共同答案。本文要聊的这套引擎，也正是从那个圈子里生长出来的产物。</p>
+<h2>二、先算一笔账：为什么非压缩不可</h2>
+<p>2000 年 6 月，金山西山居的《剑侠情缘贰》上市——斜 45° 视角、即时战斗的 ARPG。官方宣传里最有技术含量的一句话是："实时绘图引擎可同时处理 1000 幅以上的游戏贴图，玩家不需要 3D 加速卡就能体验百人大混战"。这句广告词的背面，就是那一代 2D 引擎要面对的全部硬件约束：</p>
+<p><img alt="《剑侠情缘贰》（2000）天忍教总坛一战：斜 45° 视角下同屏十几个人物精灵，大战过后横七竖八的尸首——这就是软件渲染时代的&quot;百人大混战&quot;（图片来自 BYVoid 的怀旧博文，640×480 原生分辨率，按 2× 最近邻整数放大）" src="./images/jx2-battle.png"></p>
+<ul>
+<li>内存：主流 32~64MB，操作系统和游戏逻辑先吃掉一截；</li>
+<li>显存：2~8MB 是常态，AGP 4× 刚普及，主存到显存的带宽宝贵；</li>
+<li>CPU：奔腾 II / 赛扬 300~500MHz，没有 SIMD 可用的时候就靠 x86 通用指令；</li>
+<li>存储：光盘 650MB 看似宽裕，但玩家硬盘空间小，下载更是奢望。</li>
+</ul>
+<p>再看素材这一侧。《剑侠情缘贰》这种游戏里，主角、敌人、武功光影全是逐帧制作的 2D 精灵：一个 64×64 的角色帧，如果存 32-bit 真彩，是 16KB；一个角色有 8 方向 × 十余个动作 × 每动作近十帧，轻松上千帧，就是十几 MB——<strong>一个角色</strong>。同屏几十个单位、几百种怪物、加上地图贴图、UI、特效，真彩直存完全不可行。</p>
+<p>所以压缩是必须的。关键在于：<strong>压缩发生在哪个维度上？</strong> 2D 精灵的数据冗余恰好有两个相互正交的维度：</p>
+<ol>
+<li><strong>颜色维度</strong>：一个像素用 24/32 bit 存颜色太奢侈了。精灵图是手绘色块风格，一帧实际用到的颜色往往远少于 256 种；</li>
+<li><strong>空间维度</strong>：精灵图大量像素是透明背景，实色部分也常有成片的同色区域。</li>
+</ol>
+<p>针对这两个维度，那一代引擎的标准答案是：<strong>颜色维度用量化（Quantization）压到 8-bit 调色板索引，空间维度用 RLE（Run-Length Encoding）压掉重复</strong>。一个管"每个像素多大"，一个管"有多少像素值得存"。下面我们分别拆开看。</p>
+<h2>三、颜色压缩：把真彩塞进 256 色调色板</h2>
+<h3>3.1 调色板不是限制，是资产</h3>
+<p>今天的人容易把"256 色"理解成一种画质妥协，但在调色板原生时代，它首先是一种<strong>性能资产</strong>：每像素 1 字节，内存、磁盘、总线带宽全部打骨折；而且"改表不改图"的特效传统（淡入淡出、昼夜、中毒变绿）全是调色板给的。</p>
+<p>所以问题从来不是"要不要调色板"，而是：<strong>美术交上来的是 24/32-bit 真彩图，怎么选出让画面损失最小的那 256 个颜色？</strong> 这就是颜色量化（Color Quantization）问题。</p>
+<h3>3.2 Octree：把 RGB 立方体按位切八瓣</h3>
+<p>2000 年前后，离线工具链里最常用的量化算法是 <strong>Octree（八叉树）量化</strong>（Gervautz &amp; Purgathofer, 1988）。思路漂亮得像变魔术：RGB 三个通道各取 1 bit，拼成一个 3-bit 序号（0~7），作为八叉树某一层的子节点编号；逐位（从最高位到最低位）往下走，走 5~8 层，每片叶子就代表 RGB 立方体里的一个小色块。</p>
+<p><img alt="Octree 颜色量化：每层取 RGB 各 1 bit 拼成 3-bit 序号，递归八等分色彩空间" src="./images/fig-octree.png"></p>
+<p>插入时只在叶子上累加"落进来的像素数"和"RGB 分量之和"。插完全部像素后，如果叶子超过 256 片，就<strong>反复把权重最小的叶子合并回父节点</strong>（父节点继承它的像素数和颜色累加值，变成新叶子），直到只剩 256 片。每片叶子的"分量累加和 ÷ 像素数"就是调色板里的一项，叶子的编号就是索引。示意伪代码：</p>
+<div class="highlight"><pre><span></span><code><span class="k">struct</span><span class="w"> </span><span class="nc">OctreeNode</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kt">uint64_t</span><span class="w"> </span><span class="n">pixelCount</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w">          </span><span class="c1">// 落入该色域的像素数</span>
+<span class="w">    </span><span class="kt">uint64_t</span><span class="w"> </span><span class="n">sumR</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="n">sumG</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="n">sumB</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="c1">// 分量累加和（取均值用）</span>
+<span class="w">    </span><span class="kt">int</span><span class="w">      </span><span class="n">paletteIndex</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">-1</span><span class="p">;</span><span class="w">       </span><span class="c1">// 量化完成后分配的调色板索引</span>
+<span class="w">    </span><span class="n">OctreeNode</span><span class="o">*</span><span class="w"> </span><span class="n">child</span><span class="p">[</span><span class="mi">8</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{};</span><span class="w">        </span><span class="c1">// 8 个子节点</span>
+<span class="p">};</span>
+
+<span class="kt">void</span><span class="w"> </span><span class="nf">Insert</span><span class="p">(</span><span class="n">OctreeNode</span><span class="o">*</span><span class="w"> </span><span class="n">node</span><span class="p">,</span><span class="w"> </span><span class="n">RGB</span><span class="w"> </span><span class="n">c</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">layer</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">layer</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">MAX_LAYER</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">         </span><span class="c1">// 到达叶子：统计即可</span>
+<span class="w">        </span><span class="n">node</span><span class="o">-&gt;</span><span class="n">pixelCount</span><span class="o">++</span><span class="p">;</span>
+<span class="w">        </span><span class="n">node</span><span class="o">-&gt;</span><span class="n">sumR</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="n">c</span><span class="p">.</span><span class="n">r</span><span class="p">;</span><span class="w"> </span><span class="n">node</span><span class="o">-&gt;</span><span class="n">sumG</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="n">c</span><span class="p">.</span><span class="n">g</span><span class="p">;</span><span class="w"> </span><span class="n">node</span><span class="o">-&gt;</span><span class="n">sumB</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="n">c</span><span class="p">.</span><span class="n">b</span><span class="p">;</span>
+<span class="w">        </span><span class="k">return</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">bit</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">7</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">layer</span><span class="p">;</span><span class="w">              </span><span class="c1">// 本层取第几个 bit</span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">slot</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">((</span><span class="n">c</span><span class="p">.</span><span class="n">r</span><span class="w"> </span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="n">bit</span><span class="p">)</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="mi">2</span>
+<span class="w">             </span><span class="o">|</span><span class="w"> </span><span class="p">((</span><span class="n">c</span><span class="p">.</span><span class="n">g</span><span class="w"> </span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="n">bit</span><span class="p">)</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="mi">1</span>
+<span class="w">             </span><span class="o">|</span><span class="w"> </span><span class="p">((</span><span class="n">c</span><span class="p">.</span><span class="n">b</span><span class="w"> </span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="n">bit</span><span class="p">)</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="mi">1</span><span class="p">);</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">node</span><span class="o">-&gt;</span><span class="n">child</span><span class="p">[</span><span class="n">slot</span><span class="p">])</span><span class="w"> </span><span class="n">node</span><span class="o">-&gt;</span><span class="n">child</span><span class="p">[</span><span class="n">slot</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">OctreeNode</span><span class="p">;</span>
+<span class="w">    </span><span class="n">Insert</span><span class="p">(</span><span class="n">node</span><span class="o">-&gt;</span><span class="n">child</span><span class="p">[</span><span class="n">slot</span><span class="p">],</span><span class="w"> </span><span class="n">c</span><span class="p">,</span><span class="w"> </span><span class="n">layer</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="c1">// 量化：不断合并&quot;最不重要&quot;的叶子，直到只剩 K 片</span>
+<span class="kt">void</span><span class="w"> </span><span class="nf">Reduce</span><span class="p">(</span><span class="n">Octree</span><span class="o">*</span><span class="w"> </span><span class="n">tree</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">K</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="n">tree</span><span class="o">-&gt;</span><span class="n">leafCount</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="n">K</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">OctreeNode</span><span class="o">*</span><span class="w"> </span><span class="n">victim</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">LeastSignificantLeaf</span><span class="p">(</span><span class="n">tree</span><span class="p">);</span><span class="w"> </span><span class="c1">// 像素少、层级浅者优先</span>
+<span class="w">        </span><span class="n">OctreeNode</span><span class="o">*</span><span class="w"> </span><span class="n">parent</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">victim</span><span class="o">-&gt;</span><span class="n">parent</span><span class="p">;</span>
+<span class="w">        </span><span class="n">parent</span><span class="o">-&gt;</span><span class="n">pixelCount</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="n">victim</span><span class="o">-&gt;</span><span class="n">pixelCount</span><span class="p">;</span><span class="w">        </span><span class="c1">// 统计量上卷</span>
+<span class="w">        </span><span class="n">parent</span><span class="o">-&gt;</span><span class="n">sumR</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="n">victim</span><span class="o">-&gt;</span><span class="n">sumR</span><span class="p">;</span><span class="w"> </span><span class="cm">/* G、B 同理 */</span>
+<span class="w">        </span><span class="k">delete</span><span class="w"> </span><span class="n">victim</span><span class="p">;</span><span class="w">                                   </span><span class="c1">// 父节点变成叶子</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>"权重 = 像素数 + 层级惩罚"这个小公式是经典 Octree 的精髓：<strong>出现次数少的颜色、以及位于浅层（即和其他颜色差异大但没人气）的叶子先被牺牲</strong>。直观地说，就是"没人用的颜色让给有人用的颜色"。</p>
+<p>选 Octree 而不是 Median Cut、k-means 之类，是那个年代非常合理的工程决定：插入是 O(N)、每像素只要几次位运算，内存只占有效路径，几百行 C++ 就能写完——打包几千张精灵图时，快慢之分就是分钟级和小时级的区别。</p>
+<h3>3.3 这是有损压缩，损失在哪</h3>
+<p>必须明确：<strong>Octree 量化是有损的</strong>。24-bit 颜色空间有 1677 万种颜色，压到 256 项调色板，本质是多对一映射，原始 RGB 永远找不回来了。而且它丢的东西和 RLE 完全是两个维度：</p>
+<table>
+<thead>
+<tr>
+<th>手段</th>
+<th>丢什么</th>
+<th>性质</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Octree / Median Cut / Wu</td>
+<td>颜色精度</td>
+<td>有损，颜色空间降维</td>
+</tr>
+<tr>
+<td>JPEG</td>
+<td>空间高频细节</td>
+<td>有损，频域量化</td>
+</tr>
+<tr>
+<td>RLE / LZW</td>
+<td>什么都不丢</td>
+<td>无损，空间冗余</td>
+</tr>
+<tr>
+<td>抖动（Dithering）</td>
+<td>几乎不丢</td>
+<td>用噪声换精度</td>
+</tr>
+</tbody>
+</table>
+<p>正因为正交，两层可以串联：先量化成索引图，再对索引图做 RLE，互不干扰。</p>
+<p>量化的损失在两类画面上会现形。一类是<strong>大色块渐变</strong>——天空、水面、雾气：256 个颜色摊到平滑渐变上，相邻色阶之间会出现肉眼可见的断层（banding）。解药是<strong>抖动</strong>，最经典的是 Floyd-Steinberg 误差扩散：量化一个像素后，把误差按 7/16、3/16、5/16、1/16 扩散到右、左下、下、右下四个未处理邻居，色阶断层就化成了细腻的颗粒感。</p>
+<p><img alt="同一渐变分别做无量化、量化不加抖动、量化加 Floyd-Steinberg 抖动的对比" src="./images/fig-banding.png"></p>
+<p>但注意一个反直觉的结论：<strong>抖动对精灵图是负优化</strong>。精灵图靠硬边色块造型，一抖边缘就糊。所以当年的工作流里，抖动只该施加在渐变背景上，精灵图保持硬边——这个"按图层区别对待"的原则，到今天做像素风游戏依然成立。</p>
+<p>另一类受害画面是颜色分布极端的图（比如纯黑背景上几个高光点），Octree 容易把高光合并掉，这种场景 Median Cut 或 Wu 的方差切分更稳。这是选型时该知道的边界。</p>
+<h3>3.4 一套调色板，六张面孔</h3>
+<p>调色板还有一个 DOS 时代就验证过的红利：<strong>换表不换图</strong>。那套引擎把这个红利做到了极致——每个精灵载入时，一次性预生成 6 套调色板变体：</p>
+<table>
+<thead>
+<tr>
+<th>变体</th>
+<th>用途</th>
+<th>典型场景</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>原色</td>
+<td>正常绘制</td>
+<td>默认</td>
+</tr>
+<tr>
+<td>高亮</td>
+<td>整体提亮</td>
+<td>被治疗、选中闪光</td>
+</tr>
+<tr>
+<td>灰度</td>
+<td>去色</td>
+<td>冰冻、石化、死亡</td>
+</tr>
+<tr>
+<td>红染</td>
+<td>偏红</td>
+<td>被火球击中、狂暴</td>
+</tr>
+<tr>
+<td>绿染</td>
+<td>偏绿</td>
+<td>中毒</td>
+</tr>
+<tr>
+<td>蓝染</td>
+<td>偏蓝</td>
+<td>冰冻、法力相关</td>
+</tr>
+</tbody>
+</table>
+<p>运行期角色中了冰冻，不用改一个像素，绘制时把调色板指针偏移到"灰度套"即可——<strong>染色特效的边际成本是一次指针加法</strong>。这在每帧要画几百个精灵的软件渲染时代，是极其划算的以空间换时间：6 套 × 256 项 × 2 字节，每个精灵不过 3KB。</p>
+<p>这里还有一个容易踩的工程坑：<strong>一套调色板必须被一个动画的所有帧共享</strong>。如果每帧各自量化，"肤色"在第 1 帧是索引 7、第 2 帧变成索引 23，正常播放时两色接近看不出来，可一旦切到灰度或高亮变体，两个索引在变体表里的差值会被放大，角色就会在身上"闪"一下。所以打包工具必须把<strong>所有帧喂给同一棵 Octree 做联合量化</strong>，保证同一原始色在每一帧都映射到同一索引。这个约束没有任何运行期兜底，全靠工具链自觉——这是那一代引擎里典型的"约定大于校验"。</p>
+<h2>四、RLE：一种"边解压边画"的压缩</h2>
+<h3>4.1 为什么不是 LZW</h3>
+<p>既然要压缩，为什么不用更"正经"的 LZW（GIF 用的那种）？因为<strong>解压形态不对</strong>。</p>
+<p>LZW 解压需要维护一个不断生长的字典，输出是"先解压成完整位图、再整体绘制"。而 2D Blitter 引擎的核心诉求是<strong>流式绘制</strong>：屏幕上几百个精灵，每个都可能被屏幕边缘裁掉一半、被建筑遮住一角，你绝对不想"先把整张图解压到临时位图再裁剪 blit"——那等于白付一遍内存带宽。</p>
+<p>RLE 恰好相反：数据是按扫描线顺序排列的 run 流，解码器只要维持"当前写到画布哪一行、哪个 x"这一点点状态，就能<strong>一边读压缩流、一边把像素写进显存</strong>，遇到裁剪区域直接快进。解码和绘制是同一次遍历，零中间缓冲。无字典、状态极小、可以单遍流式——这就是 2D 精灵场景选 RLE 的全部理由。</p>
+<h3>4.2 把透明像素编码成一种 run</h3>
+<p>精灵图最大的空间冗余是透明背景。那套引擎的处理很妙：不给精灵单独的 mask 通道，而是把<strong>透明度做成 run 头里的一个字节</strong>：</p>
+<div class="highlight"><pre><span></span><code><span class="n">每个</span><span class="w"> </span><span class="n">run</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">[</span><span class="n">长度 count</span><span class="o">][</span><span class="n">alpha</span><span class="o">][</span><span class="n">可选的 count 个调色板索引</span><span class="o">]</span>
+<span class="w">  </span><span class="n">alpha</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="w">     </span><span class="err">→</span><span class="w"> </span><span class="n">透明</span><span class="w"> </span><span class="n">run</span><span class="err">：</span><span class="n">没有数据字节</span><span class="err">，</span><span class="n">共</span><span class="w"> </span><span class="mi">2</span><span class="w"> </span><span class="n">字节</span>
+<span class="w">  </span><span class="n">alpha</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">255</span><span class="w">   </span><span class="err">→</span><span class="w"> </span><span class="n">实色</span><span class="w"> </span><span class="n">run</span><span class="err">：</span><span class="n">头</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nf">count</span><span class="w"> </span><span class="n">个索引字节</span>
+<span class="w">  </span><span class="n">alpha</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="o">~</span><span class="mi">254</span><span class="w"> </span><span class="err">→</span><span class="w"> </span><span class="n">半透明</span><span class="w"> </span><span class="n">run</span><span class="err">：</span><span class="n">整段共享一个透明度</span>
+</code></pre></div>
+
+<p><img alt="一行精灵图像素如何编码为透明 run 与实色 run 交替的字节流" src="./images/fig-rle-row.png"></p>
+<p>编码端是朴素的逐行扫描：</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// 把一行 8-bit 索引图编码成 run 流；transparent 由 ColorKey 或 alpha 通道判定</span>
+<span class="kt">void</span><span class="w"> </span><span class="nf">EncodeLine</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="kt">uint8_t</span><span class="o">*</span><span class="w"> </span><span class="n">pixels</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">width</span><span class="p">,</span><span class="w"> </span><span class="n">ByteStream</span><span class="o">&amp;</span><span class="w"> </span><span class="n">out</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="w">    </span><span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="n">x</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">width</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">transparent</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">CountRun</span><span class="p">(</span><span class="n">pixels</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">width</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">IsTransparent</span><span class="p">);</span>
+<span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">opaque</span><span class="w">      </span><span class="o">=</span><span class="w"> </span><span class="n">CountRun</span><span class="p">(</span><span class="n">pixels</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">width</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">IsOpaque</span><span class="p">);</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">transparent</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="n">out</span><span class="p">.</span><span class="n">Write</span><span class="p">(</span><span class="n">min</span><span class="p">(</span><span class="n">transparent</span><span class="p">,</span><span class="w"> </span><span class="mi">255</span><span class="p">));</span><span class="w">  </span><span class="c1">// 长度（单字节，上限 255）</span>
+<span class="w">            </span><span class="n">out</span><span class="p">.</span><span class="n">Write</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span><span class="w">                      </span><span class="c1">// alpha = 0：透明</span>
+<span class="w">            </span><span class="n">x</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="n">transparent</span><span class="p">;</span>
+<span class="w">        </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="n">out</span><span class="p">.</span><span class="n">Write</span><span class="p">(</span><span class="n">min</span><span class="p">(</span><span class="n">opaque</span><span class="p">,</span><span class="w"> </span><span class="mi">255</span><span class="p">));</span>
+<span class="w">            </span><span class="n">out</span><span class="p">.</span><span class="n">Write</span><span class="p">(</span><span class="mi">255</span><span class="p">);</span><span class="w">                    </span><span class="c1">// alpha = 255：实色</span>
+<span class="w">            </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">min</span><span class="p">(</span><span class="n">opaque</span><span class="p">,</span><span class="w"> </span><span class="mi">255</span><span class="p">);</span><span class="w"> </span><span class="n">i</span><span class="o">++</span><span class="p">)</span>
+<span class="w">                </span><span class="n">out</span><span class="p">.</span><span class="n">Write</span><span class="p">(</span><span class="n">pixels</span><span class="p">[</span><span class="n">x</span><span class="o">++</span><span class="p">]);</span><span class="w">        </span><span class="c1">// 照搬 count 个调色板索引</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>有两个细节值得一提。其一，<strong>单 run 长度上限 255</strong>（一个字节），超长就拆成多个 run——对几十像素宽的精灵毫无影响，这是"用单字节换解码器简单"的权衡。其二，编码前会先找出帧内非透明像素的<strong>最小包围盒</strong>，只编码这一块，并在帧头记下相对原图的偏移——不规则轮廓的精灵因此不必占用矩形画布，又省一笔。</p>
+<p>经验上，这套格式对精灵图能拿到 2:1 到 6:1 的压缩比，透明像素占比越高越赚。</p>
+<h3>4.3 解码即绘制</h3>
+<p>真正的功夫在解码端。它不是一个"解压函数"，而是一个<strong>把走流、裁剪、查表、混合四件事揉在一起的绘制器</strong>：</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// 流式绘制：src 指向 RLE 流，dst 指向 16-bit 显存当前行位置</span>
+<span class="kt">void</span><span class="w"> </span><span class="nf">DrawRLE</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="kt">uint8_t</span><span class="o">*</span><span class="w"> </span><span class="n">src</span><span class="p">,</span><span class="w"> </span><span class="kt">uint16_t</span><span class="o">*</span><span class="w"> </span><span class="n">dst</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">visibleWidth</span><span class="p">,</span>
+<span class="w">             </span><span class="k">const</span><span class="w"> </span><span class="kt">uint16_t</span><span class="o">*</span><span class="w"> </span><span class="n">palette16</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">clipLeft</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">clipRight</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="w">    </span><span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="n">x</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">visibleWidth</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">count</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">*</span><span class="n">src</span><span class="o">++</span><span class="p">;</span>
+<span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">alpha</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">*</span><span class="n">src</span><span class="o">++</span><span class="p">;</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">alpha</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="n">dst</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="n">count</span><span class="p">;</span><span class="w">               </span><span class="c1">// 透明：只推画布指针，零读写</span>
+<span class="w">        </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="c1">// 裁剪：本 run 与 [clipLeft, clipRight] 求交，只画交集</span>
+<span class="w">            </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">count</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="o">++</span><span class="p">,</span><span class="w"> </span><span class="n">src</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="kt">int</span><span class="w"> </span><span class="n">px</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">i</span><span class="p">;</span>
+<span class="w">                </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">px</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="n">clipLeft</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">px</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">clipRight</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">alpha</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">255</span><span class="p">)</span>
+<span class="w">                        </span><span class="o">*</span><span class="n">dst</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">palette16</span><span class="p">[</span><span class="o">*</span><span class="n">src</span><span class="p">];</span><span class="w">            </span><span class="c1">// 查表，直写</span>
+<span class="w">                    </span><span class="k">else</span>
+<span class="w">                        </span><span class="o">*</span><span class="n">dst</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Blend</span><span class="p">(</span><span class="o">*</span><span class="n">dst</span><span class="p">,</span><span class="w"> </span><span class="n">palette16</span><span class="p">[</span><span class="o">*</span><span class="n">src</span><span class="p">],</span><span class="w"> </span><span class="n">alpha</span><span class="p">);</span><span class="w"> </span><span class="c1">// 定点混合</span>
+<span class="w">                </span><span class="p">}</span>
+<span class="w">                </span><span class="n">dst</span><span class="o">++</span><span class="p">;</span>
+<span class="w">            </span><span class="p">}</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">        </span><span class="n">x</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="n">count</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>注意透明 run 分支的杀伤力：<strong>两个自增就跳过了一段像素</strong>——不读数据、不查表、不写显存。2D 游戏里满屏精灵互相遮挡，实际可见像素远少于总像素，这个"跳过成本趋近于零"的特性就是帧率本身。当年这类绘制器通常整体用 x86 汇编（后来是 MMX）手写，把四种裁剪象限（左裁/右裁的组合）展开成四条专门路径，寄存器分配抠到个位数周期。Alpha 混合也是定点数：<code>dst = (src * a + dst * (32 - a)) / 32</code>，两条 <code>mul</code> 搞定，不碰浮点。</p>
+<h2>五、对照样本：《星际争霸 1》</h2>
+<p>这套"8-bit 调色板 + RLE 精灵"的方案不是某个引擎的奇技淫巧，而是那个时代的行业共识。最有力的证据来自暴雪——《星际争霸 1》（1998）就是 640×480、8-bit 调色板渲染的游戏，它的精灵格式 GRP（沿用到《魔兽争霸 2》，格式甚至可追溯到初代《魔兽争霸》）几乎是我们上面所有讨论的活化石，社区逆向资料（如 <a href="https://github.com/sjoblomj/irongrp">IronGRP</a> 的文档）讲得很清楚：</p>
+<ul>
+<li><strong>GRP 只存调色板索引</strong>：每像素一个字节，真正的 RGB 在外部的 <code>.pal</code> 调色板文件里（256 项 × 3 字节），图与表分离，和我们说的"索引图 + 调色板"一模一样；</li>
+<li><strong>调色板索引 0 就是透明</strong>：ColorKey 方案，不需要独立 mask；</li>
+<li><strong>RLE 压缩直接编码在像素流里</strong>：控制字节区分三种指令——"接下来 x 个像素透明"、"接下来 x 个像素同色（只存一次索引）"、"原样拷贝接下来 x 个像素"。绝大多数单位和建筑精灵都是 RLE 压缩存储的；</li>
+<li><strong>调色板换色玩到极致</strong>：玩家颜色不靠重画素材，而是用 <code>tselect.pcx</code> 这类<strong>重映射表</strong>——精灵上特定索引区间的像素，按玩家编号映射到另一组索引，一个枪兵模型瞬间变成 8 个玩家的 8 种颜色；火焰、爆炸等半透明效果则用 <code>ofire.pcx</code> 之类的<strong>二维查找表</strong>实现：精灵索引 × 背景索引 → 新索引，纯查表做出伪 Alpha 混合。</li>
+</ul>
+<p><img alt="《星际争霸 1》原版引擎（1.16.1）实战画面：640×480、8-bit 调色板渲染的 2D RTS。原图 640×480，此处按 2× 整数缩放显示（像素 1:1，无滤波）" src="./images/sc-classic-gameplay.png"></p>
+<p>把这套东西放在 1998 年的奔腾 II 上看，每一个决定都直指硬件咽喉：8-bit 索引让单位精灵的内存占用减半；RLE 让透明轮廓近乎免费；调色板重映射让"8 玩家 × 数百单位"的换色零成本；查表式半透明让爆炸特效不用做任何乘法。<strong>不是暴雪选择了这些技术，是硬件选择了它们。</strong></p>
+<h2>六、一个常见误会：同屏 256 色？</h2>
+<p>聊调色板索引图时，最常听到的疑问是："每张图 256 色，同屏几十张图，不就超过 256 色了吗？"</p>
+<p>这个疑问混淆了<strong>存储格式</strong>和<strong>显示格式</strong>。2000 年前后的 PC 2D 引擎，显示端早就切到了 16-bit 高彩（RGB565 / RGB555，同屏上限 65,536 / 32,768 色）。8-bit 索引只存在于磁盘和内存里，绘制的瞬间就被"翻译"掉了：</p>
+<div class="highlight"><pre><span></span><code><span class="n">RLE</span><span class="w"> </span><span class="n">流里读出一个字节</span><span class="err">（</span><span class="n">调色板索引</span><span class="err">）</span>
+<span class="w">        </span><span class="err">│</span>
+<span class="w">        </span><span class="err">▼</span>
+<span class="n">在</span><span class="w"> </span><span class="mi">16</span><span class="o">-</span><span class="nc">bit</span><span class="w"> </span><span class="n">调色板里查表</span><span class="err">：</span><span class="n">color16</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">palette16</span><span class="o">[</span><span class="n">index</span><span class="o">]</span>
+<span class="w">        </span><span class="err">│</span>
+<span class="w">        </span><span class="err">▼</span>
+<span class="n">写进</span><span class="w"> </span><span class="mi">16</span><span class="o">-</span><span class="nc">bit</span><span class="w"> </span><span class="n">DirectDraw</span><span class="w"> </span><span class="n">Surface</span><span class="err">（</span><span class="n">RGB565</span><span class="o">/</span><span class="mi">555</span><span class="err">）</span>
+</code></pre></div>
+
+<p>每个像素在显存里是实打实的 2 字节颜色，跟"全屏共享 256 色"毫无关系——那是 DOS Mode 13h 时代的枷锁，DirectDraw 时代早已打破。</p>
+<p><img alt="8-bit 索引 + RLE 的完整管线：打包期量化压缩，运行期流式解码查表写入 16-bit 显存" src="./images/fig-pipeline.png"></p>
+<p>那为什么还要坚持用 8-bit 索引做中间格式？三个理由，全是钱：</p>
+<ol>
+<li><strong>内存和带宽减半</strong>：每像素 1 字节 vs 2 字节，素材缓存直接翻倍，主存到显存的拷贝量减半；</li>
+<li><strong>RLE 跳过更便宜</strong>：跳过一个 8-bit run 只推 1 字节步长，透明 run 更是只读 2 字节头；</li>
+<li><strong>变体调色板小</strong>：6 套 × 256 项 × 2 字节 = 3KB/精灵，染色特效随便用。</li>
+</ol>
+<p>这就是"磁盘/内存用索引、显存用真彩、中间靠查表衔接"的三层结构，Win98 之后 DirectDraw 普及年代的标准 2D 引擎范式。Octree 量化的一切色彩损失都发生在离线打包期，<strong>运行期只是查表，一分精度都不再丢</strong>。</p>
+<h2>七、后记：这些技术死了吗</h2>
+<p>GPU 时代到来后，软件 Blitter、调色板、手写汇编绘制器都进了博物馆——今天纹理压缩换成了 BC/ETC/ASTC（同样是"有损、块级、为随机访问优化"的思路），透明混合交给了硬件 Blend Unit，没人再为一个像素的绘制周期写汇编。</p>
+<p>但有几样东西其实没死。RLE 的"run 流 + 流式消费"思想活在各种列式存储和稀疏数据结构里；颜色量化活在每一个 PNG 优化工具（pngquant 至今还是 Median Cut + Floyd-Steinberg 的组合拳）里；"预计算变体、运行期换表"的以空间换时间，和今天的 LUT 调色、Shader 查表一脉相承；而"按内容类型区别对待"——精灵硬边不抖动、背景渐变要抖动——更是任何压缩管线都绕不开的常识。</p>
+<p>回看那个时代，最动人的不是某个具体算法，而是那种<strong>在 64KB 段、2MB 显存、300MHz CPU 的夹缝里，把每一个字节、每一次访存都安排得明明白白</strong>的工程自觉。限制催生设计，诚不我欺。</p>
+</div>
+		</div>
+	</body>
+</html>
