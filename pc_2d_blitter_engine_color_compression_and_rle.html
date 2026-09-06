@@ -8,7 +8,7 @@
 		<!-- Metadata -->
 	<meta name="description" content="一个游戏程序员。曾经参与开发过<a href='https://www.bing.com/search?q=%E4%BB%99%E4%BE%A3%E5%A5%87%E7%BC%983'>仙侣奇缘3</a>、<a href='http://sh.70yx.com'>水浒传</a>、<a href='https://itunes.apple.com/cn/app/id938688461'>小米运动</a>、<a href='https://itunes.apple.com/cn/app/id1034182617'>米动</a>和<a href='https://www.taptap.com/app/143658'>无限激战</a>">
 	<meta property="og:description" content="一个游戏程序员。曾经参与开发过<a href='https://www.bing.com/search?q=%E4%BB%99%E4%BE%A3%E5%A5%87%E7%BC%983'>仙侣奇缘3</a>、<a href='http://sh.70yx.com'>水浒传</a>、<a href='https://itunes.apple.com/cn/app/id938688461'>小米运动</a>、<a href='https://itunes.apple.com/cn/app/id1034182617'>米动</a>和<a href='https://www.taptap.com/app/143658'>无限激战</a>">
-	<meta property="og:title" content="千禧年前后的 PC 2D Blitter 引擎：颜色压缩与 RLE 是怎么被硬件逼出来的" />
+	<meta property="og:title" content="PC 2D Blitter 引擎：颜色压缩与 RLE 是怎么被硬件逼出来的" />
 	<meta property="og:type" content="article" />
 	<meta property="og:url" content="https://funcman.me/pc_2d_blitter_engine_color_compression_and_rle.html" />
 		<meta property="og:image" content="https://funcman.me/images/avatar.png" />
@@ -68,7 +68,7 @@
 	</div>
 </div>		<div class="content container">
 <div class="post">
-	<h1 class="post-title">千禧年前后的 PC 2D Blitter 引擎：颜色压缩与 RLE 是怎么被硬件逼出来的</h1>
+	<h1 class="post-title">PC 2D Blitter 引擎：颜色压缩与 RLE 是怎么被硬件逼出来的</h1>
 	<span class="post-date">2026年09月05日 星期六</span>
 	<p>最近重读了一套 2000 年代初的国产 2D 端游引擎源码（Blitter 架构，DirectDraw 绘制），里面有两个模块让我感慨良久：一套 Octree 颜色量化器，和一套带 Alpha 标记的 RLE 精灵编码。它们都不是什么高深算法，教科书上都找得到，但<strong>为什么偏偏是这两个算法、以这种方式组合在一起</strong>，只有把时钟拨回到那个年代才能想明白。</p>
 <p>这篇文章就从硬件限制讲起，把这两件事的来龙去脉捋一遍。文中的代码全部是我重写的示意性伪代码，重在表达结构。</p>

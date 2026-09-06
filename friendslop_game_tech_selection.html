@@ -8,7 +8,7 @@
 		<!-- Metadata -->
 	<meta name="description" content="一个游戏程序员。曾经参与开发过<a href='https://www.bing.com/search?q=%E4%BB%99%E4%BE%A3%E5%A5%87%E7%BC%983'>仙侣奇缘3</a>、<a href='http://sh.70yx.com'>水浒传</a>、<a href='https://itunes.apple.com/cn/app/id938688461'>小米运动</a>、<a href='https://itunes.apple.com/cn/app/id1034182617'>米动</a>和<a href='https://www.taptap.com/app/143658'>无限激战</a>">
 	<meta property="og:description" content="一个游戏程序员。曾经参与开发过<a href='https://www.bing.com/search?q=%E4%BB%99%E4%BE%A3%E5%A5%87%E7%BC%983'>仙侣奇缘3</a>、<a href='http://sh.70yx.com'>水浒传</a>、<a href='https://itunes.apple.com/cn/app/id938688461'>小米运动</a>、<a href='https://itunes.apple.com/cn/app/id1034182617'>米动</a>和<a href='https://www.taptap.com/app/143658'>无限激战</a>">
-	<meta property="og:title" content="友尽游戏的设计与技术选型：以网络架构为中心的一次解剖" />
+	<meta property="og:title" content="友尽游戏的设计与技术选型" />
 	<meta property="og:type" content="article" />
 	<meta property="og:url" content="https://funcman.me/friendslop_game_tech_selection.html" />
 		<meta property="og:image" content="https://funcman.me/images/avatar.png" />
@@ -68,7 +68,7 @@
 	</div>
 </div>		<div class="content container">
 <div class="post">
-	<h1 class="post-title">友尽游戏的设计与技术选型：以网络架构为中心的一次解剖</h1>
+	<h1 class="post-title">友尽游戏的设计与技术选型</h1>
 	<span class="post-date">2026年09月04日 星期五</span>
 	<p>2025年下半年开始，独立游戏圈出现了一个半开玩笑的新词：<strong>Friendslop</strong>——"朋友垃圾游戏"，或者按国内玩家的叫法，<strong>友尽游戏</strong>。它指的是这样一类作品：2到12人合作、物理引擎驱动、画面廉价但荒诞、内置近距离语音、专为"和朋友一起玩"设计。这个词条甚至已经被Wikipedia收录，而行业分析报告则用了更体面的名字："怪咖独立合作"（weirdo indie co-op）——带有古怪机制、物理互动和近距离语音的游戏被证明特别成功，因为它们产生可分享的瞬间，在社交媒体上自然传播，省掉了昂贵的买量成本<a href="https://vibecode.game/blog/aaa-is-not-dead-its-irrelevant/" title="AAA Is Not Dead, It's Irrelevant — 关于Friendslop趋势、Yapyap首周50万、Evil Landfall发行品牌与PEAK联合创作者喊话的分析">1</a>。</p>
 <p>这个品类的成绩单是吓人的：《Lethal Company》单人开发，2023年12月Steam同时在线峰值超过23.9万<a href="https://www.pingaim.net/games/lethal-company/" title="Lethal Company Network Guide — NGO + Facepunch.Steamworks + Dissonance VOIP技术栈与23.9万峰值在线记录">2</a>；《R.E.P.O.》2025年2月上线后长期霸榜；PEAK由Aggro Crab和Landfall两个小组合作完成，成为2025年最大的黑马之一<a href="https://aggrocrab.com/" title="Aggro Crab官网 — PEAK为Aggro Crab与Landfall合作开发">3</a>；2026年2月，被形容为"反向R.E.P.O."的Yapyap首周卖出50万份<a href="https://vibecode.game/blog/aaa-is-not-dead-its-irrelevant/" title="AAA Is Not Dead, It's Irrelevant — 关于Friendslop趋势、Yapyap首周50万、Evil Landfall发行品牌与PEAK联合创作者喊话的分析">1</a>；Landfall甚至专门成立了发行品牌Evil Landfall来投资友尽游戏，其CEO已经在每天回复"这游戏很像PEAK，请投资我"式的邮件<a href="https://vibecode.game/blog/aaa-is-not-dead-its-irrelevant/" title="AAA Is Not Dead, It's Irrelevant — 关于Friendslop趋势、Yapyap首周50万、Evil Landfall发行品牌与PEAK联合创作者喊话的分析">1</a>。PEAK的联合创作者在2026年3月对独立开发者喊话："求求你们，趁这个潮流没死，快做友尽游戏。"<a href="https://vibecode.game/blog/aaa-is-not-dead-its-irrelevant/" title="AAA Is Not Dead, It's Irrelevant — 关于Friendslop趋势、Yapyap首周50万、Evil Landfall发行品牌与PEAK联合创作者喊话的分析">1</a></p>

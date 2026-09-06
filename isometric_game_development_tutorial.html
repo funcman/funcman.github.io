@@ -8,7 +8,7 @@
 		<!-- Metadata -->
 	<meta name="description" content="一个游戏程序员。曾经参与开发过<a href='https://www.bing.com/search?q=%E4%BB%99%E4%BE%A3%E5%A5%87%E7%BC%983'>仙侣奇缘3</a>、<a href='http://sh.70yx.com'>水浒传</a>、<a href='https://itunes.apple.com/cn/app/id938688461'>小米运动</a>、<a href='https://itunes.apple.com/cn/app/id1034182617'>米动</a>和<a href='https://www.taptap.com/app/143658'>无限激战</a>">
 	<meta property="og:description" content="一个游戏程序员。曾经参与开发过<a href='https://www.bing.com/search?q=%E4%BB%99%E4%BE%A3%E5%A5%87%E7%BC%983'>仙侣奇缘3</a>、<a href='http://sh.70yx.com'>水浒传</a>、<a href='https://itunes.apple.com/cn/app/id938688461'>小米运动</a>、<a href='https://itunes.apple.com/cn/app/id1034182617'>米动</a>和<a href='https://www.taptap.com/app/143658'>无限激战</a>">
-	<meta property="og:title" content="等距视角（Isometric）游戏开发教程：从菱形瓦片到遮挡排序" />
+	<meta property="og:title" content="等距视角（Isometric）游戏开发教程" />
 	<meta property="og:type" content="article" />
 	<meta property="og:url" content="https://funcman.me/isometric_game_development_tutorial.html" />
 		<meta property="og:image" content="https://funcman.me/images/avatar.png" />
@@ -68,7 +68,7 @@
 	</div>
 </div>		<div class="content container">
 <div class="post">
-	<h1 class="post-title">等距视角（Isometric）游戏开发教程：从菱形瓦片到遮挡排序</h1>
+	<h1 class="post-title">等距视角（Isometric）游戏开发教程</h1>
 	<span class="post-date">2026年09月04日 星期五</span>
 	<p>等距视角（Isometric）是游戏史上生命力最强的视觉方案之一。从《模拟城市》《帝国时代》到《暗黑破坏神》，再到千禧年前后一大批国产 2D 网游，这种"斜 45 度俯瞰"的画面撑起了整整一个时代。我早年参与过几款这类 2.5D 网游客户端的开发，后来也研究过现代引擎里的同类系统，发现这道题的两代答案恰好构成一条非常好的学习路径：<strong>同一个问题，在"只有软件光栅"和"有现代引擎"两种约束下，会演化出两套截然不同但同样精巧的架构。</strong></p>
 <p>这篇教程就把这条路径完整走一遍：从坐标系起步，到地图渲染，再到这类游戏真正的技术核心——遮挡排序——最后收在寻路和性能工程上。文中的代码都是示意性的 C++ 伪代码，重在表达结构而非可直接编译。</p>
