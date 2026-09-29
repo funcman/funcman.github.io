@@ -1,5 +1,226 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>funcman's blog</title><link href="https://funcman.me/" rel="alternate"/><link href="https://funcman.me/rss.xml" rel="self"/><id>https://funcman.me/</id><updated>2026-09-23T18:46:00+08:00</updated><entry><title>现在做游戏，是不是必死无疑？</title><link href="https://funcman.me/is_making_a_game_doomed.html" rel="alternate"/><published>2026-09-23T18:46:00+08:00</published><updated>2026-09-23T18:46:00+08:00</updated><author><name>funcman</name></author><id>tag:funcman.me,2026-09-23:/is_making_a_game_doomed.html</id><summary type="html">&lt;p&gt;知乎热议"Steam日更51款游戏，做游戏是否必死无疑"。答主"夜神不说话"的回答提气但漏洞不少："必死无疑"与"有办法不死"自相矛盾，14亿人口乘出来的销量上限是画饼，"差游戏也有好销量"是幸存者偏差。真正值钱的是恐惧驱动与希望驱动的区分——靠日常签到留住玩家的设计，流失恰恰发生在恐惧消失那一刻。该问的不是"会不会死"，而是"凭什么不死"。&lt;/p&gt;</summary><content type="html">&lt;p&gt;&lt;a href="https://www.zhihu.com/question/1966538200408367269"&gt;知乎上有个问题&lt;/a&gt;：Steam 平均每天上线 51 款游戏，行业厮杀如同绞肉，现在做一款游戏，是不是大概率必死无疑？一位叫“夜神不说话”的一线设计师&lt;a href="https://www.zhihu.com/question/1966538200408367269/answer/1967215602893559310"&gt;写了篇长回答&lt;/a&gt;，核心意思是：别管每天上架多少款，任何时候做游戏都是大概率必死无疑的，你要想清楚的不是“要不要做”，而是“怎么不死”。&lt;/p&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>funcman's blog</title><link href="https://funcman.me/" rel="alternate"/><link href="https://funcman.me/rss.xml" rel="self"/><id>https://funcman.me/</id><updated>2026-09-29T21:30:00+08:00</updated><entry><title>游戏世界的分层模拟</title><link href="https://funcman.me/layered_world_simulation.html" rel="alternate"/><published>2026-09-29T21:30:00+08:00</published><updated>2026-09-29T21:30:00+08:00</updated><author><name>funcman</name></author><id>tag:funcman.me,2026-09-29:/layered_world_simulation.html</id><summary type="html">&lt;p&gt;我想做一款能亲历演义事件、又能号令千军万马的三国角色扮演游戏。问题是，这个世界到底应该模拟到多细？&lt;/p&gt;</summary><content type="html">&lt;p&gt;我一直想做一款三国背景的角色扮演游戏。&lt;/p&gt;
+&lt;p&gt;不是《三国志》那种坐在地图外面点城市，也不是《真三国无双》那种一个人在战场里割草。我想要的是人在三国世界里面：可以是个刚出道的小人物，赶上黄巾之乱，认识刘关张；也可以慢慢有自己的部曲，参与官渡、赤壁；再往后还能做一方诸侯，从个人视角发号施令，让几千人去打仗。&lt;/p&gt;
+&lt;p&gt;问题也就跟着来了。&lt;/p&gt;
+&lt;p&gt;玩家还是小人物的时候，游戏需要知道一壶酒多少钱、客栈还有没有空房、街上的县卒认不认识你。玩家成为将军以后，游戏又要知道一万人的粮草还能吃几天、哪支部队正在绕路、哪个县准备倒向敌人。更麻烦的是，这两个尺度不是两个游戏。昨天和你喝酒的县卒，今天可能就在你的军阵里；你烧掉的一片麦田，半年后应该变成某座城里的粮荒。&lt;/p&gt;
+&lt;p&gt;如果所有东西都精确计算，做出来的东西很像《矮人要塞》。如果远处只留几个数字，又很容易变成一张会刷事件的表格。&lt;/p&gt;
+&lt;p&gt;我想讨论的是中间那条路：&lt;strong&gt;分层世界模拟&lt;/strong&gt;。&lt;/p&gt;
+&lt;h2&gt;《矮人要塞》到底模拟了什么&lt;/h2&gt;
+&lt;p&gt;《矮人要塞》经常被叫作“全量世界模拟”的代表。这个说法很形象，但是不够严谨。它并不是把全世界每个对象的全部逻辑，在每一个 tick 都重新算一遍。不同系统有自己的更新频率，地图之外的历史活动也会采用更抽象的处理。&lt;/p&gt;
+&lt;p&gt;&lt;img alt="《矮人要塞》中的大型要塞" src="./images/dwarf-fortress-steam-gameplay.jpg"&gt;&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;《矮人要塞》Steam 版游戏画面，截图来自&lt;a href="https://store.steampowered.com/app/975370/Dwarf_Fortress/"&gt;官方商店页&lt;/a&gt;。画面里同时存在人口、库存、房间、机械装置、水域和大量地形格。&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;它真正厉害的地方，是把玩家所在地点的许多系统都落到了可交互的对象上：矮人有性格、需求、技能、记忆和身体部位；物品有材质、品质和归属；液体按格流动；战斗会打中具体组织；世界生成时还会生成地形、气候、文明、战争和历史人物。&lt;/p&gt;
+&lt;p&gt;这些东西不是一叠互相看不见的数值。它们能接起来。&lt;/p&gt;
+&lt;p&gt;一个矮人失去亲人，情绪变坏，工作效率下降，和别人发生冲突，冲突又影响更多人。一次普通的袭击可以经过身体、物品、心理和社会关系几套系统，最后成为玩家记得很多年的故事。这类故事不是从剧本库里抽出来的，而是从状态和规则的连续作用里长出来的。&lt;/p&gt;
+&lt;p&gt;Tarn Adams 在《Simulation Principles from Dwarf Fortress》里总结过四条原则：尽早让模型跑起来；把系统拆成基本元素和交互；不要制造没有意义的复杂度；尽量参照现实中的对应物。他还特别提醒，只模拟玩家能看到的层级，或者再往下一层。这个说法很重要，因为《矮人要塞》虽然复杂，开发者也没有把“变量越多”当成美德。[1]&lt;/p&gt;
+&lt;p&gt;换句话说，《矮人要塞》的关键不是“每个东西都算”，而是：&lt;strong&gt;被算的东西有统一的状态，并且不同系统愿意互相负责。&lt;/strong&gt;&lt;/p&gt;
+&lt;h2&gt;全量模拟的问题不只是慢&lt;/h2&gt;
+&lt;p&gt;假设有 &lt;span class="math"&gt;\(N\)&lt;/span&gt; 个角色，每个角色选择行为时都要检查另外 &lt;span class="math"&gt;\(N-1\)&lt;/span&gt; 个角色，朴素计算量就是：&lt;/p&gt;
+&lt;div class="math"&gt;$$
+T(N) = O(N^2)
+$$&lt;/div&gt;
+&lt;p&gt;一百个人只有一万级别的关系检查，一万人就变成一亿。寻路、物品搜索、社会关系、战斗目标选择，都可能偷偷长成这种规模。即便每个角色只在附近找人，附近人数随着密度上升，成本还是会迅速增加。&lt;/p&gt;
+&lt;p&gt;更常见的是大量看起来只有 &lt;span class="math"&gt;\(O(N)\)&lt;/span&gt; 的系统叠在一起：&lt;/p&gt;
+&lt;div class="math"&gt;$$
+T_{tick} = \sum_{s=1}^{m} N_s c_s
+$$&lt;/div&gt;
+&lt;p&gt;&lt;span class="math"&gt;\(N_s\)&lt;/span&gt; 是参与第 &lt;span class="math"&gt;\(s\)&lt;/span&gt; 个系统的对象数，&lt;span class="math"&gt;\(c_s\)&lt;/span&gt; 是一次更新的成本。人口、物品、温度格、液体格、植物、任务和关系各扫一遍，单个循环都不吓人，加起来就吓人了。《矮人要塞》的开发者也公开谈过物品、搬运、寻路、温度和天气带来的性能压力。[2]&lt;/p&gt;
+&lt;p&gt;但 CPU 还不是最难的问题。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;第一个问题是调试。&lt;/strong&gt; 系统越多，因果链越长。玩家看到一座城突然饿死，开发者得判断这是运输失败、库存统计错误、道路被占用，还是某个县令的任务卡住了。所谓涌现，有时是精彩故事，有时只是一个很难复现的 bug。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;第二个问题是调参。&lt;/strong&gt; 五十个变量并不会自动产生五十倍的深度。它们也可能互相抵消，制造噪声，让设计者失去对结果的控制。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;第三个问题是内容利用率。&lt;/strong&gt; 玩家一次只能在一个地方。你给千里之外的村民算出了今天早餐吃什么，如果这个状态既不会传到玩家所在区域，也不会影响后来的世界，它就只是烧掉了一点电。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;第四个问题是确定性也救不了故事。&lt;/strong&gt; 全量模拟能够保证因果成立，却不能保证因果有趣。真实世界每天也发生大量无聊的事情。模拟得细，只是给涌现创造条件，并不等于自动拥有叙事。&lt;/p&gt;
+&lt;p&gt;这不只是我的担心。Michael Mateas 等人研究《矮人要塞》和《模拟人生》这类涌现叙事系统时，把一个老问题重新提了出来：底层模拟明明很丰富，玩家却未必看得见其中的故事。他们把它叫作 &lt;strong&gt;Tale-Spin effect&lt;/strong&gt;。模拟器既不一定能从大量普通事件里识别出哪一段称得上故事，也不一定知道怎样把它呈现给玩家。因此他们把“故事识别”和“故事支持”单独列为设计难题。[4]&lt;/p&gt;
+&lt;p&gt;这个观点对“全量模拟崇拜”是一盆很有必要的冷水。后台发生一万件事，不等于玩家获得了一万个故事。真正有用的系统还需要发现异常的因果链，把相关人物和前因后果串起来，再用合适的形式送到玩家面前。&lt;/p&gt;
+&lt;p&gt;2026 年的一次采访里，Tarn Adams 说他们判断一层模拟值不值得加入时，会亲自反复体验；如果过程中能看到一个不错的叙事节拍逐渐形成，才说明它可能有效。[5] 这个标准没有数学味，却很务实：模拟的单位不是变量，而是它最终能不能形成玩家愿意讲出来的事情。&lt;/p&gt;
+&lt;p&gt;所以我不想复制《矮人要塞》的规模。我更想复制它的因果性。&lt;/p&gt;
+&lt;h2&gt;分层模拟到底在近似什么&lt;/h2&gt;
+&lt;p&gt;“分层模拟”常见的英文叫 &lt;strong&gt;Simulation LOD&lt;/strong&gt;、&lt;strong&gt;multiresolution simulation&lt;/strong&gt; 或者 &lt;strong&gt;hierarchical simulation&lt;/strong&gt;。它和渲染 LOD 很像：近处画完整模型，远处画简化模型。不过渲染 LOD 只要看起来差不多，模拟 LOD 还要保证账能对上。&lt;/p&gt;
+&lt;p&gt;这套思路并不是游戏开发里的临时偏方。仿真领域把它叫作 Multiple Resolution Modeling，早就用于军事、交通、供应链等大规模系统。相关综述把 resolution 定义为模型描述现实对象时所使用的细节和精度，并指出战役级模型必须快速跑过几十天，工程级模型则可以把很短的过程算得很细，两者本来就在回答不同的问题。[6]&lt;/p&gt;
+&lt;p&gt;多层 Agent 模拟的研究也把微观到宏观叫作 aggregation，把宏观重新落回个体叫作 disaggregation。Mathieu 等人认为，多层模型不只是为了省计算量，还可以把领域专家真正关心的组织层次显式表示出来，或者让不同尺度的模型互相耦合。[7] 这对三国游戏很有启发：县、军队、家族和势力不应该只是为了优化才临时捏出的缓存，它们本来就是游戏世界里的真实行动者。&lt;/p&gt;
+&lt;p&gt;&lt;img alt="三层世界模拟" src="./images/layered-simulation-overview.svg"&gt;&lt;/p&gt;
+&lt;p&gt;对三国游戏，我会先分成三层：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;角色层&lt;/strong&gt;：玩家周围的街道、府邸和战场。人物是完整实体，有位置、装备、伤势、关系和当前意图。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;群体层&lt;/strong&gt;：玩家暂时看不到的县、军队和商队。只保存人口分布、粮食、财富、士气、疾病率、派系等统计量。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;世界层&lt;/strong&gt;：州郡和势力。处理税赋、迁徙、战争趋势、外交和演义事件的约束。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;设完整微观状态为 &lt;span class="math"&gt;\(x\)&lt;/span&gt;，聚合状态为 &lt;span class="math"&gt;\(z\)&lt;/span&gt;，把一群具体对象压缩成统计量的操作记作 &lt;span class="math"&gt;\(A\)&lt;/span&gt;：&lt;/p&gt;
+&lt;div class="math"&gt;$$
+z = A(x)
+$$&lt;/div&gt;
+&lt;p&gt;微观模拟器是 &lt;span class="math"&gt;\(F\)&lt;/span&gt;，粗粒度模拟器是 &lt;span class="math"&gt;\(G\)&lt;/span&gt;。我们不可能要求两个系统在每一个人的每一个动作上相同，但可以要求粗模型推进之后，和微观模型推进之后再聚合的结果接近：&lt;/p&gt;
+&lt;div class="math"&gt;$$
+G(A(x)) \approx A(F(x))
+$$&lt;/div&gt;
+&lt;p&gt;这就是分层模拟最核心的一条式子。&lt;/p&gt;
+&lt;p&gt;左边是“先把一座县城压成统计数据，再模拟一天”；右边是“让县城里所有人真的生活一天，再统计结果”。如果两边的人口、粮食、财富、伤亡和关键事件概率接近，那么玩家不在场时就可以放心走左边。&lt;/p&gt;
+&lt;p&gt;这里的“接近”也不能只写成一句感觉。可以定义误差：&lt;/p&gt;
+&lt;div class="math"&gt;$$
+E = \alpha_p |P_c-P_f| + \alpha_g |G_c-G_f| +
+    \alpha_e D_{JS}(q_c \parallel q_f)
+$$&lt;/div&gt;
+&lt;p&gt;&lt;span class="math"&gt;\(P\)&lt;/span&gt; 是人口，&lt;span class="math"&gt;\(G\)&lt;/span&gt; 是粮食，&lt;span class="math"&gt;\(q\)&lt;/span&gt; 是事件分布，&lt;span class="math"&gt;\(D_{JS}\)&lt;/span&gt; 是衡量两个概率分布差异的 Jensen-Shannon 散度。下标 &lt;span class="math"&gt;\(c\)&lt;/span&gt; 表示粗模拟，&lt;span class="math"&gt;\(f\)&lt;/span&gt; 表示细模拟。不同游戏可以用权重 &lt;span class="math"&gt;\(\alpha\)&lt;/span&gt; 决定什么更重要。&lt;/p&gt;
+&lt;p&gt;玩家不会在意远处县城第 317 个农民昨天走了哪条路，但会在意这座县城不该凭空多出五千石粮食，也会在意号称打了三个月的战争不能一个人都没死。&lt;/p&gt;
+&lt;p&gt;因此分层模拟追求的不是&lt;strong&gt;轨迹相同&lt;/strong&gt;，而是&lt;strong&gt;守恒量相同、分布相近、关键因果不丢&lt;/strong&gt;。&lt;/p&gt;
+&lt;h2&gt;最大的坑在层级接缝&lt;/h2&gt;
+&lt;p&gt;聚合很容易。两百个士兵可以压成“兵力 200、平均训练 0.63、士气 0.71、弓手占比 25%”。难的是玩家骑马赶到以后，怎么把这几个数字重新变回两百个人。&lt;/p&gt;
+&lt;p&gt;这个过程通常叫 realization 或 instantiation，也就是具现化。&lt;/p&gt;
+&lt;p&gt;&lt;img alt="聚合与具现化" src="./images/layered-simulation-roundtrip.svg"&gt;&lt;/p&gt;
+&lt;p&gt;最差的做法是临时随机生成两百个士兵。因为玩家会发现，上次见过的百夫长没了，军队明明挨过饿，所有人却都健康，账面上只有十个伤员，现场躺着的却是二十个。&lt;/p&gt;
+&lt;p&gt;仿真文献对这个问题的说法更直接：不同分辨率的模型连接时，需要专门的 resolution converter；否则两个模型交换的实体、属性、空间尺度和时间尺度都可能对不上。[6] 游戏里的“玩家进入地图”其实就是一次分辨率转换，只不过转换失败时不会收到论文里的误差报告，而是直接变成穿帮。&lt;/p&gt;
+&lt;p&gt;更可靠的做法是把状态分成三类：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;永不聚合的锚点&lt;/strong&gt;：玩家见过的人、历史人物、神器、仇恨、誓约、重伤等。它们数量少，但必须永久保留身份。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;可以聚合的守恒量&lt;/strong&gt;：人口、粮食、钱、兵器、伤亡。这些必须严格对账。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;可以重采样的分布&lt;/strong&gt;：普通士兵的年龄、熟练度、小伤、性格。具现化时从保存的分布中采样。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;如果具现化函数记作 &lt;span class="math"&gt;\(R\)&lt;/span&gt;，至少应满足往返一致性：&lt;/p&gt;
+&lt;div class="math"&gt;$$
+A(R(z)) \approx z
+$$&lt;/div&gt;
+&lt;p&gt;也就是说，把统计状态展开成个体，再聚合回去，不能变成另一支军队。&lt;/p&gt;
+&lt;p&gt;我还会给每个区域保存一个随机种子。这样相同的聚合状态在没有新事件时可以稳定地生成相同细节，避免玩家进出地图就“刷新”出不同的人。重要对象固定保存，普通对象用分层种子生成，算是存档容量和世界连续性之间的折中。&lt;/p&gt;
+&lt;h2&gt;一个能实际落地的更新方法&lt;/h2&gt;
+&lt;p&gt;分层不应该只有近、中、远三个固定圆圈。三国世界里，远处的赤壁之战可能比玩家身边一只鸡重要。模拟精度应该由“距离”和“因果重要性”共同决定。&lt;/p&gt;
+&lt;p&gt;可以给区域或实体定义一个重要度：&lt;/p&gt;
+&lt;div class="math"&gt;$$
+I = w_d \frac{1}{1+d} + w_r r + w_e e + w_h h
+$$&lt;/div&gt;
+&lt;p&gt;&lt;span class="math"&gt;\(d\)&lt;/span&gt; 是到玩家的距离，&lt;span class="math"&gt;\(r\)&lt;/span&gt; 是与玩家的关系强度，&lt;span class="math"&gt;\(e\)&lt;/span&gt; 是当前事件的重要程度，&lt;span class="math"&gt;\(h\)&lt;/span&gt; 是历史锚点权重。按 &lt;span class="math"&gt;\(I\)&lt;/span&gt; 决定更新方式：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;span class="math"&gt;\(I \ge \tau_2\)&lt;/span&gt;：角色层，每个 tick 或固定帧更新。&lt;/li&gt;
+&lt;li&gt;&lt;span class="math"&gt;\(\tau_1 \le I &amp;lt; \tau_2\)&lt;/span&gt;：群体层，每几秒或每个游戏时辰更新。&lt;/li&gt;
+&lt;li&gt;&lt;span class="math"&gt;\(I &amp;lt; \tau_1\)&lt;/span&gt;：世界层，每天或由事件触发更新。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;然后再加一个预算调度器。每帧只给模拟固定的时间 &lt;span class="math"&gt;\(B\)&lt;/span&gt;，所有待更新任务按重要度与逾期时间排队：&lt;/p&gt;
+&lt;div class="math"&gt;$$
+priority_i = I_i + \beta \frac{t_i-t_i^{last}}{\Delta t_i}
+$$&lt;/div&gt;
+&lt;p&gt;第二项可以防止低重要度对象永远饿死在队列里。近处对象更新得勤，远处对象更新得慢；战争、饥荒、玩家关系人物等会临时升级。&lt;/p&gt;
+&lt;p&gt;远处平静的县城也不需要每隔一天轮询一次。它可以计算下一件事情发生的时间，然后睡眠。比如某种事件的发生率是 &lt;span class="math"&gt;\(\lambda\)&lt;/span&gt;，下一次事件的等待时间可以从指数分布采样：&lt;/p&gt;
+&lt;div class="math"&gt;$$
+\Delta t = -\frac{\ln U}{\lambda}, \quad U \sim Uniform(0,1)
+$$&lt;/div&gt;
+&lt;p&gt;人口越多、治安越差，盗匪事件的 &lt;span class="math"&gt;\(\lambda\)&lt;/span&gt; 越高；粮食越少，逃亡和哗变的 &lt;span class="math"&gt;\(\lambda\)&lt;/span&gt; 越高。系统只在事件发生、外部输入到达或者玩家接近时唤醒这个区域。这比每 tick 问一遍“今天造反了吗”干净得多。&lt;/p&gt;
+&lt;p&gt;实现顺序上，我会这样做：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;先做一套唯一的世界账本，人口、物资和人物身份只有一个权威来源。&lt;/li&gt;
+&lt;li&gt;做角色层的精确模拟，先把一座小县城跑起来。&lt;/li&gt;
+&lt;li&gt;为每个子系统定义聚合量和守恒量，再写 &lt;span class="math"&gt;\(A\)&lt;/span&gt; 和 &lt;span class="math"&gt;\(R\)&lt;/span&gt;。&lt;/li&gt;
+&lt;li&gt;用角色层离线跑很多次，测出县城在不同输入下的产出、伤亡和事件分布。&lt;/li&gt;
+&lt;li&gt;写群体层规则，持续比较 &lt;span class="math"&gt;\(G(A(x))\)&lt;/span&gt; 与 &lt;span class="math"&gt;\(A(F(x))\)&lt;/span&gt;。&lt;/li&gt;
+&lt;li&gt;最后才做自动升降级和预算调度。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;这条顺序和 Tarn Adams 的思路其实很接近：不要先画一套巨大架构，先让小模型工作，再从运行结果里发现真正需要的抽象。[1]&lt;/p&gt;
+&lt;h2&gt;演义事件怎么放进模拟世界&lt;/h2&gt;
+&lt;p&gt;如果完全按历史时间表硬触发，模拟只是给剧本当背景。如果完全不管历史，刘备可能在黄巾之乱前就摔死，所谓三国背景很快就没了。&lt;/p&gt;
+&lt;p&gt;我的想法是把演义事件做成&lt;strong&gt;约束，不做成录像&lt;/strong&gt;。&lt;/p&gt;
+&lt;p&gt;“桃园结义”不是公元某日强制播放一段过场，而是一组条件：三个人在涿郡附近；彼此关系和政治目标达到阈值；黄巾威胁存在；他们还没有加入互斥势力。满足条件以后，系统提高这个事件的发生概率。如果条件被玩家破坏，就允许它失败、变体或者由别的人补上位置。&lt;/p&gt;
+&lt;p&gt;这样既能保留熟悉的历史引力，也允许个人行动留下痕迹。世界层负责维持大的时代压力，角色层负责决定事情具体怎样发生。&lt;/p&gt;
+&lt;p&gt;这也解释了为什么分层模拟适合三国题材。演义本来就是多尺度叙事：上一章还在帐中劝降一个人，下一章已经是“起兵五十万”。小说不会交代五十万人每天吃了什么，但关键人物的承诺、背叛和死亡必须连续。它天然知道哪些东西该聚合，哪些东西不能丢。&lt;/p&gt;
+&lt;h2&gt;LLM 应该放在哪一层&lt;/h2&gt;
+&lt;p&gt;LLM 很容易让人产生一个危险的想法：既然模型能编出合理的故事，能不能让它直接负责整个世界？&lt;/p&gt;
+&lt;p&gt;我认为不行。&lt;/p&gt;
+&lt;p&gt;LLM 擅长的是“下一段话像什么”，不是“仓库里到底还有多少粮”。它没有天然的守恒约束，也不擅长在几万次更新以后维持同一套精确状态。如果把世界状态直接交给它，迟早会出现死人复活、物资凭空增加、角色知道了不该知道的情报。这不是多写几句提示词就能彻底解决的问题。&lt;/p&gt;
+&lt;p&gt;但 LLM 放在确定性引擎上面，会非常有用。&lt;/p&gt;
+&lt;p&gt;斯坦福的 Generative Agents 实验给了一个正面的例子：25 个 Agent 通过观察、记忆检索、反思和计划，在一个类似《模拟人生》的小镇里形成了传播邀请、建立关系、共同赴约等社会行为。消融实验表明，记忆、反思和计划都对“看起来像一个可信的人”有贡献。[8] 这说明 LLM 确实可以补足传统游戏 AI 最弱的社会解释和自然语言层，但这个实验的规模也提醒我们，它离一整个三国世界还有很远。&lt;/p&gt;
+&lt;p&gt;另一边，研究者把 GPT-4 生成的对白放进《极乐迪斯科》的状态和对白结构里，请 28 名真正的玩家评价。人工对白在逻辑一致性上的偏好比例是 61%，GPT-4 是 28%；有 32% 的生成结果至少被一名玩家判断为接上下一句后不合逻辑。模型虽然很会改写同一句话，也容易顺手添加不符合当前状态的信息。[9] 针对《天外世界》构建的 KNUDGE 数据集，更把“忠实于任务结构、人物背景和世界设定”当成独立问题，而不是默认语言模型自己会做到。[10]&lt;/p&gt;
+&lt;p&gt;所以 LLM 接进游戏以后，最重要的不是给它更多形容词，而是给它更窄、更可靠的权限。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;第一，做叙事翻译器。&lt;/strong&gt; 引擎给出结构化事实：“建安五年八月，运输队在白马附近损失粮食 320 石，原因是渡口被毁。”LLM 可以把同一事实分别写成军报、酒馆传闻、士兵家书和敌军檄文。事实不由它决定，表达由它完成。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;第二，做认知过滤。&lt;/strong&gt; 每个角色只拿到自己知道的事实。县令看到的是户籍和税粮，斥候看到的是道路和敌军，百姓听到的是带噪声的传闻。LLM 根据角色身份组织语言，但不能越过知识库读取世界真值。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;第三，辅助开发粗模型。&lt;/strong&gt; 用细模拟生成轨迹，让机器学习模型拟合 &lt;span class="math"&gt;\(G\)&lt;/span&gt;，这类东西叫 learned surrogate model。它可以学习“一个县在给定人口、土地、治安和税率下，一个月以后大概会变成什么样”。不过输出仍要投影回合法状态：人口不能为负，粮食流入流出必须对账，历史锚点不能被覆盖。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;第四，做异常解释和测试。&lt;/strong&gt; 开发阶段可以让 LLM 阅读事件日志，归纳“这座城为什么饿死”，或者自动生成极端测试情景。但最终判定仍然由代码和断言完成。&lt;/p&gt;
+&lt;p&gt;如果用神经网络代替部分粗模拟，还会遇到长程漂移。单步预测误差只有 &lt;span class="math"&gt;\(\epsilon\)&lt;/span&gt;，反复自回归以后也可能被系统的敏感性放大：&lt;/p&gt;
+&lt;div class="math"&gt;$$
+\|e_k\| \lesssim \epsilon \sum_{i=0}^{k-1} L^i
+$$&lt;/div&gt;
+&lt;p&gt;&lt;span class="math"&gt;\(L\)&lt;/span&gt; 可以理解为状态转移对误差的放大程度。当 &lt;span class="math"&gt;\(L&amp;gt;1\)&lt;/span&gt;，误差会很快增长。所以训练时不能只看下一步，还要做多步 rollout；运行时要定期用精确模拟抽样校正；模型置信度低、遇到战争或罕见事件时，直接升级到显式规则。&lt;/p&gt;
+&lt;p&gt;最稳妥的分工可以概括为一句话：&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;代码保存事实，概率模型近似演化，LLM 负责把事实讲给人听。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h2&gt;最后&lt;/h2&gt;
+&lt;p&gt;《矮人要塞》证明了一件事：许多简单系统只要共享同一个世界，确实能长出开发者没有写过的故事。它的代价也同样明显：性能、调试、调参和漫长的开发时间。&lt;/p&gt;
+&lt;p&gt;对我想做的三国游戏，全量模拟不是目的。玩家相信这个世界，靠的也不是后台悄悄更新了多少对象，而是几件更具体的事：物资不会凭空出现，人物不会无缘无故失忆，远处发生的战争会留下伤亡和难民，昨天结识的人今天仍然是同一个人。&lt;/p&gt;
+&lt;p&gt;分层模拟牺牲的是不可见的个体轨迹，保住的是可以被追问的因果。&lt;/p&gt;
+&lt;p&gt;有一天，玩家从一个无名小卒成为统兵将军，回到多年前路过的县城，发现当年救过的小吏已经成了县令；他还能说出那场饥荒，记得玩家烧掉的粮仓，并且因此拒绝提供军粮。我觉得做到这里，这个世界就已经活了。&lt;/p&gt;
+&lt;p&gt;至于那个县城里其他三千人昨天早上吃了什么，真的可以不算。&lt;/p&gt;
+&lt;h2&gt;参考资料&lt;/h2&gt;
+&lt;ol&gt;
+&lt;li&gt;Tarn Adams, &lt;a href="https://www.gameaipro.com/GameAIPro2/GameAIPro2_Chapter41_Simulation_Principles_from_Dwarf_Fortress.pdf"&gt;Simulation Principles from Dwarf Fortress&lt;/a&gt;, &lt;em&gt;Game AI Pro 2&lt;/em&gt;, 2015.&lt;/li&gt;
+&lt;li&gt;Bay 12 Games, &lt;a href="https://www.bay12games.com/media/df_talk_combined_transcript.html"&gt;Dwarf Fortress Talk 合集&lt;/a&gt;，其中开发者讨论了寻路、搬运、物品、温度和天气的性能问题。&lt;/li&gt;
+&lt;li&gt;&lt;a href="https://store.steampowered.com/app/975370/Dwarf_Fortress/"&gt;Dwarf Fortress Steam 商店页&lt;/a&gt;，游戏对世界、人格、战斗、天气与地质模拟的官方说明。&lt;/li&gt;
+&lt;li&gt;James Ryan, Michael Mateas, Noah Wardrip-Fruin, &lt;a href="https://eis.ucsc.edu/papers/ryanEtAl_OpenDesignChallengesForInteractiveEmergentNarrative.pdf"&gt;Open Design Challenges for Interactive Emergent Narrative&lt;/a&gt;, 2015。文章讨论了涌现叙事中的模块化内容、组合表达、故事识别和故事支持。&lt;/li&gt;
+&lt;li&gt;PC Gamer, &lt;a href="https://www.pcgamer.com/gaming-industry/game-development/dwarf-fortress-creator-says-we-have-a-natural-lean-towards-human-made-stories-but-but-were-all-going-to-be-very-sorely-tested-in-the-coming-years-by-ai/"&gt;Dwarf Fortress creator says we have a natural lean towards human-made stories&lt;/a&gt;, 2026。包含 Tarn Adams 对模拟系统、叙事节拍和生成式 AI 的看法。&lt;/li&gt;
+&lt;li&gt;Mario Marin, Gene Lee, Jaeho Kim, &lt;a href="https://www.mdpi.com/2078-2489/11/10/469"&gt;Multiple Resolution Modeling: A Particular Case of Distributed Simulation&lt;/a&gt;, &lt;em&gt;Information&lt;/em&gt;, 2020。&lt;/li&gt;
+&lt;li&gt;Philippe Mathieu, Gildas Morvan, Sébastien Picault, &lt;a href="https://doi.org/10.1016/j.simpat.2017.12.015"&gt;Multi-level agent-based simulations: Four design patterns&lt;/a&gt;, &lt;em&gt;Simulation Modelling Practice and Theory&lt;/em&gt;, 2018。&lt;/li&gt;
+&lt;li&gt;Joon Sung Park 等, &lt;a href="https://arxiv.org/abs/2304.03442"&gt;Generative Agents: Interactive Simulacra of Human Behavior&lt;/a&gt;, UIST 2023。&lt;/li&gt;
+&lt;li&gt;Nader Akoury, Qian Yang, Mohit Iyyer, &lt;a href="https://aclanthology.org/2023.findings-emnlp.151/"&gt;A Framework for Exploring Player Perceptions of LLM-Generated Dialogue in Commercial Video Games&lt;/a&gt;, &lt;em&gt;Findings of EMNLP 2023&lt;/em&gt;。研究使用《极乐迪斯科》对白和 Lua 游戏状态评估生成文本。&lt;/li&gt;
+&lt;li&gt;Nathaniel Weir 等, &lt;a href="https://aclanthology.org/2024.emnlp-main.520/"&gt;Ontologically Faithful Generation of Non-Player Character Dialogues&lt;/a&gt;, EMNLP 2024。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;script type="text/javascript"&gt;if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+    var align = "left",
+        indent = "0em",
+        linebreak = "false";
+
+    if (true) {
+        align = (screen.width &lt; 768) ? "left" : align;
+        indent = (screen.width &lt; 768) ? "0em" : indent;
+        linebreak = (screen.width &lt; 768) ? 'true' : linebreak;
+    }
+
+    var mathjaxscript = document.createElement('script');
+    mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
+    mathjaxscript.type = 'text/javascript';
+    mathjaxscript.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.3/latest.js?config=TeX-AMS-MML_HTMLorMML';
+
+    var configscript = document.createElement('script');
+    configscript.type = 'text/x-mathjax-config';
+    configscript[(window.opera ? "innerHTML" : "text")] =
+        "MathJax.Hub.Config({" +
+        "    config: ['MMLorHTML.js']," +
+        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'none' } }," +
+        "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
+        "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
+        "    displayAlign: '"+ align +"'," +
+        "    displayIndent: '"+ indent +"'," +
+        "    showMathMenu: true," +
+        "    messageStyle: 'normal'," +
+        "    tex2jax: { " +
+        "        inlineMath: [ ['\\\\(','\\\\)'] ], " +
+        "        displayMath: [ ['$$','$$'] ]," +
+        "        processEscapes: true," +
+        "        preview: 'TeX'," +
+        "    }, " +
+        "    'HTML-CSS': { " +
+        "        availableFonts: ['STIX', 'TeX']," +
+        "        preferredFont: 'STIX'," +
+        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'inherit ! important'} }," +
+        "        linebreaks: { automatic: "+ linebreak +", width: '90% container' }," +
+        "    }, " +
+        "}); " +
+        "if ('default' !== 'default') {" +
+            "MathJax.Hub.Register.StartupHook('HTML-CSS Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax['HTML-CSS'].FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+            "MathJax.Hub.Register.StartupHook('SVG Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax.SVG.FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+        "}";
+
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(configscript);
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
+}
+&lt;/script&gt;</content><category term="gamedev"/><category term="游戏开发"/><category term="模拟"/><category term="矮人要塞"/><category term="LLM"/><category term="数学"/></entry><entry><title>现在做游戏，是不是必死无疑？</title><link href="https://funcman.me/is_making_a_game_doomed.html" rel="alternate"/><published>2026-09-23T18:46:00+08:00</published><updated>2026-09-23T18:46:00+08:00</updated><author><name>funcman</name></author><id>tag:funcman.me,2026-09-23:/is_making_a_game_doomed.html</id><summary type="html">&lt;p&gt;知乎热议"Steam日更51款游戏，做游戏是否必死无疑"。答主"夜神不说话"的回答提气但漏洞不少："必死无疑"与"有办法不死"自相矛盾，14亿人口乘出来的销量上限是画饼，"差游戏也有好销量"是幸存者偏差。真正值钱的是恐惧驱动与希望驱动的区分——靠日常签到留住玩家的设计，流失恰恰发生在恐惧消失那一刻。该问的不是"会不会死"，而是"凭什么不死"。&lt;/p&gt;</summary><content type="html">&lt;p&gt;&lt;a href="https://www.zhihu.com/question/1966538200408367269"&gt;知乎上有个问题&lt;/a&gt;：Steam 平均每天上线 51 款游戏，行业厮杀如同绞肉，现在做一款游戏，是不是大概率必死无疑？一位叫“夜神不说话”的一线设计师&lt;a href="https://www.zhihu.com/question/1966538200408367269/answer/1967215602893559310"&gt;写了篇长回答&lt;/a&gt;，核心意思是：别管每天上架多少款，任何时候做游戏都是大概率必死无疑的，你要想清楚的不是“要不要做”，而是“怎么不死”。&lt;/p&gt;
 &lt;p&gt;这话说得提气，但先把逻辑捋一捋。“必死无疑”和“有办法避免必死无疑”是不能同时成立的——&lt;strong&gt;既是必死，就没有办法；既有办法，就不是必死&lt;/strong&gt;。他真正想说的其实是“大概率失败，但不是定局”。一词之差，性质完全不同：前者是宿命论，后者是概率题。我理解这种修辞，泼冷水嘛，要把幻想浇透。但修辞不能当论证用，尤其不能自己跟自己打架。&lt;/p&gt;
 &lt;p&gt;回答里最值钱的一句话是：“&lt;strong&gt;喜欢某个类型的玩家，不是你的玩家。&lt;/strong&gt;”做过游戏的人都该把这句贴在显示器边上。喜欢《战地》的人没有义务玩你的“战地 like”，喜欢扫雷数独的人也不会因为你做得“更好”就改换门庭。玩家忠诚度和迁移成本是真实存在的。不管追热门还是钻冷门，&lt;strong&gt;把别人的玩家基数当成自己的潜在销量，都是立项时最常见的自欺&lt;/strong&gt;。这部分我完全同意。&lt;/p&gt;
 &lt;p&gt;但一到算账的地方就开始忽悠了。他说哪怕一千个人里只有一个人喜欢你的游戏，乘以十四亿人口，理论上限就是一百四十万份。这个算法毛病很大：十四亿人不是 Steam 用户，大部分连玩家都不是；而且“让一千个人里的那一个看见你”，&lt;strong&gt;恰恰是整个过程中最难、最贵的一环&lt;/strong&gt;，被他一句话免费赠送了。更要命的是，这和他自己后面说的“宣传必须从零开始，假定所有观众都不是你的玩家”直接打架——既然被看见这么难，那一百四十万就是画出来的饼。至于一万四千份就能财富自由的说法，扣掉平台抽成、税和开发成本，顶多算回本有余。数字论证这块，这篇回答不及格。&lt;/p&gt;
@@ -3297,7 +3518,7 @@ $$
 
 &lt;h3&gt;效果示例&lt;/h3&gt;
 &lt;p&gt;一个比较复杂的例子：&lt;/p&gt;
-&lt;div class="graphviz"&gt;&lt;img alt="finite_state_machine" src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+CjwhRE9DVFlQRSBzdmcgUFVCTElDICItLy9XM0MvL0RURCBTVkcgMS4xLy9FTiIKICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPgo8IS0tIEdlbmVyYXRlZCBieSBncmFwaHZpeiB2ZXJzaW9uIDE1LjEuMSAoMjAyNjA4MDUuMDkyMSkKIC0tPgo8IS0tIFRpdGxlOiBmaW5pdGVfc3RhdGVfbWFjaGluZSBQYWdlczogMSAtLT4KPHN2ZyB3aWR0aD0iNDQ2cHQiIGhlaWdodD0iMjIzcHQiCiB2aWV3Qm94PSIwLjAwIDAuMDAgNDQ2LjAwIDIyMy4wMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayI+CjxnIGlkPSJncmFwaDAiIGNsYXNzPSJncmFwaCIgdHJhbnNmb3JtPSJzY2FsZSgxIDEpIHJvdGF0ZSgwKSB0cmFuc2xhdGUoNCAyMTguNjQpIj4KPHRpdGxlPmZpbml0ZV9zdGF0ZV9tYWNoaW5lPC90aXRsZT4KPHBvbHlnb24gZmlsbD0id2hpdGUiIHN0cm9rZT0ibm9uZSIgcG9pbnRzPSItNCw0IC00LC0yMTguNjQgNDQxLjU3LC0yMTguNjQgNDQxLjU3LDQgLTQsNCIvPgo8ZyBpZD0iY2x1c3QxIiBjbGFzcz0iY2x1c3RlciI+Cjx0aXRsZT5jbHVzdGVyX2d1YXJkPC90aXRsZT4KPHBvbHlnb24gZmlsbD0ibm9uZSIgc3Ryb2tlPSJwdXJwbGUiIHN0cm9rZS1kYXNoYXJyYXk9IjUsMiIgcG9pbnRzPSIzMzcuNTcsLTggMzM3LjU3LC04MyA0MzcuNTcsLTgzIDQzNy41NywtOCAzMzcuNTcsLTgiLz4KPHRleHQgeG1sOnNwYWNlPSJwcmVzZXJ2ZSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgeD0iMzg3LjU3IiB5PSItNjkuNSIgZm9udC1mYW1pbHk9IlRpbWVzLHNlcmlmIiBmb250LXNpemU9IjEwLjAwIj7lrojmiqTmnaHku7bvvJrorqHmlbAgJmx0OyAzPC90ZXh0Pgo8L2c+CjwhLS0gUzMgLS0+CjxnIGlkPSJub2RlMSIgY2xhc3M9Im5vZGUiPgo8dGl0bGU+UzM8L3RpdGxlPgo8ZWxsaXBzZSBmaWxsPSJsaWdodHBpbmsiIHN0cm9rZT0icmVkIiBjeD0iMjQuNjQiIGN5PSItMTQ4IiByeD0iMjAuNjQiIHJ5PSIyMC42NCIvPgo8ZWxsaXBzZSBmaWxsPSJub25lIiBzdHJva2U9InJlZCIgY3g9IjI0LjY0IiBjeT0iLTE0OCIgcng9IjI0LjY0IiByeT0iMjQuNjQiLz4KPHRleHQgeG1sOnNwYWNlPSJwcmVzZXJ2ZSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgeD0iMjQuNjQiIHk9Ii0xNDIuOTUiIGZvbnQtZmFtaWx5PSJUaW1lcyxzZXJpZiIgZm9udC1zaXplPSIxNC4wMCI+UzM8L3RleHQ+CjwvZz4KPCEtLSBTMiAtLT4KPGcgaWQ9Im5vZGUzIiBjbGFzcz0ibm9kZSI+Cjx0aXRsZT5TMjwvdGl0bGU+CjxlbGxpcHNlIGZpbGw9ImxpZ2h0Z3JlZW4iIHN0cm9rZT0iZGFya2dyZWVuIiBjeD0iMTk3LjQzIiBjeT0iLTE0OCIgcng9IjIwLjY0IiByeT0iMjAuNjQiLz4KPHRleHQgeG1sOnNwYWNlPSJwcmVzZXJ2ZSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgeD0iMTk3LjQzIiB5PSItMTQyLjk1IiBmb250LWZhbWlseT0iVGltZXMsc2VyaWYiIGZvbnQtc2l6ZT0iMTQuMDAiPlMyPC90ZXh0Pgo8L2c+CjwhLS0gUzMmIzQ1OyZndDtTMiAtLT4KPGcgaWQ9ImVkZ2U0IiBjbGFzcz0iZWRnZSI+Cjx0aXRsZT5TMyYjNDU7Jmd0O1MyPC90aXRsZT4KPHBhdGggZmlsbD0ibm9uZSIgc3Ryb2tlPSJyZWQiIGQ9Ik00OS43NSwtMTQ4Qzc5Ljk3LC0xNDggMTMxLjgzLC0xNDggMTY1LjA5LC0xNDgiLz4KPHBvbHlnb24gZmlsbD0icmVkIiBzdHJva2U9InJlZCIgcG9pbnRzPSIxNjQuOTIsLTE1MS41IDE3NC45MiwtMTQ4IDE2NC45MiwtMTQ0LjUgMTY0LjkyLC0xNTEuNSIvPgo8dGV4dCB4bWw6c3BhY2U9InByZXNlcnZlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiB4PSIxMTMuMDQiIHk9Ii0xNTMuNSIgZm9udC1mYW1pbHk9IlRpbWVzLHNlcmlmIiBmb250LXNpemU9IjEwLjAwIj7mgaLlpI08L3RleHQ+CjwvZz4KPCEtLSBTMSAtLT4KPGcgaWQ9Im5vZGUyIiBjbGFzcz0ibm9kZSI+Cjx0aXRsZT5TMTwvdGl0bGU+CjxlbGxpcHNlIGZpbGw9ImxpZ2h0Ymx1ZSIgc3Ryb2tlPSJibHVlIiBjeD0iMzg3LjA3IiBjeT0iLTE5NCIgcng9IjIwLjY0IiByeT0iMjAuNjQiLz4KPHRleHQgeG1sOnNwYWNlPSJwcmVzZXJ2ZSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgeD0iMzg3LjA3IiB5PSItMTg4Ljk1IiBmb250LWZhbWlseT0iVGltZXMsc2VyaWYiIGZvbnQtc2l6ZT0iMTQuMDAiPlMxPC90ZXh0Pgo8L2c+CjwhLS0gUzEmIzQ1OyZndDtTMiAtLT4KPGcgaWQ9ImVkZ2UxIiBjbGFzcz0iZWRnZSI+Cjx0aXRsZT5TMSYjNDU7Jmd0O1MyPC90aXRsZT4KPHBhdGggZmlsbD0ibm9uZSIgc3Ryb2tlPSJibHVlIiBkPSJNMzcwLjA0LC0xODIuMUMzNTIuMDMsLTE2OS41NCAzMjEuNCwtMTUwLjUzIDI5MS41NywtMTQzIDI3MS4yMiwtMTM3Ljg2IDI0Ny42LC0xMzkuMjEgMjI5LjI0LC0xNDEuNzkiLz4KPHBvbHlnb24gZmlsbD0iYmx1ZSIgc3Ryb2tlPSJibHVlIiBwb2ludHM9IjIyOC44MywtMTM4LjMxIDIxOS41MiwtMTQzLjM3IDIyOS45NSwtMTQ1LjIyIDIyOC44MywtMTM4LjMxIi8+Cjx0ZXh0IHhtbDpzcGFjZT0icHJlc2VydmUiIHRleHQtYW5jaG9yPSJtaWRkbGUiIHg9IjI4MS44MiIgeT0iLTE0OC41IiBmb250LWZhbWlseT0iVGltZXMsc2VyaWYiIGZvbnQtc2l6ZT0iMTAuMDAiPuW8gOWnizwvdGV4dD4KPHRleHQgeG1sOnNwYWNlPSJwcmVzZXJ2ZSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgeD0iMzMwLjU0IiB5PSItMTMzLjQ5IiBmb250LWZhbWlseT0iVGltZXMsc2VyaWYiIGZvbnQtc2l6ZT0iMTAuMDAiPuWKqOS9nO+8mumHjee9ruiuoeaVsOWZqDwvdGV4dD4KPC9nPgo8IS0tIFMyJiM0NTsmZ3Q7UzMgLS0+CjxnIGlkPSJlZGdlMyIgY2xhc3M9ImVkZ2UiPgo8dGl0bGU+UzImIzQ1OyZndDtTMzwvdGl0bGU+CjxwYXRoIGZpbGw9Im5vbmUiIHN0cm9rZT0icmVkIiBkPSJNMTgxLjgzLC0xMzMuODFDMTY3Ljk0LC0xMjEuMzcgMTQ1Ljc5LC0xMDQuMTkgMTIyLjc5LC05NyA5Ni43MywtODguODYgNjkuNDEsLTEwNS44MSA1MC40LC0xMjIuMzIiLz4KPHBvbHlnb24gZmlsbD0icmVkIiBzdHJva2U9InJlZCIgcG9pbnRzPSI0OC4xMywtMTE5LjY1IDQzLjE0LC0xMjkgNTIuODcsLTEyNC44IDQ4LjEzLC0xMTkuNjUiLz4KPHRleHQgeG1sOnNwYWNlPSJwcmVzZXJ2ZSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgeD0iMTEzLjA0IiB5PSItMTAyLjUiIGZvbnQtZmFtaWx5PSJUaW1lcyxzZXJpZiIgZm9udC1zaXplPSIxMC4wMCI+6ZSZ6K+vPC90ZXh0Pgo8dGV4dCB4bWw6c3BhY2U9InByZXNlcnZlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiB4PSI4My4xNyIgeT0iLTg3LjMxIiBmb250LWZhbWlseT0iVGltZXMsc2VyaWYiIGZvbnQtc2l6ZT0iMTAuMDAiPuadoeS7tu+8muWinuWKoOiuoeaVsOWZqDwvdGV4dD4KPC9nPgo8IS0tIFMyJiM0NTsmZ3Q7UzEgLS0+CjxnIGlkPSJlZGdlMiIgY2xhc3M9ImVkZ2UiPgo8dGl0bGU+UzImIzQ1OyZndDtTMTwvdGl0bGU+CjxwYXRoIGZpbGw9Im5vbmUiIHN0cm9rZT0iZGFya2dyZWVuIiBkPSJNMjE3LjgsLTE1Mi43NUMyNTAuMzksLTE2MC43NCAzMTYuNDEsLTE3Ni45MiAzNTUuMzcsLTE4Ni40NyIvPgo8cG9seWdvbiBmaWxsPSJkYXJrZ3JlZW4iIHN0cm9rZT0iZGFya2dyZWVuIiBwb2ludHM9IjM1NC41MSwtMTg5Ljg3IDM2NS4wNSwtMTg4Ljg1IDM1Ni4xNywtMTgzLjA3IDM1NC41MSwtMTg5Ljg3Ii8+Cjx0ZXh0IHhtbDpzcGFjZT0icHJlc2VydmUiIHRleHQtYW5jaG9yPSJtaWRkbGUiIHg9IjI4MS44MiIgeT0iLTE3NS4xMiIgZm9udC1mYW1pbHk9IlRpbWVzLHNlcmlmIiBmb250LXNpemU9IjEwLjAwIj7lgZzmraI8L3RleHQ+CjwvZz4KPCEtLSBDMSAtLT4KPGcgaWQ9Im5vZGU0IiBjbGFzcz0ibm9kZSI+Cjx0aXRsZT5DMTwvdGl0bGU+Cjxwb2x5Z29uIGZpbGw9ImdvbGQiIHN0cm9rZT0iYmxhY2siIHBvaW50cz0iNDE1LjcsLTUyIDM1OC40NSwtNTIgMzU4LjQ1LC0xNiA0MTUuNywtMTYgNDE1LjcsLTUyIi8+Cjx0ZXh0IHhtbDpzcGFjZT0icHJlc2VydmUiIHRleHQtYW5jaG9yPSJtaWRkbGUiIHg9IjM4Ny4wNyIgeT0iLTMyLjQiIGZvbnQtZmFtaWx5PSJUaW1lcyxzZXJpZiIgZm9udC1zaXplPSI4LjAwIj7plJnor6/orqHmlbDlmag8L3RleHQ+CjwvZz4KPCEtLSBTMiYjNDU7Jmd0O0MxIC0tPgo8ZyBpZD0iZWRnZTUiIGNsYXNzPSJlZGdlIj4KPHRpdGxlPlMyJiM0NTsmZ3Q7QzE8L3RpdGxlPgo8cGF0aCBmaWxsPSJub25lIiBzdHJva2U9InB1cnBsZSIgc3Ryb2tlLWRhc2hhcnJheT0iMSw1IiBkPSJNMjE1Ljc1LC0xMzcuNDhDMjQ4LjMyLC0xMTcuNjkgMzE4Ljk1LC03NC43OCAzNTguMjYsLTUwLjkiLz4KPC9nPgo8L2c+Cjwvc3ZnPgo="&gt;&lt;/div&gt;
+&lt;div class="graphviz"&gt;&lt;img alt="finite_state_machine" src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+DQo8IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iDQogImh0dHA6Ly93d3cudzMub3JnL0dyYXBoaWNzL1NWRy8xLjEvRFREL3N2ZzExLmR0ZCI+DQo8IS0tIEdlbmVyYXRlZCBieSBncmFwaHZpeiB2ZXJzaW9uIDE2LjEuMCAoMjAyNjA5MDQuMDEzOSkNCiAtLT4NCjwhLS0gVGl0bGU6IGZpbml0ZV9zdGF0ZV9tYWNoaW5lIFBhZ2VzOiAxIC0tPg0KPHN2ZyB3aWR0aD0iNTU2cHQiIGhlaWdodD0iMjIxcHQiDQogdmlld0JveD0iMC4wMCAwLjAwIDU1Ni4wMCAyMjEuMDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiPg0KPGcgaWQ9ImdyYXBoMCIgY2xhc3M9ImdyYXBoIiB0cmFuc2Zvcm09InNjYWxlKDEgMSkgcm90YXRlKDApIHRyYW5zbGF0ZSg0IDIxNi42NCkiPg0KPHRpdGxlPmZpbml0ZV9zdGF0ZV9tYWNoaW5lPC90aXRsZT4NCjxwb2x5Z29uIGZpbGw9IndoaXRlIiBzdHJva2U9Im5vbmUiIHBvaW50cz0iLTQsNCAtNCwtMjE2LjY0IDU1MS45MSwtMjE2LjY0IDU1MS45MSw0IC00LDQiLz4NCjxnIGlkPSJjbHVzdDEiIGNsYXNzPSJjbHVzdGVyIj4NCjx0aXRsZT5jbHVzdGVyX2d1YXJkPC90aXRsZT4NCjxwb2x5Z29uIGZpbGw9Im5vbmUiIHN0cm9rZT0icHVycGxlIiBzdHJva2UtZGFzaGFycmF5PSI1LDIiIHBvaW50cz0iMzY5LjE2LC04IDM2OS4xNiwtODAgNTM5LjkxLC04MCA1MzkuOTEsLTggMzY5LjE2LC04Ii8+DQo8dGV4dCB4bWw6c3BhY2U9InByZXNlcnZlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiB4PSI0NTQuNTMiIHk9Ii02Ni41IiBmb250LWZhbWlseT0iVGltZXMgTmV3IFJvbWFuLHNlcmlmIiBmb250LXNpemU9IjEwLjAwIj7lrojmiqTmnaHku7bvvJrorqHmlbAgJmx0OyAzPC90ZXh0Pg0KPC9nPg0KPCEtLSBTMyAtLT4NCjxnIGlkPSJub2RlMSIgY2xhc3M9Im5vZGUiPg0KPHRpdGxlPlMzPC90aXRsZT4NCjxlbGxpcHNlIGZpbGw9ImxpZ2h0cGluayIgc3Ryb2tlPSJyZWQiIGN4PSIzMi4yMyIgY3k9Ii0xNDgiIHJ4PSIyMC42NCIgcnk9IjIwLjY0Ii8+DQo8ZWxsaXBzZSBmaWxsPSJub25lIiBzdHJva2U9InJlZCIgY3g9IjMyLjIzIiBjeT0iLTE0OCIgcng9IjI0LjY0IiByeT0iMjQuNjQiLz4NCjx0ZXh0IHhtbDpzcGFjZT0icHJlc2VydmUiIHRleHQtYW5jaG9yPSJtaWRkbGUiIHg9IjMyLjIzIiB5PSItMTQyLjk1IiBmb250LWZhbWlseT0iVGltZXMgTmV3IFJvbWFuLHNlcmlmIiBmb250LXNpemU9IjE0LjAwIj5TMzwvdGV4dD4NCjwvZz4NCjwhLS0gUzIgLS0+DQo8ZyBpZD0ibm9kZTMiIGNsYXNzPSJub2RlIj4NCjx0aXRsZT5TMjwvdGl0bGU+DQo8ZWxsaXBzZSBmaWxsPSJsaWdodGdyZWVuIiBzdHJva2U9ImRhcmtncmVlbiIgY3g9IjIxNy4wMSIgY3k9Ii0xNDgiIHJ4PSIyMC42NCIgcnk9IjIwLjY0Ii8+DQo8dGV4dCB4bWw6c3BhY2U9InByZXNlcnZlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiB4PSIyMTcuMDEiIHk9Ii0xNDIuOTUiIGZvbnQtZmFtaWx5PSJUaW1lcyBOZXcgUm9tYW4sc2VyaWYiIGZvbnQtc2l6ZT0iMTQuMDAiPlMyPC90ZXh0Pg0KPC9nPg0KPCEtLSBTMyYjNDU7Jmd0O1MyIC0tPg0KPGcgaWQ9ImVkZ2U0IiBjbGFzcz0iZWRnZSI+DQo8dGl0bGU+UzMmIzQ1OyZndDtTMjwvdGl0bGU+DQo8cGF0aCBmaWxsPSJub25lIiBzdHJva2U9InJlZCIgZD0iTTU3LjEyLC0xNDhDODkuODEsLTE0OCAxNDguNTQsLTE0OCAxODQuNzEsLTE0OCIvPg0KPHBvbHlnb24gZmlsbD0icmVkIiBzdHJva2U9InJlZCIgcG9pbnRzPSIxODQuNTMsLTE1MS41IDE5NC41MywtMTQ4IDE4NC41MywtMTQ0LjUgMTg0LjUzLC0xNTEuNSIvPg0KPHRleHQgeG1sOnNwYWNlPSJwcmVzZXJ2ZSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgeD0iMTI2LjYyIiB5PSItMTQ5Ljc1IiBmb250LWZhbWlseT0iVGltZXMgTmV3IFJvbWFuLHNlcmlmIiBmb250LXNpemU9IjEwLjAwIj7mgaLlpI08L3RleHQ+DQo8L2c+DQo8IS0tIFMxIC0tPg0KPGcgaWQ9Im5vZGUyIiBjbGFzcz0ibm9kZSI+DQo8dGl0bGU+UzE8L3RpdGxlPg0KPGVsbGlwc2UgZmlsbD0ibGlnaHRibHVlIiBzdHJva2U9ImJsdWUiIGN4PSI0NTQuNTMiIGN5PSItMTkyIiByeD0iMjAuNjQiIHJ5PSIyMC42NCIvPg0KPHRleHQgeG1sOnNwYWNlPSJwcmVzZXJ2ZSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgeD0iNDU0LjUzIiB5PSItMTg2Ljk1IiBmb250LWZhbWlseT0iVGltZXMgTmV3IFJvbWFuLHNlcmlmIiBmb250LXNpemU9IjE0LjAwIj5TMTwvdGV4dD4NCjwvZz4NCjwhLS0gUzEmIzQ1OyZndDtTMiAtLT4NCjxnIGlkPSJlZGdlMSIgY2xhc3M9ImVkZ2UiPg0KPHRpdGxlPlMxJiM0NTsmZ3Q7UzI8L3RpdGxlPg0KPHBhdGggZmlsbD0ibm9uZSIgc3Ryb2tlPSJibHVlIiBkPSJNNDM1LjQ4LC0xODMuNTZDNDEwLjc3LC0xNzIuNTIgMzY0Ljc0LC0xNTMuNzYgMzIzLjE2LC0xNDYuNzUgMzA5LjM1LC0xNDQuNDIgMzA1LjY2LC0xNDYuNjMgMjkxLjY2LC0xNDYuNzUgMjc3Ljc2LC0xNDYuODcgMjYyLjM4LC0xNDcuMTEgMjQ5LjI5LC0xNDcuMzUiLz4NCjxwb2x5Z29uIGZpbGw9ImJsdWUiIHN0cm9rZT0iYmx1ZSIgcG9pbnRzPSIyNDkuNDYsLTE0My44NSAyMzkuNTMsLTE0Ny41NCAyNDkuNiwtMTUwLjg1IDI0OS40NiwtMTQzLjg1Ii8+DQo8dGV4dCB4bWw6c3BhY2U9InByZXNlcnZlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiB4PSIzMDcuNDEiIHk9Ii0xNDguNSIgZm9udC1mYW1pbHk9IlRpbWVzIE5ldyBSb21hbixzZXJpZiIgZm9udC1zaXplPSIxMC4wMCI+5byA5aeLPC90ZXh0Pg0KPHRleHQgeG1sOnNwYWNlPSJwcmVzZXJ2ZSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgeD0iMzg2LjE1IiB5PSItMTM3LjI1IiBmb250LWZhbWlseT0iVGltZXMgTmV3IFJvbWFuLHNlcmlmIiBmb250LXNpemU9IjEwLjAwIj7liqjkvZzvvJrph43nva7orqHmlbDlmag8L3RleHQ+DQo8L2c+DQo8IS0tIFMyJiM0NTsmZ3Q7UzMgLS0+DQo8ZyBpZD0iZWRnZTMiIGNsYXNzPSJlZGdlIj4NCjx0aXRsZT5TMiYjNDU7Jmd0O1MzPC90aXRsZT4NCjxwYXRoIGZpbGw9Im5vbmUiIHN0cm9rZT0icmVkIiBkPSJNMjAwLjU3LC0xMzQuOTVDMTg2LjQ1LC0xMjMuOTQgMTY0LjQ2LC0xMDkgMTQyLjM3LC0xMDIuNzUgMTEzLjYxLC05NC42MiA4Mi4yNCwtMTEwLjQgNjAuNTQsLTEyNS41MSIvPg0KPHBvbHlnb24gZmlsbD0icmVkIiBzdHJva2U9InJlZCIgcG9pbnRzPSI1OC40OSwtMTIyLjY3IDUyLjUyLC0xMzEuNDEgNjIuNjQsLTEyOC4zMSA1OC40OSwtMTIyLjY3Ii8+DQo8dGV4dCB4bWw6c3BhY2U9InByZXNlcnZlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiB4PSIxMjYuNjIiIHk9Ii0xMDQuNSIgZm9udC1mYW1pbHk9IlRpbWVzIE5ldyBSb21hbixzZXJpZiIgZm9udC1zaXplPSIxMC4wMCI+6ZSZ6K+vPC90ZXh0Pg0KPHRleHQgeG1sOnNwYWNlPSJwcmVzZXJ2ZSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgeD0iNjMiIHk9Ii05MS4wNCIgZm9udC1mYW1pbHk9IlRpbWVzIE5ldyBSb21hbixzZXJpZiIgZm9udC1zaXplPSIxMC4wMCI+5p2h5Lu277ya5aKe5Yqg6K6h5pWw5ZmoPC90ZXh0Pg0KPC9nPg0KPCEtLSBTMiYjNDU7Jmd0O1MxIC0tPg0KPGcgaWQ9ImVkZ2UyIiBjbGFzcz0iZWRnZSI+DQo8dGl0bGU+UzImIzQ1OyZndDtTMTwvdGl0bGU+DQo8cGF0aCBmaWxsPSJub25lIiBzdHJva2U9ImRhcmtncmVlbiIgZD0iTTIzNy42OSwtMTUxLjY4QzI3OC42NCwtMTU5LjMzIDM3My4zMywtMTc3LjAyIDQyMi41NSwtMTg2LjIxIi8+DQo8cG9seWdvbiBmaWxsPSJkYXJrZ3JlZW4iIHN0cm9rZT0iZGFya2dyZWVuIiBwb2ludHM9IjQyMS43OSwtMTg5LjYzIDQzMi4yNiwtMTg4LjAzIDQyMy4wNywtMTgyLjc1IDQyMS43OSwtMTg5LjYzIi8+DQo8dGV4dCB4bWw6c3BhY2U9InByZXNlcnZlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiB4PSIzMDcuNDEiIHk9Ii0xNjkuMTIiIGZvbnQtZmFtaWx5PSJUaW1lcyBOZXcgUm9tYW4sc2VyaWYiIGZvbnQtc2l6ZT0iMTAuMDAiPuWBnOatojwvdGV4dD4NCjwvZz4NCjwhLS0gQzEgLS0+DQo8ZyBpZD0ibm9kZTQiIGNsYXNzPSJub2RlIj4NCjx0aXRsZT5DMTwvdGl0bGU+DQo8cG9seWdvbiBmaWxsPSJnb2xkIiBzdHJva2U9ImJsYWNrIiBwb2ludHM9IjUzMS45MSwtNTIgMzc3LjE2LC01MiAzNzcuMTYsLTE2IDUzMS45MSwtMTYgNTMxLjkxLC01MiIvPg0KPHRleHQgeG1sOnNwYWNlPSJwcmVzZXJ2ZSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgeD0iNDU0LjUzIiB5PSItMzAuMTUiIGZvbnQtZmFtaWx5PSJUaW1lcyBOZXcgUm9tYW4sc2VyaWYiIGZvbnQtc2l6ZT0iOC4wMCI+6ZSZ6K+v6K6h5pWw5ZmoPC90ZXh0Pg0KPC9nPg0KPCEtLSBTMiYjNDU7Jmd0O0MxIC0tPg0KPGcgaWQ9ImVkZ2U1IiBjbGFzcz0iZWRnZSI+DQo8dGl0bGU+UzImIzQ1OyZndDtDMTwvdGl0bGU+DQo8cGF0aCBmaWxsPSJub25lIiBzdHJva2U9InB1cnBsZSIgc3Ryb2tlLWRhc2hhcnJheT0iMSw1IiBkPSJNMjM2LjEsLTEzOS4yNEMyNzQuMzQsLTEyMC43NCAzNjQuMDgsLTc3LjMgNDE1LjUyLC01Mi40Ii8+DQo8L2c+DQo8L2c+DQo8L3N2Zz4NCg=="&gt;&lt;/div&gt;
 &lt;p&gt;看看效果，它的代码是：&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;一个比较复杂的例子：
 

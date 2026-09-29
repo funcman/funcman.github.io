@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="560" viewBox="0 0 960 560" role="img" aria-labelledby="title desc">
+    <title id="title">三层世界模拟结构</title>
+    <desc id="desc">从角色层到群体层再到世界层，模拟精度逐层降低，覆盖范围逐层扩大。</desc>
+    <defs>
+        <linearGradient id="background" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stop-color="#f7f2e8" />
+            <stop offset="1" stop-color="#e8dcc4" />
+        </linearGradient>
+        <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+            <feDropShadow dx="0" dy="5" stdDeviation="6" flood-color="#5b4630" flood-opacity="0.18" />
+        </filter>
+        <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+            <path d="M0,0 L0,6 L9,3 z" fill="#73563a" />
+        </marker>
+    </defs>
+    <rect width="960" height="560" rx="18" fill="url(#background)" />
+    <text x="480" y="48" text-anchor="middle" font-family="Microsoft YaHei, sans-serif" font-size="26" font-weight="700" fill="#2d241b">同一个世界，不同的计算分辨率</text>
+    <g filter="url(#shadow)">
+        <rect x="80" y="105" width="800" height="350" rx="28" fill="#e6cf9f" stroke="#9a713e" stroke-width="2" />
+        <rect x="205" y="155" width="550" height="250" rx="25" fill="#d8b36d" stroke="#815b2f" stroke-width="2" />
+        <rect x="330" y="205" width="300" height="150" rx="22" fill="#b85c38" stroke="#76351f" stroke-width="2" />
+    </g>
+    <g font-family="Microsoft YaHei, sans-serif" text-anchor="middle">
+        <text x="480" y="245" font-size="25" font-weight="700" fill="#ffffff">角色层</text>
+        <text x="480" y="280" font-size="17" fill="#fff7ee">人物 物品 伤势 关系 战术</text>
+        <text x="480" y="312" font-size="15" fill="#ffe7d7">高频更新 精确因果</text>
+
+        <text x="480" y="182" font-size="22" font-weight="700" fill="#3b2a19">群体层</text>
+        <text x="480" y="390" font-size="16" fill="#3b2a19">县城 军队 商队 人口分布 粮食 士气</text>
+
+        <text x="480" y="136" font-size="22" font-weight="700" fill="#3b2a19">世界层</text>
+        <text x="480" y="442" font-size="16" fill="#3b2a19">州郡 势力 税赋 迁徙 外交 战争趋势</text>
+    </g>
+    <path d="M180 495 L395 495" stroke="#73563a" stroke-width="3" marker-end="url(#arrow)" />
+    <text x="180" y="525" font-family="Microsoft YaHei, sans-serif" font-size="16" fill="#4b3825">覆盖范围扩大</text>
+    <path d="M780 495 L565 495" stroke="#73563a" stroke-width="3" marker-end="url(#arrow)" />
+    <text x="680" y="525" font-family="Microsoft YaHei, sans-serif" font-size="16" fill="#4b3825">模拟精度提高</text>
+</svg>
+
