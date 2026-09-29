@@ -80,8 +80,19 @@
 <p>《矮人要塞》经常被叫作“全量世界模拟”的代表。这个说法很形象，但是不够严谨。它并不是把全世界每个对象的全部逻辑，在每一个 tick 都重新算一遍。不同系统有自己的更新频率，地图之外的历史活动也会采用更抽象的处理。</p>
 <p><img alt="《矮人要塞》中的大型要塞" src="./images/dwarf-fortress-steam-gameplay.jpg"></p>
 <p><em>《矮人要塞》Steam 版游戏画面，截图来自<a href="https://store.steampowered.com/app/975370/Dwarf_Fortress/">官方商店页</a>。画面里同时存在人口、库存、房间、机械装置、水域和大量地形格。</em></p>
+<p>在 Steam 版以前，社区还给经典版做过不少第三方“图壳”。更准确地说，它们是读取游戏状态的可视化器，底层仍然是同一个《矮人要塞》。最有代表性的是 <strong>Stonesense</strong>：它作为 DFHack 插件打开一个只读窗口，把一层层的二维格子重新画成等距 3D，还可以同时显示多个 Z 层。[13]</p>
+<p><img alt="Stonesense 显示的 Roadtruss 要塞" src="./images/df-stonesense-roadtruss.jpg"></p>
+<p><em>Stonesense 显示的 Roadtruss 地上要塞。截图来自 <a href="https://docs.dfhack.org/en/stable/docs/tools/stonesense.html">DFHack 官方文档</a>。同一份模拟状态，换一个观察方式，就能看见原界面很难表达的高度和建筑结构。</em></p>
+<p>另一个项目 <strong>Armok Vision</strong> 更激进。它是单独运行的 Unity 程序，通过 DFHack 的 <code>remotefortressreader</code> 接口读取地图，再生成可以自由观察甚至用第一人称行走的 3D 场景。[14]</p>
+<p><img alt="Armok Vision 的 3D 森林视角" src="./images/df-armok-vision.jpg"></p>
+<p><em>Armok Vision 读取《矮人要塞》地图后的 3D 视角，右下角仍能看到经典版窗口。截图来自<a href="https://imgur.com/a/bPmeo">项目官方截图集</a>。</em></p>
+<p>这些工具有个很有意思的启发：<strong>模拟的分辨率和画面的分辨率不是一回事。</strong> ASCII、像素图块、等距 3D 和第一人称 3D 可以只是同一世界状态的不同投影。反过来，画面做成 3D 也不会自动增加世界深度。对我想做的三国游戏，这意味着角色视角、战场视角和州郡地图未必需要三套互相打架的世界，只需要三套针对不同尺度的观察与操作方式。</p>
 <p>它真正厉害的地方，是把玩家所在地点的许多系统都落到了可交互的对象上：矮人有性格、需求、技能、记忆和身体部位；物品有材质、品质和归属；液体按格流动；战斗会打中具体组织；世界生成时还会生成地形、气候、文明、战争和历史人物。</p>
 <p>这些东西不是一叠互相看不见的数值。它们能接起来。</p>
+<p>最出名的例子大概是 2015 年的“猫酒精中毒事件”。酒馆里的矮人会把酒洒在地上；原本用来传播血脚印的代码，让走过酒液的猫爪沾上了酒；猫又有舔毛清洁的行为，清洁时会吃下身上的污染物；酒精系统最后再按照体型计算醉酒反应。几套单独看都很合理的规则接在一起，结果就是猫喝醉、呕吐，早期版本里甚至会因酒精中毒死亡。真正的 bug 是清洁时把沾到的酒算成了整整一杯，对猫的体型来说剂量太大。[11][12]</p>
+<p><img alt="猫酒精中毒事件拟游戏截图" src="./images/dwarf-fortress-drunk-cats.png"></p>
+<p><em>根据猫酒精中毒事件重新绘制的拟游戏截图，并非《矮人要塞》官方画面。底部依次表现酒液洒落、猫爪沾酒、舔爪清洁和醉酒的因果链。</em></p>
+<p>这件事最妙的地方，是代码里根本没有一条“猫走进酒馆以后随机喝醉”的剧情规则。开发者只实现了液体沾染、足迹、清洁、摄入、体型和酒精反应，荒唐的结果由系统之间的接口自己推了出来。修复剂量错误以后，猫仍然可以因为舔到酒而醉，只是不再轻易暴毙。<strong>好的涌现不是凭空随机，而是意外结果能够沿着规则一层层倒推回去。</strong></p>
 <p>一个矮人失去亲人，情绪变坏，工作效率下降，和别人发生冲突，冲突又影响更多人。一次普通的袭击可以经过身体、物品、心理和社会关系几套系统，最后成为玩家记得很多年的故事。这类故事不是从剧本库里抽出来的，而是从状态和规则的连续作用里长出来的。</p>
 <p>Tarn Adams 在《Simulation Principles from Dwarf Fortress》里总结过四条原则：尽早让模型跑起来；把系统拆成基本元素和交互；不要制造没有意义的复杂度；尽量参照现实中的对应物。他还特别提醒，只模拟玩家能看到的层级，或者再往下一层。这个说法很重要，因为《矮人要塞》虽然复杂，开发者也没有把“变量越多”当成美德。[1]</p>
 <p>换句话说，《矮人要塞》的关键不是“每个东西都算”，而是：<strong>被算的东西有统一的状态，并且不同系统愿意互相负责。</strong></p>
@@ -229,6 +240,10 @@ $$</div>
 <li>Joon Sung Park 等, <a href="https://arxiv.org/abs/2304.03442">Generative Agents: Interactive Simulacra of Human Behavior</a>, UIST 2023。</li>
 <li>Nader Akoury, Qian Yang, Mohit Iyyer, <a href="https://aclanthology.org/2023.findings-emnlp.151/">A Framework for Exploring Player Perceptions of LLM-Generated Dialogue in Commercial Video Games</a>, <em>Findings of EMNLP 2023</em>。研究使用《极乐迪斯科》对白和 Lua 游戏状态评估生成文本。</li>
 <li>Nathaniel Weir 等, <a href="https://aclanthology.org/2024.emnlp-main.520/">Ontologically Faithful Generation of Non-Player Character Dialogues</a>, EMNLP 2024。</li>
+<li>PC Gamer, <a href="https://www.pcgamer.com/how-cats-get-drunk-in-dwarf-fortress-and-why-its-creators-havent-figured-out-time-travel-yet/">How cats get drunk in Dwarf Fortress, and why its creators haven't figured out time travel yet</a>, 2016。Tarn Adams 解释了酒液、足迹、清洁、摄入剂量和体型计算形成的因果链。</li>
+<li>Dwarf Fortress Bug Tracker, <a href="https://dwarffortressbugtracker.com/view.php?id=9270">0009270 Tavern Keepers Serve Drinks to Animals potentially causing inebriation and death</a>, 2015。原始问题记录及对猫自我清洁机制的排查。</li>
+<li>DFHack Documentation, <a href="https://docs.dfhack.org/en/stable/docs/tools/stonesense.html">Stonesense</a>。该工具是具有游戏状态只读访问权的等距 3D 可视化器。</li>
+<li>RosaryMala, <a href="https://github.com/RosaryMala/armok-vision">Armok Vision</a>。基于 Unity、DFHack 与 protobuf 远程接口的实时 3D 可视化器。</li>
 </ol>
 <script type="text/javascript">if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
     var align = "left",
