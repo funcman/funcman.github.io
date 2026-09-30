@@ -43,6 +43,6 @@
     <text x="328" y="210" text-anchor="middle" font-family="Microsoft YaHei, sans-serif" font-size="14" fill="#59442f">A</text>
     <path d="M608 270 L643 270" stroke="#68513a" stroke-width="3" marker-end="url(#arrow)" />
     <text x="626" y="255" text-anchor="middle" font-family="Microsoft YaHei, sans-serif" font-size="14" fill="#59442f">R</text>
-    <path d="M780 420 C780 462 180 462 180 420" fill="none" stroke="#9c7650" stroke-width="2.5" stroke-dasharray="7 6" marker-end="url(#arrow)" />
+    <path d="M780 420 C780 445 660 450 500 450 C370 450 240 450 180 450" fill="none" stroke="#9c7650" stroke-width="2.5" stroke-dasharray="7 6" marker-end="url(#arrow)" />
     <text x="480" y="477" text-anchor="middle" font-family="Microsoft YaHei, sans-serif" font-size="15" fill="#59442f">往返检查：展开再聚合，账不能变</text>
 </svg>
