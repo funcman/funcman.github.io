@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="zh_cn" prefix="og: http://ogp.me/ns#">
+	<head>
+		<link href="http://gmpg.org/xfn/11" rel="profile">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta http-equiv="content-type" content="text/html; charset=utf-8">
+
+		<!-- Metadata -->
+	<meta name="description" content="一个游戏程序员。曾经参与开发过<a href='https://www.bing.com/search?q=%E4%BB%99%E4%BE%A3%E5%A5%87%E7%BC%983'>仙侣奇缘3</a>、<a href='http://sh.70yx.com'>水浒传</a>、<a href='https://itunes.apple.com/cn/app/id938688461'>小米运动</a>、<a href='https://itunes.apple.com/cn/app/id1034182617'>米动</a>和<a href='https://www.taptap.com/app/143658'>无限激战</a>">
+	<meta property="og:description" content="一个游戏程序员。曾经参与开发过<a href='https://www.bing.com/search?q=%E4%BB%99%E4%BE%A3%E5%A5%87%E7%BC%983'>仙侣奇缘3</a>、<a href='http://sh.70yx.com'>水浒传</a>、<a href='https://itunes.apple.com/cn/app/id938688461'>小米运动</a>、<a href='https://itunes.apple.com/cn/app/id1034182617'>米动</a>和<a href='https://www.taptap.com/app/143658'>无限激战</a>">
+	<meta property="og:title" content="从数学量词说起" />
+	<meta property="og:type" content="article" />
+	<meta property="og:url" content="https://funcman.me/about_mathematical_quantifiers.html" />
+		<meta property="og:image" content="https://funcman.me/images/avatar.png" />
+
+		<!-- Enable responsiveness on mobile devices-->
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+
+		<title>funcman's blog</title>
+
+		<!-- CSS -->
+		<link href="//fonts.googleapis.com/" rel="dns-prefetch">
+		<link href="//fonts.googleapis.com/css?family=Droid+Serif:400,700,400italic|Abril+Fatface|PT+Sans:400,400italic,700&amp;subset=latin,latin-ext" rel="stylesheet">
+
+		<link rel="stylesheet" href="https://funcman.me/theme/css/poole.css" />
+		<link rel="stylesheet" href="https://funcman.me/theme/css/hyde.css" />
+		<link rel="stylesheet" href="https://funcman.me/theme/css/syntax.css" />
+			<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css" crossorigin="anonymous">
+
+		<!-- Feeds -->
+<link href="https://funcman.me/rss.xml" type="application/atom+xml" rel="alternate" title="funcman's blog Full Atom Feed" />
+
+		<!-- Analytics -->
+	</head>
+
+	<body class="theme-base-0e">
+<div class="sidebar">
+	<div class="container sidebar-sticky">
+		<div class="sidebar-about">
+
+			<h1>
+				<a href="/">
+					<img class="profile-picture" src="https://funcman.me/images/avatar.png">
+					funcman's blog
+				</a>
+			</h1>
+			<p class="lead"></p>
+			<p class="lead">一个游戏程序员。曾经参与开发过<a href='https://www.bing.com/search?q=%E4%BB%99%E4%BE%A3%E5%A5%87%E7%BC%983'>仙侣奇缘3</a>、<a href='http://sh.70yx.com'>水浒传</a>、<a href='https://itunes.apple.com/cn/app/id938688461'>小米运动</a>、<a href='https://itunes.apple.com/cn/app/id1034182617'>米动</a>和<a href='https://www.taptap.com/app/143658'>无限激战</a> </p>
+			<p></p>
+		</div>
+		<nav class="sidebar-social">
+					<a class="sidebar-social-item" href="mailto:hyq1986@gmail.com">
+						<i class="fa-solid fa-envelope"></i>
+					</a>
+					<a class="sidebar-social-item" href="https://twitter.com/funcman" target="_blank">
+						<i class="fa-brands fa-twitter"></i>
+					</a>
+					<a class="sidebar-social-item" href="https://github.com/funcman" target="_blank">
+						<i class="fa-brands fa-github"></i>
+					</a>
+					<a class="sidebar-social-item" href="https://funcman.itch.io" target="_blank">
+						<i class="fa-brands fa-itch-io"></i>
+					</a>
+			<a class="sidebar-social-item" href="https://funcman.me/rss.xml">
+				<i class="fa-solid fa-rss"></i>
+			</a>
+		</nav>
+	</div>
+</div>		<div class="content container">
+<div class="post">
+	<h1 class="post-title">从数学量词说起</h1>
+	<span class="post-date">2026年10月06日 星期二</span>
+	<p>本学渣最近还是在学数学。之前已经发现，看懂符号对数学学习有多重要，现在又意识到，理解数学语言这件事也绕不过去。</p>
+<p>比如，一个式子里的符号都认识，未必就知道整个式子在说什么。这有点像背单词，单词挨个查过了，句子还是读不通。数学也有这样的情况，只不过它的句子可能长得不像句子。</p>
+<p>这次让我注意到这个问题的，是微积分里的定义。定义到底要不要背，我觉得是要的，但是背之前，至少得弄清楚它说了什么。否则把“对任意……存在……”背得滚瓜烂熟，换个地方再看到，还是不知道该怎么办。</p>
+<h2>任意和存在</h2>
+<p>学极限时，会遇到所谓的 <span class="math">\(\varepsilon\)</span>-<span class="math">\(\delta\)</span> 语言。比如，函数在 <span class="math">\(x\)</span> 趋近于 <span class="math">\(x_0\)</span> 时，以 <span class="math">\(A\)</span> 为极限，定义里会说：</p>
+<blockquote>
+<p>对任意 <span class="math">\(\varepsilon&gt;0\)</span>，存在 <span class="math">\(\delta&gt;0\)</span>，使得对定义域内的所有 <span class="math">\(x\)</span>，只要 <span class="math">\(0&lt;|x-x_0|&lt;\delta\)</span>，就有 <span class="math">\(|f(x)-A|&lt;\varepsilon\)</span>。</p>
+</blockquote>
+<p>先不急着看那些不等式，只看开头的“任意”和“存在”。这两个词平时也用，似乎没什么特别。但在数学里，它们有明确的名字，叫量词。</p>
+<p>这里的量词，和语文课上“一本书”“三只猫”里的“本”“只”不是一回事。数学量词更接近日常说的“所有”“至少有一个”。</p>
+<ul>
+<li><span class="math">\(\forall\)</span> 是全称量词，读作“对任意”或“对所有”。</li>
+</ul>
+<blockquote>
+<p>它是倒过来的大写字母 A，由逻辑学家根岑引入，可以联系英文 all（所有）来记。</p>
+</blockquote>
+<ul>
+<li><span class="math">\(\exists\)</span> 是存在量词，读作“存在至少一个”。</li>
+</ul>
+<blockquote>
+<p>它是反写的大写字母 E，源于皮亚诺表示存在的记号，可以联系英文 exists（存在）来记。</p>
+</blockquote>
+<p>“任意”要求讨论范围里的每个对象都满足条件，不能遗漏。“存在”则只要求至少有一个，也没有说只能有一个。</p>
+<p>这样看，两个符号本身倒是不难。难的是，它们放在一起之后，顺序也有意义。</p>
+<h2>每个人喜欢的书</h2>
+<p>“每个人都有一本喜欢的书”和“有一本书，所有人都喜欢”，显然是两回事。</p>
+<p>前一句里，你可以喜欢小说，我可以喜欢数学书，大家各有各的。后一句就麻烦了，要找到一本大家都喜欢的书。</p>
+<p>为了把这件事写成数学表达式，先约定 <span class="math">\(x\)</span> 表示我们讨论的人，<span class="math">\(y\)</span> 表示我们讨论的书，再用 <span class="math">\(P(x,y)\)</span> 表示“人 <span class="math">\(x\)</span> 喜欢书 <span class="math">\(y\)</span>”。</p>
+<p>第一句话就可以写成：</p>
+<div class="math">$$
+\forall x\,\exists y\,P(x,y)
+$$</div>
+<p>第二句话则是：</p>
+<div class="math">$$
+\exists y\,\forall x\,P(x,y)
+$$</div>
+<p>看起来只是换了两个符号的位置，要求却变了。</p>
+<p>第一种写法，先任意选一个人，再为这个人找一本喜欢的书。选出来的书，可以随着人的不同而变化。</p>
+<p>第二种写法，先找一本书，再检查是不是所有人都喜欢它。书已经选定了，不能看到有人不喜欢，就临时换成另一本。</p>
+<p>所以，量词顺序还规定了一件事：后面的选择，可以依赖前面的什么对象。这个区别，在日常说话时可能靠语境就过去了，数学里却需要写清楚。</p>
+<h2>这个 P 是函数么</h2>
+<p>看到 <span class="math">\(P(x,y)\)</span>，我又有一个疑问：它长得和函数差不多，是函数么？</p>
+<p>这里一般把它叫作“谓词”。这个名字有点陌生，但放到刚才的例子里，就是一个真假取决于 <span class="math">\(x\)</span> 和 <span class="math">\(y\)</span> 的判断。</p>
+<p>“人 <span class="math">\(x\)</span> 喜欢书 <span class="math">\(y\)</span>”，在人和书还没有指定的时候，我们不知道它是真是假。换成具体的人和书，就成了一个可以判断真假的命题。</p>
+<p>也可以把谓词理解成返回真假的函数：</p>
+<div class="math">$$
+P:\text{人集合}\times\text{书集合}\to\{\text{真},\text{假}\}
+$$</div>
+<p>这里的 <span class="math">\(\times\)</span> 表示笛卡尔积，也就是把一个人和一本书配成一对；箭头表示把这对对象映射到真或假。这样一说，对程序员而言就容易理解了，有点像一个返回布尔值的函数。</p>
+<p>当然，数学里把它写出来，并不意味着我们就有一个程序，能自动判断所有人到底喜欢哪本书。它首先是在表达一个条件。</p>
+<p>谓词负责说“满足什么条件”，量词负责说“哪些对象要满足这个条件”。两者组合起来，就能把前面那两句话的区别写清楚。</p>
+<h2>回头再看极限</h2>
+<p>有了这个例子，再看“对任意 <span class="math">\(\varepsilon&gt;0\)</span>，存在 <span class="math">\(\delta&gt;0\)</span>”，就好理解一些。</p>
+<p><span class="math">\(\varepsilon\)</span> 是对函数值误差的要求，<span class="math">\(\delta\)</span> 是对自变量距离的限制。先提出误差要求，再根据这个要求，找到合适的距离限制。</p>
+<p>以 <span class="math">\(f(x)=2x\)</span> 为例，当 <span class="math">\(x\)</span> 趋近于 <span class="math">\(1\)</span> 时，函数值趋近于 <span class="math">\(2\)</span>。因为：</p>
+<div class="math">$$
+|2x-2|=2|x-1|
+$$</div>
+<p>所以，无论给出多小的 <span class="math">\(\varepsilon&gt;0\)</span>，取 <span class="math">\(\delta=\varepsilon/2\)</span> 就行。只要 <span class="math">\(0&lt;|x-1|&lt;\delta\)</span>，就能保证 <span class="math">\(|2x-2|&lt;\varepsilon\)</span>。</p>
+<p>这里的 <span class="math">\(\delta\)</span> 可以随着 <span class="math">\(\varepsilon\)</span> 变化。误差要求越严格，距离限制也可以越严格。但 <span class="math">\(\delta\)</span> 选定之后，范围内的所有 <span class="math">\(x\)</span> 都必须满足要求，不能只挑一个表现不错的 <span class="math">\(x\)</span> 交差。</p>
+<p>原来，“无限接近”可以这样表达：无论你把误差标准定得多严格，我都能给出一个范围，保证范围内的函数值满足要求。</p>
+<p>连续和一致连续，也有类似的区别。函数在一个集合上连续，允许针对不同的点，分别找合适的 <span class="math">\(\delta\)</span>；一致连续则要求，给定 <span class="math">\(\varepsilon\)</span> 之后，能找到一个 <span class="math">\(\delta\)</span>，对集合内的任意两点都管用。</p>
+<p>一个允许距离限制随位置变化，一个要求整个集合共用同一个距离限制。看名字只多了“一致”两个字，实际要求却强了不少。</p>
+<h2>这样的语言有什么用</h2>
+<p>到这里，我多少理解了，为什么数学要把普通的话写得这么严格。</p>
+<p>首先，它能把直觉变成可以检查的定义。“越来越接近”容易产生印象，但印象不够明确。写成量词和条件之后，才知道到底要满足什么。</p>
+<p>然后，它还告诉我们证明该怎么做。要证明所有对象都满足一个条件，就不能只检查几个例子；要证明至少存在一个，就可以找一个满足条件的对象，或者证明它必然存在。</p>
+<p>反过来，要推翻“所有对象都满足”，找到一个反例就够了。比如“所有素数都是奇数”，一个 <span class="math">\(2\)</span> 就能把它推翻，不需要把其他素数都查一遍。</p>
+<p>连否定一句话，也得看量词。“并非所有人都喜欢这本书”，只说明至少有一个人不喜欢；“没有人喜欢这本书”，才说明所有人都不喜欢。这两句话不能混用。</p>
+<p>这样的区分，也不只用于数学。比如，“每个用户都能访问至少一台服务器”，并不要求所有用户访问同一台。如果要说这个要求没有满足，那就是“存在一个用户，他无法访问任何服务器”。描述程序的条件、检查需求的时候，也会遇到这些问题。</p>
+<p>我以前看定义，容易把注意力全放在运算符和不等式上。现在觉得，还得留意谁先给定、谁后选择，以及一个条件到底要对多少对象成立。不然计算部分看懂了，整句话还是可能读错。</p>
+<h2>还有哪些数学语言</h2>
+<p>量词和谓词属于逻辑语言。再往外看，还有集合语言，用 <span class="math">\(x\in A\)</span> 表达归属，用 <span class="math">\(A\subseteq B\)</span> 表达包含；函数语言，用 <span class="math">\(f:X\to Y\)</span> 表达对应关系；以及代数、几何、概率等领域常见的表达方式。</p>
+<p>还有递归这样的定义方式，用已经定义的对象继续定义后面的对象。比如 <span class="math">\(a_0=1\)</span>，<span class="math">\(a_{n+1}=2a_n\)</span>，就是从 <span class="math">\(1\)</span> 开始，每次翻倍。</p>
+<p>这些说法也不是互相隔开的。一句 <span class="math">\(\forall x\in\mathbb R,\ f(x)\geq0\)</span>，就同时用到了量词、集合、函数和不等式。</p>
+<p>目前我还没有能力把这些东西都弄明白，不过接下来再遇到定义，至少可以多问一句：这句话到底在要求什么？至于背下来，等读通了再背，应该会容易一点。</p>
+<script type="text/javascript">if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+    var align = "left",
+        indent = "0em",
+        linebreak = "false";
+
+    if (true) {
+        align = (screen.width < 768) ? "left" : align;
+        indent = (screen.width < 768) ? "0em" : indent;
+        linebreak = (screen.width < 768) ? 'true' : linebreak;
+    }
+
+    var mathjaxscript = document.createElement('script');
+    mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
+    mathjaxscript.type = 'text/javascript';
+    mathjaxscript.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.3/latest.js?config=TeX-AMS-MML_HTMLorMML';
+
+    var configscript = document.createElement('script');
+    configscript.type = 'text/x-mathjax-config';
+    configscript[(window.opera ? "innerHTML" : "text")] =
+        "MathJax.Hub.Config({" +
+        "    config: ['MMLorHTML.js']," +
+        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'none' } }," +
+        "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
+        "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
+        "    displayAlign: '"+ align +"'," +
+        "    displayIndent: '"+ indent +"'," +
+        "    showMathMenu: true," +
+        "    messageStyle: 'normal'," +
+        "    tex2jax: { " +
+        "        inlineMath: [ ['\\\\(','\\\\)'] ], " +
+        "        displayMath: [ ['$$','$$'] ]," +
+        "        processEscapes: true," +
+        "        preview: 'TeX'," +
+        "    }, " +
+        "    'HTML-CSS': { " +
+        "        availableFonts: ['STIX', 'TeX']," +
+        "        preferredFont: 'STIX'," +
+        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'inherit ! important'} }," +
+        "        linebreaks: { automatic: "+ linebreak +", width: '90% container' }," +
+        "    }, " +
+        "}); " +
+        "if ('default' !== 'default') {" +
+            "MathJax.Hub.Register.StartupHook('HTML-CSS Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax['HTML-CSS'].FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+            "MathJax.Hub.Register.StartupHook('SVG Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax.SVG.FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+        "}";
+
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(configscript);
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
+}
+</script>
+</div>
+		</div>
+	</body>
+</html>
